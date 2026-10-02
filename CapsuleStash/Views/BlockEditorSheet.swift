@@ -276,7 +276,7 @@ struct BlockEditorSheet: View {
 
     private func field<Content: View>(_ label: String, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(label)
+            LText(key: label)
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Theme.muted)
             content()

@@ -921,6 +921,45 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertFalse(show, "Dock 아이콘 기본값은 숨김(아니오)")
     }
 
+    // MARK: - 표시 언어 (T-25 한·영)
+
+    func testAppLanguageResolve() {
+        XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "ko"), "ko", "기본은 시스템 언어")
+        XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "en"), "en")
+        XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "ja"), "en", "미지원 시스템 언어는 영어")
+        XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: nil), "en")
+        XCTAssertEqual(AppLanguage.resolve(saved: "ko", systemCode: "en"), "ko", "명시 선택 우선")
+        XCTAssertEqual(AppLanguage.resolve(saved: "en", systemCode: "ko"), "en")
+        XCTAssertEqual(AppLanguage.resolve(saved: "system", systemCode: "ko"), "ko")
+        XCTAssertEqual(AppLanguage.resolve(saved: "system", systemCode: "fr"), "en")
+    }
+
+    /// 카탈로그 키 정합성. 키 형식이 틀리면 원문(한국어)으로 떨어진다.
+    /// `String(localized:locale:)` 은 Text와 같은 경로로 키를 뽑아 검증한다.
+    func testCatalogStaticStrings() {
+        let en = Locale(identifier: "en")
+        XCTAssertEqual(String(localized: "검색", locale: en), "Search")
+        XCTAssertEqual(String(localized: "취소", locale: en), "Cancel")
+        XCTAssertEqual(String(localized: "계정 정보", locale: en), "Account Info")
+        XCTAssertEqual(String(localized: "언어", locale: en), "Language")
+        XCTAssertEqual(String(localized: "검색: docker, github, swift…", locale: en), "Search: docker, github, swift…")
+        XCTAssertEqual(String(localized: "⌘1 ID ⌘2 PW", locale: en), "⌘1 ID ⌘2 Secret")
+    }
+
+    func testCatalogFormatKeys() {
+        let en = Locale(identifier: "en")
+        XCTAssertEqual(String(localized: "블록 \(3)개", locale: en), "3 blocks")
+        XCTAssertEqual(String(localized: "코드 \(1)개", locale: en), "1 code blocks")
+        XCTAssertEqual(String(localized: "이미지 \(2)개", locale: en), "2 images")
+        XCTAssertEqual(String(localized: "수정 \("5분 전")", locale: en), "Modified 5분 전")
+        XCTAssertEqual(String(localized: "저장 \("2026-10-03")", locale: en), "Saved 2026-10-03")
+        XCTAssertEqual(String(localized: "포함된 블록 \(2)개가 모두 사라집니다.", locale: en), "All 2 blocks will be deleted.")
+        XCTAssertEqual(String(localized: "포함된 Project \(2)개가 모두 사라집니다.", locale: en), "All 2 projects will be deleted.")
+        XCTAssertEqual(String(localized: "'\("W")' 삭제", locale: en), "Delete 'W'")
+        XCTAssertEqual(String(localized: "\("W")에 새 Project", locale: en), "New Project in W")
+        XCTAssertEqual(String(localized: "\("Secret 2") 복사", locale: en), "Copy Secret 2")
+    }
+
     // MARK: - 첨부 (이미지/파일)
 
     @MainActor

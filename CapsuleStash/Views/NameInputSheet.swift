@@ -27,17 +27,17 @@ struct NameInputSheet: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(prompt.title)
+            LText(key: prompt.title)
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Theme.ink)
 
             if !prompt.subtitle.isEmpty {
-                Text(prompt.subtitle)
+                LText(key: prompt.subtitle)
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.muted)
             }
 
-            TextField(prompt.placeholder, text: $text)
+            TextField(LocalizedStringKey(prompt.placeholder), text: $text)
                 .textFieldStyle(.roundedBorder)
                 .font(.system(size: 14))
                 .foregroundStyle(Theme.ink)

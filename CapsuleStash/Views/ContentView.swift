@@ -42,7 +42,7 @@ struct ContentView: View {
                     withAnimation(.easeOut(duration: 0.18)) { appState.isSidebarVisible.toggle() }
                 } label: {
                     Label(
-                        appState.isSidebarVisible ? "사이드바 숨기기" : "사이드바 보이기",
+                        appState.isSidebarVisible ? LocalizedStringKey("사이드바 숨기기") : LocalizedStringKey("사이드바 보이기"),
                         systemImage: "sidebar.left"
                     )
                 }

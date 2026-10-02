@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("vaultBiometric") private var vaultBiometric = true
     @AppStorage("vaultLockOnQuit") private var vaultLockOnQuit = true
     @AppStorage("showDockIcon") private var showDockIcon = false
+    @AppStorage("appLanguage") private var appLanguage = "system"
     @AppStorage("appearanceMode") private var appearanceMode = Theme.AppearanceMode.system.rawValue
 
     @State private var launchAtLogin = false
@@ -58,6 +59,16 @@ struct SettingsView: View {
                 .pickerStyle(.radioGroup)
                 .help("앱 전체 밝기를 바꾼다. 즉시 적용된다")
                 .onChange(of: appearanceMode) { _, _ in Theme.applyAppearance() }
+            }
+
+            Section("언어") {
+                Picker("언어", selection: $appLanguage) {
+                    Text("시스템 설정 따름").tag("system")
+                    Text("한국어").tag("ko")
+                    Text("English").tag("en")
+                }
+                .pickerStyle(.radioGroup)
+                .help("앱 표시 언어를 바꾼다. 즉시 적용된다")
             }
 
             Section("보안") {

@@ -203,7 +203,7 @@ struct SidebarView: View {
                 .font(.system(size: 10))
                 .frame(width: 11)
                 .foregroundStyle(Theme.sidebarMuted)
-            Text(title)
+            LText(key: title)
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.sidebarMuted)
             Spacer()
@@ -225,7 +225,7 @@ struct SidebarView: View {
                 HStack(spacing: 6) {
                     Image(systemName: store.isVaultUnlocked ? "lock.open" : "lock")
                         .font(.system(size: 11))
-                    Text(store.isVaultUnlocked ? "Vault 열림" : "Vault 잠김")
+                    Text(LocalizedStringKey(store.isVaultUnlocked ? "Vault 열림" : "Vault 잠김"))
                         .font(.system(size: 12))
                 }
                 .foregroundStyle(Theme.sidebarMuted)

@@ -23,7 +23,7 @@ struct BlockTypePicker: View {
                     // 생성 우선: 입력 시트를 먼저 보여주고 저장될 때만 만든다
                     appState.requestBlockCreation(type: type, in: projectId)
                 } label: {
-                    Text(type.displayName)
+                    LText(key: type.displayName)
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.ink)
                         .padding(.horizontal, 10)

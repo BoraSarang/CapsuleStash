@@ -8,6 +8,8 @@ struct CapsuleStashApp: App {
     @StateObject private var appState: AppState
     @Environment(\.openWindow) private var openWindow
     @State private var cancellables = Set<AnyCancellable>()
+    /// 설정(⌘,)의 표시 언어. 바뀌면 전 씬 로케일이 즉시 바뀐다.
+    @AppStorage("appLanguage") private var appLanguage = "system"
 
     init() {
         // 설정(⌘,)의 모양 선택을 가장 먼저 적용한다 (기본 시스템 추적).
@@ -19,11 +21,14 @@ struct CapsuleStashApp: App {
     }
 
     var body: some Scene {
+        // appLanguage를 읽어 설정 변경 시 씬을 다시 그린다 (값은 effectiveLocale이 계산)
+        let _ = appLanguage
         // 메인 창
         Window("Capsule Stash", id: AppState.mainWindowID) {
             ContentView()
                 .environmentObject(store)
                 .environmentObject(appState)
+                .environment(\.locale, AppLanguage.effectiveLocale)
                 .onAppear {
                     registerGlobalHotKey()
                     observeMenuBarRequests()
@@ -45,6 +50,7 @@ struct CapsuleStashApp: App {
             MenuBarContentView()
                 .environmentObject(store)
                 .environmentObject(appState)
+                .environment(\.locale, AppLanguage.effectiveLocale)
         }
         .menuBarExtraStyle(.menu)
 
@@ -53,6 +59,7 @@ struct CapsuleStashApp: App {
             DebugPanelView()
                 .environmentObject(store)
                 .environmentObject(appState)
+                .environment(\.locale, AppLanguage.effectiveLocale)
         }
         .defaultSize(width: 860, height: 560)
         .windowResizability(.contentMinSize)
@@ -60,6 +67,7 @@ struct CapsuleStashApp: App {
         // 설정 (⌘,) — 네이티브 Settings 씬
         Settings {
             SettingsView()
+                .environment(\.locale, AppLanguage.effectiveLocale)
         }
     }
 

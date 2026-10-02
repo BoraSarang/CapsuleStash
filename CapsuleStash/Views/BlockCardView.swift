@@ -75,7 +75,7 @@ struct BlockCardView: View {
                 }
                 CapsuleIconButton(systemImage: "link", tooltip: "URL 복사") { copyURL() }
             } else if block.type == .credential {
-                Text(vaultLabel)
+                LText(key: vaultLabel)
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.muted)
             } else if block.type == .image || block.type == .file {
@@ -515,11 +515,10 @@ struct BlockCardView: View {
         }
     }
 
-    private func credentialRow(label: String, value: String, isSecret: Bool,
-                               systemImage: String, tooltip: String, primary: Bool = false,
+    private func credentialRow(label: String, value: String, isSecret: Bool,                               systemImage: String, tooltip: String, primary: Bool = false,
                                action: @escaping () -> Void) -> some View {
         HStack(spacing: 10) {
-            Text(label)
+            LText(key: label)
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.muted)
                 .frame(width: 72, alignment: .leading)

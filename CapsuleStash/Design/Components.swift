@@ -2,6 +2,17 @@ import SwiftUI
 
 // MARK: - 목업(mockup-v0.1.html) 공통 컴포넌트
 
+/// 카탈로그 번역을 타는 Text.
+/// `Text(변수)` 는 번역 없이 그대로 표시되므로, 변수로 전달되는 UI 문구는 이 래퍼를 쓴다.
+/// (리터럴 자리에 직접 쓰면 SwiftUI가 알아서 번역하므로 그대로 둔다.)
+struct LText: View {
+    let key: String
+
+    var body: some View {
+        Text(LocalizedStringKey(key))
+    }
+}
+
 /// 블록 타입 배지 (`<span class="type …">`)
 struct TypeBadge: View {
     let text: String
@@ -38,7 +49,7 @@ struct CapsuleButton: View {
                 if let systemImage {
                     Image(systemName: systemImage).imageScale(.small)
                 }
-                Text(title)
+                LText(key: title)
             }
             .font(.system(size: 12, weight: .semibold))
             .padding(.horizontal, 10)
@@ -103,7 +114,7 @@ struct CapsuleIconButton: View {
                 .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help(tooltip)
+        .help(Text(LocalizedStringKey(tooltip)))
     }
 
     private var foreground: Color {
@@ -188,11 +199,11 @@ struct EmptyStateView: View {
             Image(systemName: systemImage)
                 .font(.system(size: 40, weight: .light))
                 .foregroundStyle(Theme.muted)
-            Text(title)
+            LText(key: title)
                 .font(Theme.serif(22))
                 .foregroundStyle(Theme.ink)
             if let message {
-                Text(message)
+                LText(key: message)
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.muted)
                     .multilineTextAlignment(.center)

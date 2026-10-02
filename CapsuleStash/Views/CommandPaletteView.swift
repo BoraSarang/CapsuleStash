@@ -112,7 +112,7 @@ struct CommandPaletteView: View {
                         Text("일치하는 항목이 없습니다")
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundStyle(Theme.ink)
-                        Text(SearchQuery.usageHint)
+                        Text(LocalizedStringKey(SearchQuery.usageHint))
                             .font(.system(size: 12))
                             .foregroundStyle(Theme.muted)
                     }

@@ -113,7 +113,7 @@ struct ProjectDetailView: View {
 
     private var relativeDate: String {
         let formatter = RelativeDateTimeFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.locale = AppLanguage.effectiveLocale
         formatter.unitsStyle = .short
         return formatter.localizedString(for: project.updatedAt, relativeTo: Date())
     }
