@@ -1,4 +1,5 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// T-04 Project 문서 상세 (제목 + 메타 + 블록 목록 + 블록 추가).
 struct ProjectDetailView: View {
@@ -13,6 +14,7 @@ struct ProjectDetailView: View {
     @State private var isEditingTags = false
     @State private var newTagText = ""
     @State private var isAddingBlock = false
+    @State private var isDropTargeted = false
 
     var body: some View {
         ScrollView {
@@ -39,6 +41,18 @@ struct ProjectDetailView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .background(Theme.paper)
+        // T-14 외부 드롭으로 블록 추가 (파일·텍스트·웹URL). 카드가 파일을 선점하면 건너뛴다.
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.cardRadius)
+                .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
+                .padding(8)
+        )
+        .onDrop(of: [.fileURL, .plainText, .url], isTargeted: $isDropTargeted) { providers in
+            let cardClaimedFiles = appState.fileDropHandled
+            appState.fileDropHandled = false
+            handleExternalDrop(providers, skipFiles: cardClaimedFiles)
+            return true
+        }
         .sheet(item: $appState.blockCreation) { request in
             BlockEditorSheet(create: request)
                 .environmentObject(store)
@@ -232,6 +246,50 @@ struct ProjectDetailView: View {
         }
         if ClipboardService.copy(text, label: project.name) {
             appState.notifyCopy(project.name)
+        }
+    }
+
+    // MARK: - T-14 외부 드롭
+
+    /// Finder·브라우저·텍스트 드롭으로 블록을 만든다.
+    /// 카드가 파일을 선점했으면(`skipFiles`) 파일은 건너뛰고 텍스트·URL만 처리한다.
+    private func handleExternalDrop(_ providers: [NSItemProvider], skipFiles: Bool) {
+        if !skipFiles {
+            AttachmentStore.urls(from: providers) { urls in
+                guard !urls.isEmpty else { return }
+                let created = self.store.importFileDrops(urls, to: self.project.id)
+                if created > 0 {
+                    self.appState.notify("블록 \(created)개 추가됨")
+                }
+            }
+        }
+        for provider in providers {
+            let isFile = provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier)
+            if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier), !isFile {
+                provider.loadObject(ofClass: NSString.self) { object, _ in
+                    guard let text = object as? String else { return }
+                    Task { @MainActor in
+                        if self.store.importTextDrop(text, to: self.project.id) {
+                            self.appState.notify("텍스트 블록 추가됨")
+                        }
+                    }
+                }
+            } else if provider.hasItemConformingToTypeIdentifier(UTType.url.identifier), !isFile {
+                provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, _ in
+                    var url: URL?
+                    if let direct = item as? URL {
+                        url = direct
+                    } else if let data = item as? Data {
+                        url = URL(dataRepresentation: data, relativeTo: nil)
+                    }
+                    guard let url, url.scheme?.hasPrefix("http") == true else { return }
+                    Task { @MainActor in
+                        if self.store.importFileDrops([url], to: self.project.id) > 0 {
+                            self.appState.notify("웹 링크 추가됨")
+                        }
+                    }
+                }
+            }
         }
     }
 }

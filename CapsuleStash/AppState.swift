@@ -33,6 +33,10 @@ final class AppState: ObservableObject {
         sidebarWidth = min(Self.sidebarMaxWidth, max(Self.sidebarMinWidth, width))
     }
 
+    /// T-14 카드 드롭 선점 플래그. 카드 onDrop이 먼저 실행돼 이미지·파일 블록이
+    /// 파일 소비를 선언하면, 상세 화면의 파일 드롭은 건너뛰고 텍스트·URL만 처리한다.
+    var fileDropHandled = false
+
     /// 블록 추가 요청. 타입 선택 → 입력 시트 표시 → 저장 시 생성, 취소 시 미생성.
     func requestBlockCreation(type: BlockType, in projectId: UUID) {
         blockCreation = BlockCreationRequest(projectId: projectId, type: type)

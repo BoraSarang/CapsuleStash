@@ -748,6 +748,66 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: url), original, "제한 이하는 바이트 그대로")
     }
 
+    // MARK: - 외부 드롭 가져오기 (T-14, 임시 폴더 격리)
+
+    @MainActor
+    private func makeStoreWithProject(dir: URL) throws -> (DataStore, Project) {
+        let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
+        store.createWorkspace(name: "W")
+        guard let ws = store.workspaces.first,
+              let project = store.createProject(title: "P", in: ws.id) else {
+            throw XCTSkip("Workspace·Project 필요")
+        }
+        return (store, project)
+    }
+
+    @MainActor
+    func testImportFileDropsCreatesBlocks() throws {
+        KeychainStore.inMemory = [:]
+        defer { KeychainStore.inMemory = nil }
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+
+        let png = try makeTestPNG(width: 100, height: 100)
+        defer { try? FileManager.default.removeItem(at: png) }
+        let txt = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).txt")
+        try "hello".write(to: txt, atomically: true, encoding: .utf8)
+        defer { try? FileManager.default.removeItem(at: txt) }
+
+        let created = store.importFileDrops([png, txt, URL(string: "https://example.com/a")!], to: project.id)
+        XCTAssertEqual(created, 3, "이미지+파일+웹링크 각 1블록")
+        let types = store.selectedProject?.blocks.map(\.type) ?? []
+        XCTAssertTrue(types.contains(.image))
+        XCTAssertTrue(types.contains(.file))
+        let web = store.selectedProject?.blocks.first(where: { $0.type == .webLink })
+        XCTAssertEqual(web?.siteName, "example.com")
+        XCTAssertTrue(FileManager.default.fileExists(
+            atPath: dir.appendingPathComponent("images", isDirectory: true).path),
+            "images 폴더에 보관")
+    }
+
+    @MainActor
+    func testImportFileDropsIgnoresUnknownProject() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
+        XCTAssertEqual(store.importFileDrops([URL(fileURLWithPath: "/tmp/x.png")], to: UUID()), 0)
+        XCTAssertFalse(store.importTextDrop("hi", to: UUID()))
+    }
+
+    @MainActor
+    func testImportTextDrop() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+        XCTAssertTrue(store.importTextDrop("첫 줄\n둘째 줄", to: project.id))
+        let block = store.selectedProject?.blocks.first(where: { $0.type == .text })
+        XCTAssertEqual(block?.title, "첫 줄")
+        XCTAssertEqual(block?.content, "첫 줄\n둘째 줄")
+        XCTAssertFalse(store.importTextDrop("   \n  ", to: project.id), "빈 텍스트 무시")
+    }
+
     @MainActor
     func testDeleteBlockClearsAttachments() throws {
         KeychainStore.inMemory = [:]

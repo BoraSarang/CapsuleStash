@@ -308,6 +308,60 @@ final class DataStore: ObservableObject {
         DebugLogger.feature("블록 추가: \(block.type.displayName)")
     }
 
+    /// T-14 외부 드롭 가져오기. 파일은 이미지/파일 블록으로, http(s) URL은 웹 링크로 만든다.
+    /// - Returns: 생성된 블록 수 (없는 Project면 0).
+    @discardableResult
+    func importFileDrops(_ urls: [URL], to projectId: UUID) -> Int {
+        guard allProjects.contains(where: { $0.project.id == projectId }) else { return 0 }
+        var created = 0
+        let files = urls.filter(\.isFileURL)
+        let images = files.filter { AttachmentStore.isImageFile($0) }
+        if !images.isEmpty {
+            let names = AttachmentStore.importFiles(from: images, kind: AttachmentStore.imagesKind,
+                                                    baseDirectory: attachmentBaseDirectory)
+            if !names.isEmpty {
+                insertBlock(Block(projectId: projectId, type: .image,
+                                  title: "이미지 \(names.count)개", imageNames: names))
+                created += 1
+            }
+        }
+        let others = files.filter { !AttachmentStore.isImageFile($0) }
+        if !others.isEmpty {
+            let names = AttachmentStore.importFiles(from: others, kind: AttachmentStore.filesKind,
+                                                    baseDirectory: attachmentBaseDirectory)
+            if !names.isEmpty {
+                let base = others[0].deletingPathExtension().lastPathComponent
+                insertBlock(Block(projectId: projectId, type: .file,
+                                  title: base.isEmpty ? "파일" : String(base.prefix(40)),
+                                  imageNames: names))
+                created += 1
+            }
+        }
+        for url in urls where !url.isFileURL {
+            insertBlock(Block(projectId: projectId, type: .webLink,
+                              title: url.host ?? url.absoluteString,
+                              url: url.absoluteString, siteName: url.host))
+            created += 1
+        }
+        if created > 0 {
+            // [HARD] paths are user data — log counts only, never names.
+            DebugLogger.feature("드롭 가져오기: 블록 \(created)개")
+        }
+        return created
+    }
+
+    /// T-14 텍스트 드롭 → 텍스트 블록. 빈 문자열은 무시한다.
+    @discardableResult
+    func importTextDrop(_ text: String, to projectId: UUID) -> Bool {
+        guard allProjects.contains(where: { $0.project.id == projectId }) else { return false }
+        let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return false }
+        let firstLine = trimmed.split(separator: "\n").first.map(String.init) ?? "텍스트"
+        insertBlock(Block(projectId: projectId, type: .text,
+                          title: String(firstLine.prefix(40)), content: trimmed))
+        return true
+    }
+
     func updateBlock(_ block: Block) {
         mutateProject(block.projectId) { project in
             guard let index = project.blocks.firstIndex(where: { $0.id == block.id }) else { return }

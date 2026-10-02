@@ -36,6 +36,10 @@ struct BlockCardView: View {
                 .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
         )
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            // 이미지·파일 블록이 소비를 선언하면 상세 화면의 파일 드롭이 건너뛴다 (T-14 중복 방지)
+            if block.type == .image || block.type == .file {
+                appState.fileDropHandled = true
+            }
             handleDrop(providers)
             return true
         }
