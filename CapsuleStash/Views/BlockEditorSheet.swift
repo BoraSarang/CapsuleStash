@@ -2,8 +2,7 @@ import AppKit
 import SwiftUI
 
 /// 블록 편집 시트. 목업에는 편집 UI가 없으나 우측 콘텐츠 수정 수단으로 MVP에 추가했다.
-/// (docs/DESIGN.md §4). 모든 입력 컨트롤은 명시적 라이트 색상을 사용한다 —
-/// 시스템 appearance에 의존하지 않는다 (Theme.applyFixedAppearance 참고).
+/// (docs/DESIGN.md §4). 입력 컨트롤 색상은 토큰을 사용해 외관 모드를 따라간다.
 struct BlockEditorSheet: View {
     @EnvironmentObject private var store: DataStore
     @EnvironmentObject private var appState: AppState
@@ -193,7 +192,7 @@ struct BlockEditorSheet: View {
                                     Image(systemName: "xmark.circle.fill")
                                         .font(.system(size: 18))
                                         .foregroundStyle(Theme.ink)
-                                        .background(Color.white, in: Circle())
+                                        .background(Theme.card, in: Circle())
                                 }
                                 .buttonStyle(.plain)
                                 .padding(6)
@@ -284,7 +283,7 @@ struct BlockEditorSheet: View {
         }
     }
 
-    /// 명시적 라이트 색상의 멀티라인 에디터. 시스템 appearance와 무관하게 항상 보인다.
+    /// 멀티라인 에디터. 배경·전경 모두 토큰이라 외관 모드를 따라간다.
     private func editor(text: Binding<String>, mono: Bool, minHeight: CGFloat) -> some View {
         TextEditor(text: text)
             .font(mono ? Theme.monoBody : .system(size: 14))
@@ -292,7 +291,7 @@ struct BlockEditorSheet: View {
             .scrollContentBackground(.hidden)
             .padding(8)
             .frame(minHeight: minHeight, alignment: .topLeading)
-            .background(Color.white, in: RoundedRectangle(cornerRadius: 8))
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 8))
             .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.line, lineWidth: 1))
     }
 
@@ -343,7 +342,7 @@ struct BlockEditorSheet: View {
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
         } else {
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.white)
+                .fill(Theme.card)
                 .frame(height: 110)
                 .overlay(
                     VStack(spacing: 6) {
@@ -353,7 +352,7 @@ struct BlockEditorSheet: View {
                             .font(.system(size: 11))
                             .lineLimit(2)
                     }
-                    .foregroundStyle(Color(hex: 0x5C574A))
+                    .foregroundStyle(Theme.tileText)
                     .padding(8)
                 )
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))

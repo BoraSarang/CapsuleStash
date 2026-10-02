@@ -87,7 +87,7 @@ struct CommandPaletteView: View {
     }
 
     private var cardBackground: Color {
-        reduceTransparency ? Color(hex: 0xFBF9F3) : Color(hex: 0xFBF9F3).opacity(0.98)
+        reduceTransparency ? Theme.card : Theme.card.opacity(0.98)
     }
 
     @ViewBuilder
@@ -182,7 +182,7 @@ struct CommandPaletteView: View {
         }
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
-        .background(isHighlighted ? Color(hex: 0xF1E9D6) : .clear, in: RoundedRectangle(cornerRadius: 10))
+        .background(isHighlighted ? Theme.accentSoft : .clear, in: RoundedRectangle(cornerRadius: 10))
         .contentShape(Rectangle())
     }
 

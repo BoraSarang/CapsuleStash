@@ -10,8 +10,8 @@ struct CapsuleStashApp: App {
     @State private var cancellables = Set<AnyCancellable>()
 
     init() {
-        // custom 디자인 시스템은 라이트 전용이므로 가장 먼저 appearance를 고정한다.
-        Theme.applyFixedAppearance()
+        // 설정(⌘,)의 모양 선택을 가장 먼저 적용한다 (기본 시스템 추적).
+        Theme.applyAppearance()
         _store = StateObject(wrappedValue: DataStore())
         _appState = StateObject(wrappedValue: AppState())
     }

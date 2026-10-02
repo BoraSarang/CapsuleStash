@@ -3,59 +3,125 @@ import SwiftUI
 
 // MARK: - T-07 custom 디자인 토큰 (docs/DESIGN.md §2 · docs/mockup-v0.1.html 대응)
 //
-// 이 디자인 시스템은 라이트(paper) 전용이다. 시스템 다크모드에서는
-// TextField/TextEditor/Menu/팝오버 같은 시스템 컨트롤이 뒤집히면서 고정색과 충돌해
-// 글자가 안 보이는 등의 깨짐이 발생하므로, 앱 전체 appearance를 라이트로 고정한다.
-// 다크모드 대응은 2차(T-18). 모든 화면 색상은 반드시 아래 토큰만 사용한다.
+// T-18부터 라이트·다크 적응형이다. 모든 색상은 `ThemeToken.all` 단일 테이블에서 나와
+// 라이트/다크 16진수를 한곳에서 관리한다. 테스트는 테이블을 직접 검증한다.
+// 외관은 설정(⌘,)의 모양 선택(시스템/라이트/다크)에 따라 `applyAppearance()` 가 바꾼다.
+
+/// 단일 진실 원천: 이름 + 라이트/다크 16진수. `Theme.xxx` 는 여기서 만든 적응형 Color다.
+struct ThemeToken: Hashable {
+    let name: String
+    let light: UInt32
+    let dark: UInt32
+
+    static let all: [ThemeToken] = [
+        .init(name: "ink", light: 0x16150F, dark: 0xEDE8DB),
+        .init(name: "sidebar", light: 0x1B1A15, dark: 0x12110F),
+        .init(name: "sidebarElevated", light: 0x242219, dark: 0x1D1C18),
+        .init(name: "sidebarHover", light: 0x2A2820, dark: 0x27251F),
+        .init(name: "sidebarLine", light: 0x38352A, dark: 0x35322A),
+        .init(name: "sidebarText", light: 0xD9D3C4, dark: 0xD9D3C4),
+        .init(name: "sidebarMuted", light: 0x8A857A, dark: 0x9A948A),
+        .init(name: "paper", light: 0xFAF7F0, dark: 0x171613),
+        .init(name: "titlebar", light: 0xE9E2D3, dark: 0x201F1B),
+        .init(name: "card", light: 0xFFFFFF, dark: 0x22211C),
+        .init(name: "line", light: 0xE8E0D1, dark: 0x35322B),
+        .init(name: "codeBackground", light: 0x14130F, dark: 0x0E0D0B),
+        .init(name: "codeForeground", light: 0xF2EAD9, dark: 0xF2EAD9),
+        .init(name: "tagBackground", light: 0xEFE8D6, dark: 0x2C2A23),
+        .init(name: "muted", light: 0x8A857A, dark: 0x9A948A),
+        .init(name: "accent", light: 0xFF5C00, dark: 0xFF5C00),
+        .init(name: "accentSoft", light: 0xFFE9D6, dark: 0x3A2415),
+        .init(name: "sage", light: 0x5F6F52, dark: 0x8BA07B),
+        .init(name: "gold", light: 0xC99A2E, dark: 0xC99A2E),
+        .init(name: "webBlue", light: 0x2D5BD7, dark: 0x6B93F5),
+        .init(name: "webBlueSoft", light: 0xE8F0FF, dark: 0x232E4A),
+        .init(name: "tileTop", light: 0xD9CFB8, dark: 0x2E2C26),
+        .init(name: "tileBottom", light: 0xA9B39A, dark: 0x232220),
+        .init(name: "tileText", light: 0x5C574A, dark: 0xA39E93),
+    ]
+}
 
 enum Theme {
-    /// 앱 기동 시 1회 호출. `CapsuleStashApp.init()` 에서 실행된다.
-    /// (`NSApp` 전역은 테스트 프로세스처럼 App 인스턴스가 없을 때 nil이라
-    /// `NSApplication.shared` 경유로 설정한다.)
-    static func applyFixedAppearance() {
-        NSApplication.shared.appearance = NSAppearance(named: .aqua)
-        DebugLogger.feature("Appearance 고정: 라이트(aqua) — custom 토큰 전용")
+    /// 모양 모드 (설정 저장 키 `appearanceMode`).
+    enum AppearanceMode: String {
+        case system, light, dark
     }
 
-    // MARK: 색
+    /// 앱 기동·설정 변경 시 호출. `CapsuleStashApp.init()` 에서 실행된다.
+    /// (`NSApp` 전역은 테스트 프로세스처럼 App 인스턴스가 없을 때 nil이라
+    /// `NSApplication.shared` 경유로 설정한다.)
+    static func applyAppearance() {
+        let raw = UserDefaults.standard.string(forKey: "appearanceMode") ?? AppearanceMode.system.rawValue
+        let mode = AppearanceMode(rawValue: raw) ?? .system
+        switch mode {
+        case .system: NSApplication.shared.appearance = nil
+        case .light: NSApplication.shared.appearance = NSAppearance(named: .aqua)
+        case .dark: NSApplication.shared.appearance = NSAppearance(named: .darkAqua)
+        }
+        DebugLogger.feature("Appearance 적용: \(raw)")
+    }
+
+    // MARK: 색 (ThemeToken.all 단일 테이블에서 생성)
+
+    private static func color(_ name: String) -> Color {
+        guard let token = ThemeToken.all.first(where: { $0.name == name }) else { return .clear }
+        return adaptive(light: token.light, dark: token.dark)
+    }
+
+    /// 유효 외관에 따라 라이트/다크 16진수를 고르는 적응형 Color.
+    /// 테스트 프로세스(aqua)에선 라이트로 풀린다.
+    static func adaptive(light: UInt32, dark: UInt32) -> Color {
+        Color(nsColor: NSColor(name: nil, dynamicProvider: { appearance in
+            let hex = appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua ? dark : light
+            return NSColor(hex: hex)
+        }))
+    }
 
     /// 본문 잉크 (타이틀바 · 블록 헤더 배경)
-    static let ink = Color(hex: 0x16150F)
+    static var ink: Color { color("ink") }
     /// 다크 사이드바 배경
-    static let sidebar = Color(hex: 0x1B1A15)
+    static var sidebar: Color { color("sidebar") }
     /// 사이드바 카드/푸터 배경
-    static let sidebarElevated = Color(hex: 0x242219)
+    static var sidebarElevated: Color { color("sidebarElevated") }
     /// 사이드바 호버
-    static let sidebarHover = Color(hex: 0x2A2820)
+    static var sidebarHover: Color { color("sidebarHover") }
     /// 사이드바 구분선
-    static let sidebarLine = Color(hex: 0x38352A)
+    static var sidebarLine: Color { color("sidebarLine") }
     /// 사이드바 본문 텍스트
-    static let sidebarText = Color(hex: 0xD9D3C4)
+    static var sidebarText: Color { color("sidebarText") }
     /// 사이드바 보조 텍스트
-    static let sidebarMuted = Color(hex: 0x8A857A)
+    static var sidebarMuted: Color { color("sidebarMuted") }
 
     /// 콘텐츠 페이퍼 배경
-    static let paper = Color(hex: 0xFAF7F0)
+    static var paper: Color { color("paper") }
     /// 타이틀바 배경
-    static let titlebar = Color(hex: 0xE9E2D3)
+    static var titlebar: Color { color("titlebar") }
     /// 블록 카드 배경
-    static let card = Color.white
+    static var card: Color { color("card") }
     /// 카드/ 구분선
-    static let line = Color(hex: 0xE8E0D1)
+    static var line: Color { color("line") }
     /// 코드 블록 배경
-    static let codeBackground = Color(hex: 0x14130F)
+    static var codeBackground: Color { color("codeBackground") }
     /// 코드 블록 전경
-    static let codeForeground = Color(hex: 0xF2EAD9)
+    static var codeForeground: Color { color("codeForeground") }
     /// 태그 칩 배경
-    static let tagBackground = Color(hex: 0xEFE8D6)
+    static var tagBackground: Color { color("tagBackground") }
     /// 본문 보조 텍스트
-    static let muted = Color(hex: 0x8A857A)
+    static var muted: Color { color("muted") }
 
     /// 캡슐 오렌지 액센트
-    static let accent = Color(hex: 0xFF5C00)
-    static let accentSoft = Color(hex: 0xFFE9D6)
-    static let sage = Color(hex: 0x5F6F52)
-    static let gold = Color(hex: 0xC99A2E)
+    static var accent: Color { color("accent") }
+    static var accentSoft: Color { color("accentSoft") }
+    static var sage: Color { color("sage") }
+    static var gold: Color { color("gold") }
+
+    /// 웹 링크 파랑 (뱃지·링크)
+    static var webBlue: Color { color("webBlue") }
+    static var webBlueSoft: Color { color("webBlueSoft") }
+    /// 썸네일 타일 그러데이션·문구
+    static var tileTop: Color { color("tileTop") }
+    static var tileBottom: Color { color("tileBottom") }
+    static var tileText: Color { color("tileText") }
 
     // MARK: 블록 타입 색 (mockup `.type.*` 대응)
 
@@ -63,9 +129,9 @@ enum Theme {
         switch type {
         case .text, .markdown: return ink
         case .code, .shell: return accent
-        case .webLink, .webArchive: return Color(hex: 0x2D5BD7)
+        case .webLink, .webArchive: return webBlue
         case .image, .file: return sage
-        case .credential: return Color(hex: 0x7A2EE0)
+        case .credential: return adaptive(light: 0x7A2EE0, dark: 0xA67FF0)
         }
     }
 
@@ -94,6 +160,18 @@ enum Theme {
 }
 
 // MARK: - Color 유틸
+
+extension NSColor {
+    /// 0xRRGGBB (sRGB). Theme 적응형 Provider용.
+    convenience init(hex: UInt32) {
+        self.init(
+            srgbRed: CGFloat((hex >> 16) & 0xFF) / 255,
+            green: CGFloat((hex >> 8) & 0xFF) / 255,
+            blue: CGFloat(hex & 0xFF) / 255,
+            alpha: 1
+        )
+    }
+}
 
 extension Color {
     /// 0xRRGGBB

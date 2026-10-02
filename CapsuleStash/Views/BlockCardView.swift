@@ -165,10 +165,10 @@ struct BlockCardView: View {
                         let saved = WebArchiveStore.hasOfflineFiles(for: block)
                         Text(saved ? "오프라인 저장됨" : "미저장 — 주소·메모만 보관 중")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(saved ? Color(hex: 0x2D5BD7) : Theme.muted)
+                            .foregroundStyle(saved ? Theme.webBlue : Theme.muted)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
-                            .background((saved ? Color(hex: 0xE8F0FF) : Theme.tagBackground), in: Capsule())
+                            .background((saved ? Theme.webBlueSoft : Theme.tagBackground), in: Capsule())
                     }
                 }
                 Spacer(minLength: 0)
@@ -178,7 +178,7 @@ struct BlockCardView: View {
                 Button { open(url) } label: {
                     Text(urlString)
                         .font(Theme.monoCaption)
-                        .foregroundStyle(Color(hex: 0x2D5BD7))
+                        .foregroundStyle(Theme.webBlue)
                         .lineLimit(1)
                         .truncationMode(.middle)
                 }
@@ -284,7 +284,7 @@ struct BlockCardView: View {
         RoundedRectangle(cornerRadius: 10)
             .fill(
                 LinearGradient(
-                    colors: [Color(hex: 0xD9CFB8), Color(hex: 0xA9B39A)],
+                    colors: [Theme.tileTop, Theme.tileBottom],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -293,7 +293,7 @@ struct BlockCardView: View {
             .overlay(
                 Image(systemName: "globe")
                     .font(.system(size: 20, weight: .light))
-                    .foregroundStyle(Color(hex: 0x5C574A))
+                    .foregroundStyle(Theme.tileText)
             )
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
     }
@@ -344,7 +344,7 @@ struct BlockCardView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(
                     LinearGradient(
-                        colors: [Color(hex: 0xD9CFB8), Color(hex: 0xA9B39A)],
+                        colors: [Theme.tileTop, Theme.tileBottom],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -358,7 +358,7 @@ struct BlockCardView: View {
                             .font(.system(size: 11))
                             .lineLimit(2)
                     }
-                    .foregroundStyle(Color(hex: 0x5C574A))
+                    .foregroundStyle(Theme.tileText)
                     .padding(8)
                 )
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))

@@ -8,11 +8,8 @@
 
 ## 2. 토큰 (확정) — 구현: `CapsuleStash/Design/Theme.swift`
 
-> appearance 고정: custom 토큰은 라이트(paper) 전용이라 `Theme.applyFixedAppearance()` 가
-> 앱 기동 시 `NSApplication.shared.appearance = .aqua` 로 고정한다. 시스템 다크모드에서
-> TextField/TextEditor/Menu/팝오버가 뒤집히면 고정색과 충돌해 글자가 안 보이는 깨짐이 발생하기 때문이다.
-> 모든 입력 컨트롤은 시스템 색에 의존하지 않고 명시적 토큰 색을 지정한다.
-> 다크모드 대응은 2차(T-18).
+> 외관: `ThemeToken.all` 단일 테이블의 라이트/다크 적응형 토큰 (T-18). 설정(⌘,) 모양에서 시스템/라이트/다크 선택, 기본 시스템 추적.
+> 구 라이트 고정(`applyFixedAppearance`)은 T-18에서 해제됨.
 
 ### 2.1 색
 | 토큰 | 값 | 용도 |

@@ -27,7 +27,7 @@ struct BlockTypePicker: View {
                         .font(.system(size: 13))
                         .foregroundStyle(Theme.ink)
                         .padding(.horizontal, 10)
-                        .padding(.vertical, 6)
+                        .padding(.vertical, 5)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .contentShape(Rectangle())
                 }
@@ -35,7 +35,7 @@ struct BlockTypePicker: View {
                 .help(type.purposeHint)
             }
         }
-        .padding(.bottom, 8)
-        .frame(width: 220)
+        .padding(.bottom, 6)
+        .frame(width: 160)
     }
 }

@@ -126,7 +126,7 @@ struct ProjectDetailView: View {
                 }
                 .padding(.horizontal, 8)
                 .padding(.vertical, 3)
-                .background(Color.white, in: Capsule())
+                .background(Theme.card, in: Capsule())
                 .overlay(Capsule().strokeBorder(Theme.accent.opacity(0.5), lineWidth: 1))
             }
             TextField("태그 추가 후 Enter", text: $newTagText)

@@ -173,7 +173,7 @@ struct SidebarView: View {
                         .foregroundStyle(Theme.gold)
                 }
             }
-            .foregroundStyle(isActive ? Theme.ink : Color(hex: 0xA9A294))
+            .foregroundStyle(isActive ? Theme.ink : Theme.sidebarMuted)
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
@@ -205,7 +205,7 @@ struct SidebarView: View {
                 .foregroundStyle(Theme.sidebarMuted)
             Text(title)
                 .font(.system(size: 13))
-                .foregroundStyle(Color(hex: 0xA9A294))
+                .foregroundStyle(Theme.sidebarMuted)
             Spacer()
             Text("\(count)")
                 .font(.system(size: 11, design: .monospaced))

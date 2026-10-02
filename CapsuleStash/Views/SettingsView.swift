@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("clipboardClearDelay") private var clearDelay: Double = 30
     @AppStorage("vaultAutoLock") private var vaultAutoLock = false
     @AppStorage("vaultBiometric") private var vaultBiometric = true
+    @AppStorage("appearanceMode") private var appearanceMode = Theme.AppearanceMode.system.rawValue
 
     @State private var launchAtLogin = false
     @State private var launchError: String?
@@ -41,6 +42,17 @@ struct SettingsView: View {
                         refreshHotkeyStatus()
                     }
                 }
+            }
+
+            Section("모양") {
+                Picker("테마", selection: $appearanceMode) {
+                    Text("시스템 설정 따름").tag(Theme.AppearanceMode.system.rawValue)
+                    Text("라이트").tag(Theme.AppearanceMode.light.rawValue)
+                    Text("다크").tag(Theme.AppearanceMode.dark.rawValue)
+                }
+                .pickerStyle(.radioGroup)
+                .help("앱 전체 밝기를 바꾼다. 즉시 적용된다")
+                .onChange(of: appearanceMode) { _, _ in Theme.applyAppearance() }
             }
 
             Section("보안") {

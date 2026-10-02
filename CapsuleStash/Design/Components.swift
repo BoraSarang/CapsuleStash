@@ -57,13 +57,13 @@ struct CapsuleButton: View {
     private var foreground: Color {
         switch style {
         case .plain, .ghost: return Theme.ink
-        case .primary: return .white
+        case .primary: return Theme.paper
         }
     }
 
     private var background: Color {
         switch style {
-        case .plain: return .white
+        case .plain: return Theme.card
         case .primary: return Theme.ink
         case .ghost: return .clear
         }
@@ -109,13 +109,13 @@ struct CapsuleIconButton: View {
     private var foreground: Color {
         switch style {
         case .plain, .ghost: return Theme.ink
-        case .primary: return .white
+        case .primary: return Theme.paper
         }
     }
 
     private var background: Color {
         switch style {
-        case .plain: return .white
+        case .plain: return Theme.card
         case .primary: return Theme.ink
         case .ghost: return .clear
         }
@@ -168,7 +168,7 @@ struct ToastView: View {
     var body: some View {
         Text(message.text)
             .font(.system(size: 13, weight: .medium))
-            .foregroundStyle(.white)
+            .foregroundStyle(Theme.paper)
             .padding(.horizontal, 18)
             .padding(.vertical, 10)
             .background(Theme.ink, in: Capsule())
