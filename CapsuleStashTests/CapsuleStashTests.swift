@@ -255,6 +255,42 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(query.freeText, "관리", "따옴표가 없으면 나머지는 자유 텍스트")
     }
 
+    // MARK: - 검색 확장 (T-16: 전각 정규화·tag 필터)
+
+    func testSearchNormalizesFullWidth() {
+        XCTAssertEqual("Ｄｏｃｋｅｒ　１２３".normalizedForSearch, "docker 123")
+        XCTAssertEqual("Ｓｋ-ＡＢＣ".normalizedForSearch, "sk-abc")
+        let query = SearchQuery.parse("ＤＯＣＫＥＲ")
+        XCTAssertEqual(query.freeText, "docker")
+    }
+
+    func testSearchTagFilterParses() {
+        let query = SearchQuery.parse("tag:swift docker")
+        XCTAssertEqual(query.tags, ["swift"])
+        XCTAssertEqual(query.freeText, "docker")
+        let hashed = SearchQuery.parse("tag:#AI-Dev")
+        XCTAssertEqual(hashed.tags, ["ai-dev"], "# 접두어 제거 + 소문자 정규화")
+        let quoted = SearchQuery.parse("tag:\"서버 관리\"")
+        XCTAssertEqual(quoted.tags, ["서버 관리"])
+        XCTAssertTrue(SearchQuery.parse("tag:").isEmpty, "빈 tag는 무시")
+    }
+
+    @MainActor
+    func testSearchTagFilterRestrictsResults() {
+        let store = makeStore()
+        store.searchQuery = "tag:swiftui"
+        let hits = store.searchHits
+        XCTAssertFalse(hits.isEmpty)
+        XCTAssertTrue(hits.allSatisfy { $0.project.tags.contains("swiftui") })
+    }
+
+    @MainActor
+    func testSearchFullWidthQueryFindsHalfWidth() {
+        let store = makeStore()
+        store.searchQuery = "ＤＯＣＫＥＲ"
+        XCTAssertFalse(store.searchHits.isEmpty, "전각 쿼리로 반각 내용이 검색돼야 함")
+    }
+
     @MainActor
     func testEmptyQueryProducesNoHits() {
         let store = makeStore()

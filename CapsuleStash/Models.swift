@@ -257,9 +257,10 @@ struct SearchQuery: Equatable {
     var freeText: String = ""
     var types: Set<BlockType> = []
     var projectName: String?
+    var tags: Set<String> = []
 
-    /// `type:code project:"Docker 배포" docker` 형태 파싱 (PLAN §11).
-    /// 공백이 포함된 값은 큰따옴표로 감싼다. `project:` 는 문서(Project)명 기준.
+    /// `type:code project:"Docker 배포" tag:swift docker` 형태 파싱 (PLAN §11).
+    /// 공백이 포함된 값은 큰따옴표로 감싼다. `project:` 는 문서(Project)명, `tag:` 는 태그 기준.
     static func parse(_ raw: String) -> SearchQuery {
         var query = SearchQuery()
         var words: [String] = []
@@ -270,11 +271,15 @@ struct SearchQuery: Equatable {
             } else if token.hasPrefix("project:") {
                 let value = String(token.dropFirst(8)).trimmingCharacters(in: .whitespaces)
                 if !value.isEmpty { query.projectName = value }
+            } else if token.hasPrefix("tag:") {
+                var value = String(token.dropFirst(4)).trimmingCharacters(in: .whitespaces)
+                if value.hasPrefix("#") { value.removeFirst() }
+                if !value.isEmpty { query.tags.insert(value.normalizedForSearch) }
             } else {
                 words.append(token)
             }
         }
-        query.freeText = words.joined(separator: " ").trimmingCharacters(in: .whitespaces).lowercased()
+        query.freeText = words.joined(separator: " ").trimmingCharacters(in: .whitespaces).normalizedForSearch
         return query
     }
 
@@ -305,10 +310,32 @@ struct SearchQuery: Equatable {
         return tokens
     }
 
-    var isEmpty: Bool { freeText.isEmpty && types.isEmpty && projectName == nil }
+    var isEmpty: Bool { freeText.isEmpty && types.isEmpty && projectName == nil && tags.isEmpty }
 
     /// 팔레트 빈 결과 화면에 보여줄 사용법
-    static let usageHint = "예: type:code · project:\"Docker 배포\" · docker"
+    static let usageHint = "예: type:code · project:\"Docker 배포\" · tag:swift · docker"
+}
+
+// MARK: - 검색 정규화 (T-16)
+
+///
+/// 전각(全角) 영숫자·공백을 반각으로 접어 검색한다. 쿼리·색인 양쪽에 적용.
+extension String {
+    var normalizedForSearch: String {
+        var result = ""
+        result.reserveCapacity(count)
+        for scalar in unicodeScalars {
+            let v = scalar.value
+            if v == 0x3000 {
+                result.append(" ")
+            } else if v >= 0xFF01 && v <= 0xFF5E {
+                result.append(Character(UnicodeScalar(v - 0xFEE0)!))
+            } else {
+                result.append(Character(scalar))
+            }
+        }
+        return result.lowercased()
+    }
 }
 
 struct SearchHit: Identifiable {

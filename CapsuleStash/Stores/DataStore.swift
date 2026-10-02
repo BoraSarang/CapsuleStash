@@ -111,7 +111,12 @@ final class DataStore: ObservableObject {
 
         for entry in allProjects {
             if let projectName = query.projectName,
-               entry.project.name.lowercased() != projectName.lowercased() {
+               entry.project.name.normalizedForSearch != projectName.normalizedForSearch {
+                continue
+            }
+            // T-16 태그 필터: 문서 태그 중 하나라도 포함해야 한다
+            if !query.tags.isEmpty,
+               !entry.project.tags.contains(where: { query.tags.contains($0.normalizedForSearch) }) {
                 continue
             }
 
@@ -161,17 +166,18 @@ final class DataStore: ObservableObject {
     }
 
     private func score(_ hit: SearchHit) -> Int {
-        let term = parsedQuery.freeText
+        let term = parsedQuery.freeText.normalizedForSearch
         guard !term.isEmpty else { return 0 }
-        if hit.title.lowercased().hasPrefix(term) { return 30 }
-        if hit.title.lowercased().contains(term) { return 20 }
-        if hit.block?.searchIndexText.lowercased().contains(term) == true { return 10 }
+        if hit.title.normalizedForSearch.hasPrefix(term) { return 30 }
+        if hit.title.normalizedForSearch.contains(term) { return 20 }
+        if hit.block?.searchIndexText.normalizedForSearch.contains(term) == true { return 10 }
         return 1
     }
 
     private func matches(_ term: String, _ candidates: [String]) -> Bool {
         if term.isEmpty { return true }
-        return candidates.contains { $0.lowercased().contains(term) }
+        let normalized = term.normalizedForSearch
+        return candidates.contains { $0.normalizedForSearch.contains(normalized) }
     }
 
     private func snippet(for block: Block, term: String) -> String {
