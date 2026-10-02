@@ -205,6 +205,18 @@ struct Block: Identifiable, Hashable, Codable {
         }
         return content
     }
+
+    /// T-15 팔레트 단축키용 필드 복사 문자열 (`⌘1` 아이디, `⌘2` Secret 1).
+    /// nil이면 복사 불가 — 호출자가 안내 토스트를 띄운다.
+    /// [HARD] 시크릿은 `vaultUnlocked` 일 때만 반환한다.
+    func credentialCopyText(secret: Bool, vaultUnlocked: Bool) -> String? {
+        guard type == .credential, let credential else { return nil }
+        if secret {
+            guard vaultUnlocked, !credential.password.isEmpty else { return nil }
+            return credential.password
+        }
+        return credential.username.isEmpty ? nil : credential.username
+    }
 }
 
 // MARK: Credential

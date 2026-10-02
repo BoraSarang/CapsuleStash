@@ -700,6 +700,27 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(ErrorMessages.shared.message(for: ErrorCode.webArchive), "웹 페이지를 오프라인으로 저장하지 못했습니다.")
     }
 
+    // MARK: - Credential 필드 단축키 (T-15)
+
+    func testCredentialCopyText() {
+        let cred = Block(projectId: UUID(), type: .credential, title: "Naver",
+                         credential: Credential(homepage: "", username: "토리",
+                                                password: "pw", secondSecret: "s2"))
+        XCTAssertEqual(cred.credentialCopyText(secret: false, vaultUnlocked: false), "토리", "⌘1 아이디는 잠금과 무관")
+        XCTAssertNil(cred.credentialCopyText(secret: true, vaultUnlocked: false), "[HARD] 잠금 시 시크릿 금지")
+        XCTAssertEqual(cred.credentialCopyText(secret: true, vaultUnlocked: true), "pw", "⌘2 Secret 1은 해제 시만")
+
+        let empty = Block(projectId: UUID(), type: .credential, title: "E",
+                          credential: Credential())
+        XCTAssertNil(empty.credentialCopyText(secret: false, vaultUnlocked: true), "빈 아이디는 nil")
+        XCTAssertNil(empty.credentialCopyText(secret: true, vaultUnlocked: true), "빈 시크릿은 nil")
+
+        let text = Block(projectId: UUID(), type: .text, title: "T", content: "hi")
+        XCTAssertNil(text.credentialCopyText(secret: false, vaultUnlocked: true), "일반 블록은 nil")
+        let noCred = Block(projectId: UUID(), type: .credential, title: "N")
+        XCTAssertNil(noCred.credentialCopyText(secret: false, vaultUnlocked: true))
+    }
+
     // MARK: - 첨부 정리·리사이즈 (T-12, 임시 폴더 격리)
 
     private func makeTestPNG(width: Int, height: Int) throws -> URL {

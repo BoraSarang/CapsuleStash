@@ -46,7 +46,7 @@
 ## 3차
 
 - [x] T-10 Credential Keychain 암호화 저장 + Touch ID 해제 + 클립보드 자동삭제 (시크릿만 Keychain 블록 ID 단위 보관, JSON엔 홈페이지·아이디만, 삭제 시 정리, DebugPanel Keychain 건수)
-- [ ] T-15 Credential `⌘1`/`⌘2` 필드 단위 복사 단축키
+- [x] T-15 Credential `⌘1`/`⌘2` 필드 단위 복사 단축키 (팔레트 하이라이트 행: `⌘1` 아이디 항상, `⌘2` Secret 1은 Vault 해제 시만, `credentialCopyText` 게이트 + 테스트)
 - [ ] T-16 全角/부분 검색 옵션, 태그 기반 스마트 필터 확장
 - [ ] T-17 앱 종료 후 자동잠금 옵션
 

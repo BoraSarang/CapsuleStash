@@ -34,7 +34,18 @@ struct CommandPaletteView: View {
                     moveHighlight(1)
                     return .handled
                 }
+                // T-15 Credential 필드 단축키: ⌘1 아이디, ⌘2 Secret 1(Vault 해제 시만).
                 // ⌘C 는 검색창의 기본 텍스트 복사와 충돌하므로 결과 행의 복사 버튼을 쓴다.
+                .onKeyPress(phases: .down) { press in
+                    guard press.modifiers.contains(.command) else { return .ignored }
+                    if press.characters == "1" {
+                        return copyCredentialField(secret: false) ? .handled : .ignored
+                    }
+                    if press.characters == "2" {
+                        return copyCredentialField(secret: true) ? .handled : .ignored
+                    }
+                    return .ignored
+                }
         }
         .onAppear {
             isFieldFocused = true
@@ -233,6 +244,34 @@ struct CommandPaletteView: View {
     }
 
     // MARK: - 키보드 처리
+
+    /// T-15 하이라이트된 Credential 행의 필드 복사. 복사했으면 true.
+    /// 시크릿은 Vault 잠금 해제 상태에서만 복사한다 ([HARD]).
+    @discardableResult
+    private func copyCredentialField(secret: Bool) -> Bool {
+        guard !hits.isEmpty else { return false }
+        let hit = hits[min(highlightedIndex, hits.count - 1)]
+        guard hit.kind == .credential, let block = hit.block else { return false }
+        if let text = block.credentialCopyText(secret: secret, vaultUnlocked: store.isVaultUnlocked) {
+            let label = secret ? "\(block.title) Secret 1" : "\(block.title) 아이디"
+            if ClipboardService.copy(text, label: label, isSecret: secret) {
+                appState.notifyCopy(label, isSecret: secret)
+                return true
+            }
+            return false
+        }
+        if secret {
+            if !store.isVaultUnlocked {
+                DebugLogger.error(code: ErrorCode.vaultLocked, "\(block.title) 비밀값 접근 시도")
+                appState.notify("Vault를 먼저 해제하세요")
+            } else {
+                appState.notify("복사할 Secret 1이 없습니다")
+            }
+        } else {
+            appState.notify("복사할 아이디가 없습니다")
+        }
+        return true
+    }
 
     private func openHighlighted() {
         guard !hits.isEmpty else { return }
