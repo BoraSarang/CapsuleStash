@@ -1,0 +1,480 @@
+import AppKit
+import SwiftUI
+import UniformTypeIdentifiers
+
+/// T-04 블록 카드. 목업 `.block` 대응 (접기/펼치기 · 타입별 본문 · 복사).
+struct BlockCardView: View {
+    let block: Block
+    var isFirst: Bool
+    var isLast: Bool
+
+    @EnvironmentObject private var store: DataStore
+    @EnvironmentObject private var appState: AppState
+    @State private var isEditing = false
+    @State private var isDropTargeted = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            header
+            if !block.isCollapsed {
+                DashedLine(color: Theme.line, pattern: [4, 3])
+                    .frame(height: 1)
+                bodyView
+                    .padding(.horizontal, Theme.blockPadding)
+                    .padding(.vertical, 14)
+            }
+        }
+        .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).strokeBorder(Theme.line, lineWidth: 1))
+        .overlay(
+            RoundedRectangle(cornerRadius: Theme.cardRadius)
+                .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
+        )
+        .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+            handleDrop(providers)
+            return true
+        }
+        .sheet(isPresented: $isEditing) {
+            BlockEditorSheet(block: block)
+                .environmentObject(store)
+                .environmentObject(appState)
+        }
+    }
+
+    // MARK: - 헤더 (목업 `.block-head` + `편집` 버튼)
+
+    private var header: some View {
+        HStack(spacing: 10) {
+            TypeBadge(text: block.badgeLabel, type: block.type)
+
+            Text(block.title)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(1)
+
+            Spacer(minLength: 8)
+
+            CapsuleIconButton(systemImage: "pencil", tooltip: "편집") { isEditing = true }
+
+            if block.type == .webLink || block.type == .webArchive {
+                if let url = URL(string: block.url ?? "") {
+                    CapsuleIconButton(systemImage: "arrow.up.forward.app", tooltip: "브라우저로 열기") {
+                        open(url)
+                    }
+                }
+                CapsuleIconButton(systemImage: "link", tooltip: "URL 복사") { copyURL() }
+            } else if block.type == .credential {
+                Text(vaultLabel)
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.muted)
+            } else if block.type == .image || block.type == .file {
+                CapsuleIconButton(systemImage: "folder", tooltip: "경로 복사") { copyImagePaths() }
+            } else {
+                CapsuleIconButton(systemImage: "doc.on.doc", tooltip: "복사", style: .primary) { copyBlockContent() }
+            }
+
+            CapsuleIconButton(
+                systemImage: block.isCollapsed ? "chevron.down" : "chevron.up",
+                tooltip: block.isCollapsed ? "펼치기" : "접기"
+            ) {
+                store.toggleBlockCollapsed(block)
+            }
+
+            Menu {
+                Button("편집…") { isEditing = true }
+                Divider()
+                Button("위로") { store.moveBlock(block, offset: -1) }.disabled(isFirst)
+                Button("아래로") { store.moveBlock(block, offset: 1) }.disabled(isLast)
+                Button("이 Project 즐겨찾기") { toggleProjectFavorite() }
+                Divider()
+                Button("복사", action: copyBlockContent)
+                Button("삭제", role: .destructive) {
+                    store.deleteBlock(block)
+                    appState.notify("블록 삭제됨")
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 24, height: 22)
+                    .contentShape(Rectangle())
+            }
+            .menuStyle(.borderlessButton)
+            .menuIndicator(.hidden)
+            .fixedSize()
+            .help("더 보기")
+        }
+        .padding(.horizontal, Theme.blockPadding)
+        .padding(.vertical, 12)
+    }
+
+    // MARK: - 본문
+
+    @ViewBuilder
+    private var bodyView: some View {
+        switch block.type {
+        case .code, .shell:
+            codeBody
+        case .webLink, .webArchive:
+            webBody
+        case .image, .file:
+            imageBody
+        case .credential:
+            credentialBody
+        default:
+            Text(block.content)
+                .font(.system(size: 14))
+                .foregroundStyle(Theme.ink)
+                .lineSpacing(3)
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+
+    private var codeBody: some View {
+        Text(block.content)
+            .font(Theme.monoBody)
+            .foregroundStyle(Theme.codeForeground)
+            .padding(14)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Theme.codeBackground, in: RoundedRectangle(cornerRadius: 10))
+            .textSelection(.enabled)
+    }
+
+    private var webBody: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(alignment: .top, spacing: 12) {
+                webThumbnail
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(block.content.isEmpty ? (block.title) : block.content)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                        .lineLimit(2)
+                    Text(subtitleText)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.muted)
+                        .lineLimit(1)
+                    if let date = block.savedAt {
+                        Text("저장 \(Self.savedDateFormatter.string(from: date))")
+                            .font(.system(size: 11))
+                            .foregroundStyle(Theme.muted)
+                    }
+                    if block.type == .webArchive {
+                        Text(block.url == nil ? "원본 URL 없음" : "오프라인 저장 완료")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundStyle(block.url == nil ? Theme.muted : Color(hex: 0x2D5BD7))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 2)
+                            .background(Color(hex: 0xE8F0FF), in: Capsule())
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            // URL 행은 항상 표시: 없으면 안내 문구 (빈 카드처럼 보이는 문제 해소)
+            if let urlString = block.url, !urlString.isEmpty, let url = URL(string: urlString) {
+                Button { open(url) } label: {
+                    Text(urlString)
+                        .font(Theme.monoCaption)
+                        .foregroundStyle(Color(hex: 0x2D5BD7))
+                        .lineLimit(1)
+                        .truncationMode(.middle)
+                }
+                .buttonStyle(.plain)
+                .help("브라우저로 열기")
+            } else {
+                Text("URL 없음 — 편집에서 URL을 추가하면 열기·검색이 됩니다")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.muted)
+            }
+        }
+    }
+
+    private var webThumbnail: some View {
+        RoundedRectangle(cornerRadius: 10)
+            .fill(
+                LinearGradient(
+                    colors: [Color(hex: 0xD9CFB8), Color(hex: 0xA9B39A)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            )
+            .frame(width: 120, height: 80)
+            .overlay(
+                Image(systemName: "globe")
+                    .font(.system(size: 20, weight: .light))
+                    .foregroundStyle(Color(hex: 0x5C574A))
+            )
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+    }
+
+    private var subtitleText: String {
+        var parts: [String] = []
+        if let site = block.siteName, !site.isEmpty {
+            parts.append(site)
+        } else if let host = block.webHost {
+            // 사이트명이 비면 URL 호스트를 대신 표시
+            parts.append(host)
+        }
+        parts.append(block.type == .webArchive ? "아카이브" : "링크 저장")
+        return parts.joined(separator: " • ")
+    }
+
+    @ViewBuilder
+    private var imageBody: some View {
+        if block.imageNames.isEmpty {
+            Text(block.type == .image ? "첨부된 이미지가 없습니다. 편집에서 추가하세요." : "첨부된 파일이 없습니다. 편집에서 추가하세요.")
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.muted)
+        } else {
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                ForEach(block.imageNames, id: \.self) { name in
+                    cardThumbnail(for: name)
+                        .help("Finder에서 이미지·파일을 끌어다 놓으면 이 블록에 추가됩니다")
+                }
+            }
+        }
+    }
+
+    /// 카드 썸네일. 실파일이 있으면 미리보기, 없으면 파일명 타일.
+    @ViewBuilder
+    private func cardThumbnail(for name: String) -> some View {
+        if block.type == .image,
+           let url = AttachmentStore.fileURL(kind: AttachmentStore.imagesKind, name: name),
+           FileManager.default.fileExists(atPath: url.path),
+           let nsImage = NSImage(contentsOf: url) {
+            Image(nsImage: nsImage)
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(height: 120)
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+        } else {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(
+                    LinearGradient(
+                        colors: [Color(hex: 0xD9CFB8), Color(hex: 0xA9B39A)],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(height: 120)
+                .overlay(
+                    VStack(spacing: 6) {
+                        Image(systemName: block.type == .image ? "photo" : "doc")
+                            .font(.system(size: 18, weight: .light))
+                        Text(name)
+                            .font(.system(size: 11))
+                            .lineLimit(2)
+                    }
+                    .foregroundStyle(Color(hex: 0x5C574A))
+                    .padding(8)
+                )
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+                .help("파일 위치: Application Support/CapsuleStash/\(block.type == .image ? "images" : "files")/\(name)")
+        }
+    }
+
+    private var credentialBody: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            if let credential = block.credential {
+                credentialRow(
+                    label: "홈페이지",
+                    value: credential.homepage,
+                    isSecret: false,
+                    systemImage: "arrow.up.forward.app",
+                    tooltip: "브라우저로 열기"
+                ) {
+                    if let url = URL(string: credential.homepage) {
+                        open(url)
+                    } else {
+                        DebugLogger.error(code: ErrorCode.webOpen, "URL 형식 오류")
+                        appState.notify("열 수 없는 URL입니다")
+                    }
+                }
+
+                Divider().overlay(Theme.line)
+                credentialRow(
+                    label: "아이디",
+                    value: credential.username,
+                    isSecret: false,
+                    systemImage: "doc.on.doc",
+                    tooltip: "아이디 복사",
+                    primary: true
+                ) {
+                    if ClipboardService.copy(credential.username, label: "\(block.title) 아이디") {
+                        appState.notifyCopy("\(block.title) 아이디")
+                    }
+                }
+
+                Divider().overlay(Theme.line)
+                secretRow(
+                    label: "Secret 1",
+                    value: credential.password,
+                    copyLabel: "\(block.title) Secret 1"
+                )
+
+                // 두 번째 시크릿은 값이 있을 때만 표시 (빈 행으로 산만해지지 않게)
+                if !credential.secondSecret.isEmpty {
+                    Divider().overlay(Theme.line)
+                    secretRow(
+                        label: "Secret 2",
+                        value: credential.secondSecret,
+                        copyLabel: "\(block.title) Secret 2"
+                    )
+                }
+            } else {
+                Text("저장된 계정 정보가 없습니다. 편집에서 입력하면 시크릿은 Keychain에 보관됩니다.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(Theme.muted)
+            }
+        }
+    }
+
+    /// Vault 잠금과 연동된 시크릿 행. 잠금 상태면 마스킹 표시 + 복사 차단.
+    private func secretRow(label: String, value: String, copyLabel: String) -> some View {
+        credentialRow(
+            label: label,
+            value: store.isVaultUnlocked ? value : "••••••••••",
+            isSecret: true,
+            systemImage: "doc.on.doc",
+            tooltip: "\(label) 복사",
+            primary: true
+        ) {
+            guard store.isVaultUnlocked else {
+                DebugLogger.error(code: ErrorCode.vaultLocked, "\(block.title) 비밀값 접근 시도")
+                appState.notify("Vault를 먼저 해제하세요")
+                return
+            }
+            if ClipboardService.copy(value, label: copyLabel, isSecret: true) {
+                appState.notifyCopy(copyLabel, isSecret: true)
+            }
+        }
+    }
+
+    private func credentialRow(label: String, value: String, isSecret: Bool,
+                               systemImage: String, tooltip: String, primary: Bool = false,
+                               action: @escaping () -> Void) -> some View {
+        HStack(spacing: 10) {
+            Text(label)
+                .font(.system(size: 13))
+                .foregroundStyle(Theme.muted)
+                .frame(width: 72, alignment: .leading)
+            Text(value.isEmpty ? "—" : value)
+                .font(isSecret ? Theme.monoBody : .system(size: 14))
+                .foregroundStyle(Theme.ink)
+                .lineLimit(1)
+            Spacer(minLength: 8)
+            CapsuleIconButton(systemImage: systemImage, tooltip: tooltip, style: primary ? .primary : .plain, action: action)
+        }
+        .padding(.vertical, 8)
+    }
+
+    // MARK: - 동작
+
+    /// 목업 표기 `2026-09-28` 형식. 시스템 로케일과 무관하게 고정한다.
+    private static let savedDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }()
+
+    private var vaultLabel: String {
+        store.isVaultUnlocked ? "● Vault 열림" : "●●● 잠금됨"
+    }
+
+    /// 카드에 파일을 끌어다 놓으면 이미지/파일 블록에 첨부한다.
+    /// 다른 타입 블록에는 받지 않는다.
+    private func handleDrop(_ providers: [NSItemProvider]) {
+        guard block.type == .image || block.type == .file else {
+            appState.notify("이미지·파일 블록에만 끌어다 놓을 수 있습니다")
+            return
+        }
+        AttachmentStore.urls(from: providers) { urls in
+            let kind = self.block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
+            let accepted: [URL]
+            if self.block.type == .image {
+                accepted = urls.filter { AttachmentStore.isImageFile($0) }
+                guard !accepted.isEmpty else {
+                    self.appState.notify("이미지 파일을 끌어다 놓으세요")
+                    return
+                }
+            } else {
+                accepted = urls.filter { $0.isFileURL }
+            }
+            guard !accepted.isEmpty else { return }
+            let names = AttachmentStore.importFiles(from: accepted, kind: kind)
+            guard !names.isEmpty else { return }
+            var updated = self.block
+            updated.imageNames += names
+            updated.updatedAt = Date()
+            self.store.updateBlock(updated)
+            self.appState.notify("\(names.count)개 \(self.block.type.displayName) 추가됨")
+        }
+    }
+
+    private func copyBlockContent() {
+        let text = block.copyPayload(includeSecrets: store.isVaultUnlocked)
+        guard !text.isEmpty else {
+            appState.notify("복사할 내용이 없습니다")
+            return
+        }
+        if ClipboardService.copy(text, label: block.title) {
+            appState.notifyCopy(block.title)
+        }
+    }
+
+    /// 이미지/파일 블록의 예상 보관 경로를 복사한다 (원본 뷰어는 T-12).
+    private func copyImagePaths() {
+        guard !block.imageNames.isEmpty else {
+            appState.notify("첨부된 파일이 없습니다")
+            return
+        }
+        let base = PersistenceStore.attachmentsURL(kind: block.type == .image ? "images" : "files").path
+        let text = block.imageNames.map { base + "/" + $0 }.joined(separator: "\n")
+        if ClipboardService.copy(text, label: "\(block.title) 경로") {
+            appState.notifyCopy("\(block.title) 경로")
+        }
+    }
+
+    private func copyURL() {
+        guard let url = block.url, !url.isEmpty else {
+            appState.notify("저장된 URL이 없습니다")
+            return
+        }
+        if ClipboardService.copy(url, label: "\(block.title) URL") {
+            appState.notifyCopy("URL")
+        }
+    }
+
+    private func open(_ url: URL) {
+        DebugLogger.feature("외부 링크 열기: \(url.host() ?? url.absoluteString)")
+        NSWorkspace.shared.open(url)
+    }
+
+    private func toggleProjectFavorite() {
+        if let project = store.selectedProject { store.toggleFavorite(project) }
+    }
+}
+
+// MARK: - 점선 구분선 (목업 `border-bottom: 1px dashed`)
+
+struct DashedLine: Shape {
+    var color: Color = Theme.line
+    var pattern: [CGFloat] = [4, 3]
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: 0, y: rect.height / 2))
+        var x: CGFloat = 0
+        var index = 0
+        while x < rect.width {
+            let segment = pattern[index % pattern.count]
+            path.addLine(to: CGPoint(x: min(x + segment, rect.width), y: rect.height / 2))
+            x += segment
+            index += 1
+        }
+        return path
+    }
+}

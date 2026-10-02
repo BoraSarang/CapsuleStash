@@ -1,0 +1,71 @@
+{
+  "images": [
+    {
+      "filename": "MenuBar-16pt@1x.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "16x16"
+    },
+    {
+      "filename": "MenuBar-16pt@2x.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "16x16"
+    },
+    {
+      "filename": "MenuBar-18pt@1x.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "18x18"
+    },
+    {
+      "filename": "MenuBar-18pt@2x.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "18x18"
+    },
+    {
+      "filename": "MenuBar-19pt@1x.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "19x19"
+    },
+    {
+      "filename": "MenuBar-19pt@2x.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "19x19"
+    },
+    {
+      "filename": "MenuBar-20pt@1x.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "20x20"
+    },
+    {
+      "filename": "MenuBar-20pt@2x.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "20x20"
+    },
+    {
+      "filename": "MenuBar-22pt@1x.png",
+      "idiom": "mac",
+      "scale": "1x",
+      "size": "22x22"
+    },
+    {
+      "filename": "MenuBar-22pt@2x.png",
+      "idiom": "mac",
+      "scale": "2x",
+      "size": "22x22"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "template-rendering-intent": "template"
+  }
+}

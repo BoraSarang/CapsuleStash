@@ -1,0 +1,66 @@
+name: CapsuleStash
+options:
+  bundleIdPrefix: com.borasarang
+  deploymentTarget:
+    macOS: "14.0"
+  xcodeVersion: "16.0"
+  groupSortPosition: top
+  generateEmptyDirectories: true
+targets:
+  CapsuleStash:
+    type: application
+    platform: macOS
+    sources:
+      - path: CapsuleStash
+        excludes:
+          - "Resources"
+      - path: CapsuleStash/Resources
+        buildPhase: resources
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.borasarang.CapsuleStash
+        PRODUCT_NAME: CapsuleStash
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Capsule Stash
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHumanReadableCopyright: ""
+        MARKETING_VERSION: 0.1.0
+        CURRENT_PROJECT_VERSION: 1
+        SWIFT_VERSION: "5.0"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        # 메뉴바 상주 앱이지만 MVP 는 Dock 아이콘도 유지한다 (2차에서 LSUIElement 전환 검토)
+        INFOPLIST_KEY_LSUIElement: NO
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        INFOPLIST_KEY_CFBundleIconName: AppIcon
+        COMBINE_HIDPI_IMAGES: YES
+        ENABLE_HARDENED_RUNTIME: NO
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
+  CapsuleStashTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: CapsuleStashTests
+    dependencies:
+      - target: CapsuleStash
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.borasarang.CapsuleStashTests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+schemes:
+  CapsuleStash:
+    build:
+      targets:
+        CapsuleStash: all
+        CapsuleStashTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - CapsuleStashTests
+      gatherCoverageData: false
+      environmentVariables:
+        CAPSULESTASH_TEST_DIR: /tmp/CapsuleStashTests

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capsule Stash — 디자인 목업 v0.1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16150f; --sidebar:#1b1a15; --sidebar-2:#242219;
+  --paper:#faf7f0; --card:#ffffff; --line:#e8e0d1;
+  --accent:#ff5c00; --accent-soft:#ffe9d6; --sage:#5f6f52; --gold:#c99a2e;
+  --muted:#8a857a; --mono:'JetBrains Mono',monospace;
+  --serif:'Instrument Serif',serif; --sans:'IBM Plex Sans KR',-apple-system,sans-serif;
+}
+*{box-sizing:border-box} body{margin:0;font-family:var(--sans);background:#0e0d0a;color:var(--ink);min-height:100vh;
+  background-image:radial-gradient(1000px 500px at 20% -10%,#2b2417 0%,transparent 60%),radial-gradient(800px 400px at 90% 10%,#1f2a1e 0%,transparent 60%),url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");}
+.topbar{max-width:1180px;margin:28px auto 0;padding:0 24px;display:flex;align-items:center;justify-content:space-between;color:#efe9db}
+.brand{display:flex;gap:12px;align-items:center}
+.capsule-logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#ff5c00,#ffb25c);display:grid;place-items:center;font-size:19px;box-shadow:0 8px 24px rgba(255,92,0,.35)}
+.brand h1{font-family:var(--serif);font-weight:400;font-size:26px;margin:0;letter-spacing:-.02em}
+.brand h1 em{font-style:italic;color:#ffb25c}
+.brand small{display:block;font-family:var(--sans);font-size:11px;letter-spacing:.18em;color:#a39c8b}
+.pill-tabs{display:flex;background:#1e1c16;border:1px solid #343126;border-radius:999px;padding:4px;gap:4px}
+.pill-tabs button{border:0;background:transparent;color:#b7b0a0;font-family:var(--sans);font-size:13px;font-weight:600;padding:8px 16px;border-radius:999px;cursor:pointer}
+.pill-tabs button.active{background:#faf7f0;color:#16150f}
+.hint{font-size:12px;color:#8a857a}.hint kbd{background:#242219;border:1px solid #3a372c;border-radius:6px;padding:2px 7px;font-family:var(--mono);font-size:11px;color:#efe9db}
+.stage{max-width:1180px;margin:18px auto 60px;padding:0 24px}
+/* Mac window */
+.mac{border-radius:18px;overflow:hidden;border:1px solid #3a372c;box-shadow:0 40px 100px rgba(0,0,0,.6);background:var(--paper)}
+.titlebar{background:#e9e2d3;display:flex;align-items:center;padding:12px 16px;gap:14px;border-bottom:1px solid #d8cfb9}
+.traffic{display:flex;gap:8px}.traffic i{width:12px;height:12px;border-radius:50%;display:block}
+.searchbar{flex:1;max-width:420px;margin:0 auto;background:#fff;border:1px solid #d8cfb9;border-radius:9px;padding:7px 12px;font-size:13px;color:#8a857a;display:flex;gap:8px;align-items:center}
+.newbtn{background:var(--ink);color:#fff;border:0;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.app{display:grid;grid-template-columns:272px 1fr;min-height:640px}
+/* sidebar */
+.side{background:var(--sidebar);color:#d9d3c4;padding:18px 14px;display:flex;flex-direction:column;gap:14px}
+.side h4{font-size:11px;letter-spacing:.14em;color:#8a857a;margin:8px 8px 6px}
+.ws{border-radius:12px;padding:4px}
+.ws-name{font-size:13px;font-weight:700;padding:8px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;border-radius:8px}
+.ws-name:hover{background:#2a2820}
+.proj{margin-left:6px;border-left:1px solid #38352a;padding-left:10px;margin-top:4px}
+.proj-name{font-size:13px;font-weight:600;color:#c9c2b0;padding:6px 8px}
+.col{display:flex;align-items:center;gap:8px;font-size:13px;padding:7px 8px;border-radius:8px;cursor:pointer;color:#a9a294;border:1px solid transparent;width:100%;background:transparent;text-align:left;font-family:var(--sans)}
+.col:hover{background:#26241c;color:#efe9db}
+.col.active{background:#faf7f0;color:#16150f;font-weight:700}
+.col .dot{width:7px;height:7px;border-radius:50%}
+.side-foot{margin-top:auto;background:#242219;border:1px solid #38352a;border-radius:12px;padding:12px;font-size:12px;color:#a39c8b}
+.lock{display:flex;justify-content:space-between;align-items:center}
+/* content */
+.content{padding:26px 30px;background:var(--paper)}
+.crumbs{font-size:12px;color:var(--muted);letter-spacing:.04em}
+h2.title{font-family:var(--serif);font-size:42px;margin:6px 0 4px;font-weight:400;letter-spacing:-.02em}
+.meta{font-size:13px;color:var(--muted);display:flex;gap:12px;margin-bottom:18px}
+.tags span{background:#efe8d6;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px}
+.block{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.block-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px dashed var(--line)}
+.type{font-family:var(--mono);font-size:11px;font-weight:600;letter-spacing:.08em;padding:4px 8px;border-radius:6px;background:#16150f;color:#fff}
+.type.code{background:var(--accent)} .type.web{background:#2d5bd7} .type.img{background:var(--sage)} .type.cred{background:#7a2ee0}
+.block-head b{font-size:14px} .sp{flex:1}
+.iconbtn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.iconbtn:hover{border-color:var(--ink)} .iconbtn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+.block-body{padding:16px 18px;font-size:14px;line-height:1.7}
+pre{background:#14130f;color:#f2ead9;border-radius:10px;padding:14px;font-family:var(--mono);font-size:13px;overflow:auto;margin:0}
+.webcard{display:flex;gap:14px;align-items:center}
+.webcard img{width:120px;height:80px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.cred-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #f0e9d8;font-size:14px}
+.cred-row:last-child{border:0}
+.cred-row code{font-family:var(--mono);background:#f4eee0;padding:3px 8px;border-radius:6px}
+.folded .block-body{display:none}
+.imggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.imggrid div{height:120px;border-radius:10px;background:linear-gradient(135deg,#d9cfb8,#a9b39a);border:1px solid var(--line);display:grid;place-items:center;color:#5c574a;font-size:12px}
+/* palette */
+.palette-wrap{position:fixed;inset:0;background:rgba(10,9,7,.6);backdrop-filter:blur(8px);display:none;place-items:start center;padding-top:12vh;z-index:50}
+.palette-wrap.open{display:grid}
+.palette{width:640px;background:#fbf9f3;border-radius:16px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.5);border:1px solid #fff}
+.palette input{width:100%;border:0;padding:18px 20px;font-size:17px;background:transparent;outline:none;font-family:var(--sans)}
+.results{border-top:1px solid var(--line);max-height:380px;overflow:auto;padding:8px}
+.row{display:flex;gap:12px;align-items:center;padding:11px 12px;border-radius:10px;cursor:pointer}
+.row:hover{background:#f1e9d6}
+.row .k{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:#16150f;color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;display:none;z-index:99}
+@media(max-width:900px){.app{grid-template-columns:1fr}.side{display:none}.stage{padding:0 12px}h2.title{font-size:32px}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand"><div class="capsule-logo">●</div><div><h1>Capsule <em>Stash</em></h1><small>PERSONAL KNOWLEDGE WORKSPACE</small></div></div>
+  <div class="pill-tabs"><button class="active">메인 창</button><button onclick="openPalette()">⌘⇧Space 팔레트</button></div>
+  <div class="hint"><kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>Space</kbd> 로 언제든 호출</div>
+</div>
+<div class="stage">
+<div class="mac">
+  <div class="titlebar"><div class="traffic"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i></div>
+  <div class="searchbar" onclick="openPalette()">🔍 WKWebView 아카이브 검색… <span style="margin-left:auto;font-family:var(--mono);font-size:11px">⌘⇧Space</span></div>
+  <button class="newbtn">+ 새로 만들기</button></div>
+  <div class="app">
+    <aside class="side">
+      <div><h4>WORKSPACE</h4>
+        <div class="ws"><div class="ws-name">▾ 개발 <span>4</span></div>
+          <div class="proj"><div class="proj-name">▾ macOS 앱</div>
+            <button class="col active"><span class="dot" style="background:#ff5c00"></span>WKWebView 아카이브</button>
+            <button class="col"><span class="dot" style="background:#2d5bd7"></span>메뉴바 앱 구조</button>
+            <button class="col"><span class="dot" style="background:#5f6f52"></span>글로벌 단축키</button>
+          </div>
+          <div class="proj"><div class="proj-name">▸ 서버 관리</div></div>
+        </div>
+        <div class="ws"><div class="ws-name">▸ 개인 <span>2</span></div></div>
+        <div class="ws"><div class="ws-name">▸ 업무 <span>5</span></div></div>
+      </div>
+      <div><h4>SMART</h4>
+        <button class="col">★ 즐겨찾기</button><button class="col">◷ 최근 사용</button><button class="col">🔒 계정 / Credential</button>
+      </div>
+      <div class="side-foot"><div class="lock"><span>🔒 Vault 잠금됨</span><button class="iconbtn" style="background:#333026;color:#fff;border-color:#333026" onclick="toast('Touch ID로 잠금 해제 (목업)')">Touch ID</button></div>
+      <div style="margin-top:8px">메뉴바 상주 중 • 동기화 ✓</div></div>
+    </aside>
+    <main class="content">
+      <div class="crumbs">개발 / macOS 앱 / COLLECTION</div>
+      <h2 class="title">WKWebView로 웹 페이지 저장하기</h2>
+      <div class="meta"><span>수정 2시간 전</span><span>•</span><span>블록 5개</span><span class="tags"><span>#webkit</span> <span>#archive</span></span></div>
+      <div class="block" id="b1"><div class="block-head"><span class="type">TEXT</span><b>설명</b><span class="sp"></span><button class="iconbtn" onclick="fold('b1')">접기</button><button class="iconbtn primary" onclick="copy(this,'설명 텍스트 복사됨')">복사</button></div>
+        <div class="block-body">WKWebView의 현재 페이지를 WebArchive + PDF + 본문 텍스트로 함께 저장하면 오프라인 열람과 검색이 모두 안정적이다. 기본값은 URL + 본문 + PDF 조합.</div></div>
+      <div class="block" id="b2"><div class="block-head"><span class="type code">CODE • SWIFT</span><b>아카이브 생성</b><span class="sp"></span><button class="iconbtn" onclick="fold('b2')">접기</button><button class="iconbtn primary" onclick="copy(this,'Swift 코드 복사됨')">⧉ 복사</button></div>
+        <div class="block-body"><pre>webView.createWebArchiveData { result in
+  switch result {
+  case .success(let data):
+    try? data.write(to: archiveURL)
+  case .failure(let error):
+    logger.error("\(error)")
+  }
+}</pre></div></div>
+      <div class="block" id="b3"><div class="block-head"><span class="type web">WEB • ARCHIVE</span><b>참고 문서</b><span class="sp"></span><button class="iconbtn" onclick="toast('오프라인 아카이브 열기 (목업)')">열기</button><button class="iconbtn" onclick="copy(this,'URL 복사됨')">URL 복사</button></div>
+        <div class="block-body"><div class="webcard"><img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=400&q=60&auto=format&fit=crop"><div><b>Working with web content offline in SwiftUI apps</b><br><span style="color:var(--muted);font-size:13px">developer.apple.com • PDF + 본문 저장됨 • 2026-09-28</span><br><span style="font-size:12px;background:#e8f0ff;padding:2px 8px;border-radius:999px">오프라인 보기 가능</span></div></div></div></div>
+      <div class="block" id="b4"><div class="block-head"><span class="type img">IMAGE ×2</span><b>메뉴바 구조 스케치</b><span class="sp"></span><button class="iconbtn" onclick="fold('b4')">접기</button><button class="iconbtn" onclick="toast('이미지 원본 보기 (목업)')">보기</button></div>
+        <div class="block-body"><div class="imggrid"><div>menubar-sketch-01.png</div><div>palette-flow-02.png</div></div></div></div>
+      <div class="block" id="b5"><div class="block-head"><span class="type cred">CREDENTIAL</span><b>GitHub — 개인 계정</b><span class="sp"></span><span style="font-size:12px;color:var(--muted)">●●● 암호화됨</span><button class="iconbtn" onclick="toast('Vault 잠금 해제 필요 (목업)')">보기</button></div>
+        <div class="block-body"><div class="cred-row"><span style="width:90px;color:var(--muted)">홈페이지</span><span>github.com</span><span style="flex:1"></span><button class="iconbtn" onclick="toast('브라우저 열기 (목업)')">열기</button></div>
+        <div class="cred-row"><span style="width:90px;color:var(--muted)">아이디</span><code>example</code><span style="flex:1"></span><button class="iconbtn primary" onclick="copy(this,'아이디 복사됨')">복사 ⌘1</button></div>
+        <div class="cred-row"><span style="width:90px;color:var(--muted)">패스워드</span><code>••••••••••</code><span style="flex:1"></span><button class="iconbtn primary" onclick="copy(this,'패스워드 복사됨 (30초 후 삭제)')">복사 ⌘2</button></div></div></div>
+    </main>
+  </div>
+</div>
+<p style="color:#8a857a;font-size:13px;margin-top:14px">목업 v0.1 — custom 프로필. 좌 트리 3단계 고정, 우 블록 혼합 구성, 팔레트는 ⌘⇧Space. 블록 접기·복사·검색은 동작하는 목업임.</p>
+</div>
+<div class="palette-wrap" id="palette" onclick="if(event.target===this)closePalette()"><div class="palette">
+  <input id="q" placeholder="검색: docker, github, swift…" oninput="filter()">
+  <div class="results" id="res">
+    <div class="row" data-t="docker code"><span class="type code">CODE</span><div><b>docker compose 실행</b><br><small style="color:var(--muted)">개발 / 서버 관리 / Docker 배포 • bash</small></div><span class="k">⌘C 복사</span></div>
+    <div class="row" data-t="docker collection"><span class="type">COLLECTION</span><div><b>Docker 배포</b><br><small style="color:var(--muted)">개발 / 서버 관리 • 블록 6개</small></div><span class="k">Enter 열기</span></div>
+    <div class="row" data-t="github credential"><span class="type cred">CRED</span><div><b>GitHub</b><br><small style="color:var(--muted)">개발 / 계정 • 값 숨김</small></div><span class="k">⌘1 ID ⌘2 PW</span></div>
+    <div class="row" data-t="swift wkwebview"><span class="type code">CODE</span><div><b>WKWebView 아카이브 생성</b><br><small style="color:var(--muted)">개발 / macOS 앱 • swift</small></div><span class="k">⌘C 복사</span></div>
+    <div class="row" data-t="webkit archive"><span class="type web">WEB</span><div><b>SwiftUI 오프라인 가이드</b><br><small style="color:var(--muted)">개발 / 참고 문서</small></div><span class="k">Enter 열기</span></div>
+  </div>
+</div></div>
+<div class="toast" id="toast"></div>
+<script>
+function openPalette(){document.getElementById('palette').classList.add('open');setTimeout(()=>document.getElementById('q').focus(),50)}
+function closePalette(){document.getElementById('palette').classList.remove('open')}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.shiftKey&&e.code==='Space'){e.preventDefault();openPalette()}if(e.key==='Escape')closePalette()});
+function fold(id){document.getElementById(id).classList.toggle('folded')}
+function copy(btn,msg){navigator.clipboard&&navigator.clipboard.writeText(msg).catch(()=>{});toast(msg)}
+let t;function toast(m){const el=document.getElementById('toast');el.textContent=m;el.style.display='block';clearTimeout(t);t=setTimeout(()=>el.style.display='none',1800)}
+function filter(){const q=document.getElementById('q').value.toLowerCase();document.querySelectorAll('#res .row').forEach(r=>{r.style.display=r.dataset.t.includes(q)||q===''?'flex':'none'})}
+document.querySelectorAll('.col').forEach(c=>c.addEventListener('click',()=>{document.querySelectorAll('.col').forEach(x=>x.classList.remove('active'));c.classList.add('active')}));
+</script>
+</body>
+</html>
