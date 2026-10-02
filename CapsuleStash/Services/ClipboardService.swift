@@ -6,6 +6,9 @@ import Foundation
 enum ClipboardService {
     private static var clearTask: Task<Void, Never>?
 
+    /// 마지막에 복사한 비밀값 지문 (종료 시 정리용). 값 자체는 보관하지 않는다.
+    private static var lastSecretFingerprint: String?
+
     @discardableResult
     static func copy(_ text: String, label: String, isSecret: Bool = false) -> Bool {
         guard !text.isEmpty else {
@@ -20,6 +23,7 @@ enum ClipboardService {
         }
 
         if isSecret {
+            lastSecretFingerprint = text
             // 0초(안 함)로 설정했으면 자동 삭제를 예약하지 않는다
             if secretClearDelay > 0 {
                 scheduleClear(after: secretClearDelay, fingerprint: text)
@@ -45,6 +49,16 @@ enum ClipboardService {
 
     static func read() -> String? {
         NSPasteboard.general.string(forType: .string)
+    }
+
+    /// T-17 종료 시 정리: 클립보드에 마지막 비밀값이 그대로 있으면 비운다.
+    /// [HARD] 값 자체를 로그에 남기지 않는다.
+    static func clearSecretsOnQuit() {
+        guard let fingerprint = lastSecretFingerprint,
+              NSPasteboard.general.string(forType: .string) == fingerprint else { return }
+        NSPasteboard.general.clearContents()
+        lastSecretFingerprint = nil
+        DebugLogger.info("종료 시 클립보드의 비밀값을 삭제함")
     }
 
     /// 지정 시간 뒤, 클립보드에 같은 값이 그대로 있을 때만 비운다.

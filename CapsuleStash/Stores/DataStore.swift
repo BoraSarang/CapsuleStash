@@ -470,6 +470,16 @@ final class DataStore: ObservableObject {
         DebugLogger.info("Vault 잠금")
     }
 
+    /// T-17 종료 시 자동잠금. 설정(`vaultLockOnQuit`, 기본 켜짐)이 꺼져 있으면 아무것도 안 한다.
+    func lockVaultOnQuitIfNeeded() {
+        guard UserDefaults.standard.object(forKey: "vaultLockOnQuit") as? Bool ?? true else { return }
+        if isVaultUnlocked {
+            lockVault()
+        }
+        ClipboardService.clearSecretsOnQuit()
+        DebugLogger.feature("종료 시 Vault 잠금 + 클립보드 정리")
+    }
+
     /// Keychain에서 시크릿을 복원해 메모리에 채운다 (디스크 JSON에는 시크릿이 없음).
     /// 테스트에서 직접 호출해 복원 경로를 검증한다.
     func restoreSecretsFromKeychain() {

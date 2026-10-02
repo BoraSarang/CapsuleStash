@@ -48,7 +48,7 @@
 - [x] T-10 Credential Keychain 암호화 저장 + Touch ID 해제 + 클립보드 자동삭제 (시크릿만 Keychain 블록 ID 단위 보관, JSON엔 홈페이지·아이디만, 삭제 시 정리, DebugPanel Keychain 건수)
 - [x] T-15 Credential `⌘1`/`⌘2` 필드 단위 복사 단축키 (팔레트 하이라이트 행: `⌘1` 아이디 항상, `⌘2` Secret 1은 Vault 해제 시만, `credentialCopyText` 게이트 + 테스트)
 - [x] T-16 전각·태그 검색 확장 (전각 영숫자 정규화, `tag:` 필터·따옴표·# 지원, 사용법 힌트 갱신, 테스트 4건)
-- [ ] T-17 앱 종료 후 자동잠금 옵션
+- [x] T-17 앱 종료 후 자동잠금 옵션 (종료 시 Vault 잠금 + 클립보드 비밀값 삭제, 설정 토글 기본 켜짐, 테스트 1건)
 
 ## 보류 / 결정 필요
 - [ ] 앱 전환 시 Dock 아이콘 유지 여부 (MVP는 유지, `LSUIElement` 전환은 메뉴바 전용 모드 도입 시)

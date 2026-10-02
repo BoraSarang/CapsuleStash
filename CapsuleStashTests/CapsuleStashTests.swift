@@ -898,6 +898,23 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertFalse(store.isVaultUnlocked)
     }
 
+    @MainActor
+    func testLockVaultOnQuitIfNeeded() {
+        UserDefaults.standard.removeObject(forKey: "vaultLockOnQuit")
+        defer { UserDefaults.standard.removeObject(forKey: "vaultLockOnQuit") }
+        let store = makeStore()
+        store.unlockVault()
+        // 기본 켜짐 → 잠금 (클립보드는 건드리지 않음: 지문 없음)
+        store.lockVaultOnQuitIfNeeded()
+        XCTAssertFalse(store.isVaultUnlocked)
+        // 꺼져 있으면 유지
+        UserDefaults.standard.set(false, forKey: "vaultLockOnQuit")
+        store.unlockVault()
+        store.lockVaultOnQuitIfNeeded()
+        XCTAssertTrue(store.isVaultUnlocked, "옵션 OFF면 종료 시에도 잠그지 않음")
+        store.lockVault()
+    }
+
     // MARK: - 첨부 (이미지/파일)
 
     @MainActor

@@ -7,6 +7,7 @@ struct SettingsView: View {
     @AppStorage("clipboardClearDelay") private var clearDelay: Double = 30
     @AppStorage("vaultAutoLock") private var vaultAutoLock = false
     @AppStorage("vaultBiometric") private var vaultBiometric = true
+    @AppStorage("vaultLockOnQuit") private var vaultLockOnQuit = true
     @AppStorage("appearanceMode") private var appearanceMode = Theme.AppearanceMode.system.rawValue
 
     @State private var launchAtLogin = false
@@ -66,6 +67,8 @@ struct SettingsView: View {
                 .help("아이디·패스워드 복사 후 지정 시간이 지나면 클립보드를 비웁니다")
                 Toggle("백그라운드 전환 시 Vault 잠금", isOn: $vaultAutoLock)
                     .help("다른 앱으로 전환되면 Vault를 자동으로 잠급니다")
+                Toggle("종료 시 Vault 잠금", isOn: $vaultLockOnQuit)
+                    .help("앱을 끝낼 때 Vault를 잠그고 클립보드의 비밀값을 지웁니다")
                 Toggle("생체 인증으로 Vault 해제", isOn: $vaultBiometric)
                     .help("Touch ID·Face ID를 지원하면 해제 시 인증합니다. 미지원 기기는 바로 해제됩니다")
             }

@@ -78,6 +78,10 @@ struct ContentView: View {
         .onAppear {
             DebugLogger.feature("ContentView 표시")
         }
+        // T-17 종료 시 Vault 잠금 + 클립보드 비밀값 정리
+        .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+            store.lockVaultOnQuitIfNeeded()
+        }
     }
 
     // MARK: - 타이틀바 새 블록 추가
