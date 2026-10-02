@@ -12,6 +12,8 @@ struct CapsuleStashApp: App {
     init() {
         // 설정(⌘,)의 모양 선택을 가장 먼저 적용한다 (기본 시스템 추적).
         Theme.applyAppearance()
+        // Dock 표시 여부 (기본 숨김). 설정에서 바꾸면 즉시 적용된다.
+        Self.applyDockVisibility()
         _store = StateObject(wrappedValue: DataStore())
         _appState = StateObject(wrappedValue: AppState())
     }
@@ -59,6 +61,14 @@ struct CapsuleStashApp: App {
         Settings {
             SettingsView()
         }
+    }
+
+    /// Dock 아이콘 표시 여부 (설정 키 `showDockIcon`, 기본 숨김).
+    /// 켜면 `.regular`, 끄면 `.accessory` — 즉시 적용된다.
+    static func applyDockVisibility() {
+        let show = UserDefaults.standard.object(forKey: "showDockIcon") as? Bool ?? false
+        NSApplication.shared.setActivationPolicy(show ? .regular : .accessory)
+        DebugLogger.feature("Dock 아이콘: \(show ? "표시" : "숨김")")
     }
 
     // MARK: - 글로벌 단축키

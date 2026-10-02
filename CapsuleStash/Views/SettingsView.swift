@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("vaultAutoLock") private var vaultAutoLock = false
     @AppStorage("vaultBiometric") private var vaultBiometric = true
     @AppStorage("vaultLockOnQuit") private var vaultLockOnQuit = true
+    @AppStorage("showDockIcon") private var showDockIcon = false
     @AppStorage("appearanceMode") private var appearanceMode = Theme.AppearanceMode.system.rawValue
 
     @State private var launchAtLogin = false
@@ -20,6 +21,9 @@ struct SettingsView: View {
                 Toggle("로그인 시 실행", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in setLaunchAtLogin(enabled) }
                     .help("macOS 로그인 시 CapsuleStash를 자동으로 실행합니다")
+                Toggle("Dock에 아이콘 표시", isOn: $showDockIcon)
+                    .onChange(of: showDockIcon) { _, _ in CapsuleStashApp.applyDockVisibility() }
+                    .help("끄면 메뉴바에만 상주합니다. 즉시 적용됩니다")
             }
 
             Section("Command Palette") {

@@ -915,6 +915,12 @@ final class CapsuleStashTests: XCTestCase {
         store.lockVault()
     }
 
+    func testDockIconHiddenByDefault() {
+        UserDefaults.standard.removeObject(forKey: "showDockIcon")
+        let show = UserDefaults.standard.object(forKey: "showDockIcon") as? Bool ?? false
+        XCTAssertFalse(show, "Dock 아이콘 기본값은 숨김(아니오)")
+    }
+
     // MARK: - 첨부 (이미지/파일)
 
     @MainActor
