@@ -82,6 +82,10 @@ final class SDBlock {
     var credHomepage: String
     var credUsername: String
     var hasCredential: Bool
+    /// 웹 아카이브 실파일명 (T-09). 없으면 미저장.
+    var archiveFile: String?
+    /// 웹 아카이브 PDF 실파일명 (T-09). 없으면 미저장.
+    var pdfFile: String?
     var isCollapsed: Bool
     var sortOrder: Int
     var createdAt: Date
@@ -92,6 +96,7 @@ final class SDBlock {
          content: String = "", language: String? = nil, url: String? = nil,
          siteName: String? = nil, savedAt: Date? = nil, imageNames: [String] = [],
          credHomepage: String = "", credUsername: String = "", hasCredential: Bool = false,
+         archiveFile: String? = nil, pdfFile: String? = nil,
          isCollapsed: Bool = false, sortOrder: Int = 0,
          createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
@@ -107,6 +112,8 @@ final class SDBlock {
         self.credHomepage = credHomepage
         self.credUsername = credUsername
         self.hasCredential = hasCredential
+        self.archiveFile = archiveFile
+        self.pdfFile = pdfFile
         self.isCollapsed = isCollapsed
         self.sortOrder = sortOrder
         self.createdAt = createdAt
@@ -243,7 +250,9 @@ private extension Block {
                   type: BlockType(rawValue: entity.typeRaw) ?? .text,
                   title: entity.title, content: entity.content, language: entity.language,
                   url: entity.url, siteName: entity.siteName, savedAt: entity.savedAt,
-                  imageNames: entity.imageNames, credential: credential,
+                  imageNames: entity.imageNames,
+                  archiveFile: entity.archiveFile, pdfFile: entity.pdfFile,
+                  credential: credential,
                   isCollapsed: entity.isCollapsed, sortOrder: entity.sortOrder,
                   createdAt: entity.createdAt, updatedAt: entity.updatedAt)
     }
@@ -260,6 +269,7 @@ private extension SDBlock {
                   credHomepage: block.credential?.homepage ?? "",
                   credUsername: block.credential?.username ?? "",
                   hasCredential: block.credential != nil,
+                  archiveFile: block.archiveFile, pdfFile: block.pdfFile,
                   isCollapsed: block.isCollapsed, sortOrder: sortOrder,
                   createdAt: block.createdAt, updatedAt: block.updatedAt)
     }

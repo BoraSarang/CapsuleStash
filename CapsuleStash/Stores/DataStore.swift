@@ -204,8 +204,16 @@ final class DataStore: ObservableObject {
     func deleteWorkspace(_ id: UUID) {
         if let ws = workspaces.first(where: { $0.id == id }) {
             for project in ws.projects {
-                for block in project.blocks where block.credential != nil {
-                    KeychainStore.delete(blockId: block.id)
+                for block in project.blocks {
+                    if block.credential != nil {
+                        KeychainStore.delete(blockId: block.id)
+                    }
+                    if let name = block.archiveFile {
+                        WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
+                    }
+                    if let name = block.pdfFile {
+                        WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
+                    }
                 }
             }
         }
@@ -237,8 +245,16 @@ final class DataStore: ObservableObject {
     }
 
     func deleteProject(_ project: Project) {
-        for block in project.blocks where block.credential != nil {
-            KeychainStore.delete(blockId: block.id)
+        for block in project.blocks {
+            if block.credential != nil {
+                KeychainStore.delete(blockId: block.id)
+            }
+            if let name = block.archiveFile {
+                WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
+            }
+            if let name = block.pdfFile {
+                WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
+            }
         }
         for wsIndex in workspaces.indices {
             workspaces[wsIndex].projects.removeAll { $0.id == project.id }
@@ -318,6 +334,13 @@ final class DataStore: ObservableObject {
     func deleteBlock(_ block: Block) {
         if block.credential != nil {
             KeychainStore.delete(blockId: block.id)
+        }
+        // T-09 아카이브 실파일 정리 (이미지·파일 첨부 정리는 T-12)
+        if let name = block.archiveFile {
+            WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
+        }
+        if let name = block.pdfFile {
+            WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
         }
         mutateProject(block.projectId) { project in
             project.blocks.removeAll { $0.id == block.id }

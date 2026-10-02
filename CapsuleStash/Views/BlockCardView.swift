@@ -12,6 +12,8 @@ struct BlockCardView: View {
     @EnvironmentObject private var appState: AppState
     @State private var isEditing = false
     @State private var isDropTargeted = false
+    @State private var isSavingArchive = false
+    @State private var showingOffline = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -160,12 +162,13 @@ struct BlockCardView: View {
                             .foregroundStyle(Theme.muted)
                     }
                     if block.type == .webArchive {
-                        Text(block.url == nil ? "원본 URL 없음" : "오프라인 저장 완료")
+                        let saved = WebArchiveStore.hasOfflineFiles(for: block)
+                        Text(saved ? "오프라인 저장됨" : "미저장 — 주소·메모만 보관 중")
                             .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(block.url == nil ? Theme.muted : Color(hex: 0x2D5BD7))
+                            .foregroundStyle(saved ? Color(hex: 0x2D5BD7) : Theme.muted)
                             .padding(.horizontal, 8)
                             .padding(.vertical, 2)
-                            .background(Color(hex: 0xE8F0FF), in: Capsule())
+                            .background((saved ? Color(hex: 0xE8F0FF) : Theme.tagBackground), in: Capsule())
                     }
                 }
                 Spacer(minLength: 0)
@@ -185,6 +188,94 @@ struct BlockCardView: View {
                 Text("URL 없음 — 편집에서 URL을 추가하면 열기·검색이 됩니다")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.muted)
+            }
+            // T-09 오프라인 저장·보기 (웹 아카이브만)
+            if block.type == .webArchive {
+                archiveActions
+            }
+        }
+        .sheet(isPresented: $showingOffline) {
+            if let url = offlineFileURL {
+                OfflineWebView(fileURL: url)
+                    .frame(minWidth: 800, minHeight: 600)
+            }
+        }
+    }
+
+    /// 웹 아카이브 저장·보기 행.
+    private var archiveActions: some View {
+        HStack(spacing: 8) {
+            if isSavingArchive {
+                ProgressView()
+                    .controlSize(.small)
+                Text("저장 중… (최대 30초)")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.muted)
+            } else {
+                if WebArchiveStore.hasOfflineFiles(for: block) {
+                    CapsuleButton(title: "오프라인 보기", action: { showingOffline = true })
+                    CapsuleButton(title: "다시 저장", action: saveOfflineArchive)
+                } else {
+                    CapsuleButton(title: "아카이브 저장", style: .primary, action: saveOfflineArchive)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.top, 4)
+    }
+
+    /// 실파일 URL (아카이브 우선, 없으면 PDF).
+    private var offlineFileURL: URL? {
+        if let name = block.archiveFile,
+           let url = WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: name) {
+            return url
+        }
+        if let name = block.pdfFile,
+           let url = WebArchiveStore.fileURL(kind: WebArchiveStore.pdfKind, name: name) {
+            return url
+        }
+        return nil
+    }
+
+    /// WKWebView로 읽어 .webarchive + PDF를 저장한다. 기존 파일은 새 저장 성공 후 정리.
+    private func saveOfflineArchive() {
+        guard let urlString = block.url, !urlString.isEmpty, let url = URL(string: urlString) else {
+            appState.notify("URL이 없어 저장할 수 없습니다")
+            return
+        }
+        guard !isSavingArchive else { return }
+        isSavingArchive = true
+        Task {
+            defer { isSavingArchive = false }
+            do {
+                let captured = try await WebCaptureService.capture(url: url)
+                var updated = block
+                let oldArchive = block.archiveFile
+                let oldPDF = block.pdfFile
+                if let name = WebArchiveStore.save(captured.webarchive, ext: "webarchive") {
+                    updated.archiveFile = name
+                }
+                if let name = WebArchiveStore.save(captured.pdf, ext: "pdf") {
+                    updated.pdfFile = name
+                }
+                guard updated.archiveFile != nil || updated.pdfFile != nil else {
+                    throw CapsuleError.store(code: ErrorCode.webArchive, message: "파일 기록 실패")
+                }
+                if let old = oldArchive, old != updated.archiveFile {
+                    WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: old)
+                }
+                if let old = oldPDF, old != updated.pdfFile {
+                    WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: old)
+                }
+                updated.savedAt = Date()
+                updated.updatedAt = Date()
+                store.updateBlock(updated)
+                // [HARD] 값 자체를 로그에 남기지 않는다. 제목만 기록.
+                DebugLogger.feature("아카이브 저장: \(block.title)")
+                appState.notify("오프라인 저장됨")
+            } catch {
+                DebugLogger.error(code: ErrorCode.webArchive, "아카이브 저장 실패: \(block.title)")
+                appState.notify("오프라인 저장 실패 — 네트워크·URL 확인 필요")
             }
         }
     }

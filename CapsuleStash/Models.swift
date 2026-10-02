@@ -115,7 +115,7 @@ enum BlockType: String, Codable, CaseIterable, Identifiable {
         case .code: return "언어 지정 코드 조각"
         case .shell: return "터미널 명령 (실행 안 함, 복사만)"
         case .webLink: return "페이지 주소 + 메모 — 열기로 브라우저에서 바로 열기"
-        case .webArchive: return "페이지 본문 오프라인 보관 — 실파일 저장은 T-09, 지금은 주소·설명·메모만 보관"
+        case .webArchive: return "페이지 본문 오프라인 보관 (카드에서 저장·보기)"
         case .image: return "이미지 첨부 (파일 선택기·드래그앤드롭)"
         case .file: return "파일 첨부 (파일 선택기·드래그앤드롭)"
         case .credential: return "계정·API Key 보관 (시크릿 2개까지, 메모리 보관·자동 마스킹)"
@@ -137,6 +137,10 @@ struct Block: Identifiable, Hashable, Codable {
     var savedAt: Date?
     /// 이미지 블록의 파일 이름 목록 (MVP는 파일명만 보관, 원본은 외부 경로)
     var imageNames: [String]
+    /// 웹 아카이브 실파일명 (T-09, `web-archives/` 아래). 없으면 미저장.
+    var archiveFile: String?
+    /// 웹 아카이브 PDF 실파일명 (T-09, `pdf/` 아래). 없으면 미저장.
+    var pdfFile: String?
     /// Credential 본문. [HARD] 시크릿은 파일 저장에서 제외되고 Keychain에 보관된다.
     var credential: Credential?
     var isCollapsed: Bool
@@ -147,6 +151,7 @@ struct Block: Identifiable, Hashable, Codable {
     init(id: UUID = UUID(), projectId: UUID, type: BlockType, title: String,
          content: String = "", language: String? = nil, url: String? = nil,
          siteName: String? = nil, savedAt: Date? = nil, imageNames: [String] = [],
+         archiveFile: String? = nil, pdfFile: String? = nil,
          credential: Credential? = nil, isCollapsed: Bool = false, sortOrder: Int = 0,
          createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
@@ -159,6 +164,8 @@ struct Block: Identifiable, Hashable, Codable {
         self.siteName = siteName
         self.savedAt = savedAt
         self.imageNames = imageNames
+        self.archiveFile = archiveFile
+        self.pdfFile = pdfFile
         self.credential = credential
         self.isCollapsed = isCollapsed
         self.sortOrder = sortOrder

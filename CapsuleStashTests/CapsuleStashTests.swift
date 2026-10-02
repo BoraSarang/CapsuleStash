@@ -276,7 +276,7 @@ final class CapsuleStashTests: XCTestCase {
             XCTAssertFalse(type.purposeHint.isEmpty, "\(type.rawValue)의 용도 설명이 있어야 함")
         }
         XCTAssertTrue(BlockType.webLink.purposeHint.contains("브라우저"))
-        XCTAssertTrue(BlockType.webArchive.purposeHint.contains("T-09"))
+        XCTAssertTrue(BlockType.webArchive.purposeHint.contains("오프라인"))
     }
 
     func testWebHost() {
@@ -609,6 +609,42 @@ final class CapsuleStashTests: XCTestCase {
         let dir = try makeTempDir()
         defer { try? FileManager.default.removeItem(at: dir) }
         XCTAssertNil(SwiftDataBackend.loadOrMigrate(directory: dir), "DB·JSON 둘 다 없으면 nil (시드 경로)")
+    }
+
+    // MARK: - 웹 아카이브 실파일 (T-09, 임시 폴더 격리)
+
+    func testWebArchiveStoreRoundTrip() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let data = "fake-webarchive".data(using: .utf8)!
+        let name = WebArchiveStore.save(data, ext: "webarchive", baseDirectory: dir)
+        XCTAssertNotNil(name)
+        let url = WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: name!, baseDirectory: dir)
+        XCTAssertNotNil(url)
+        XCTAssertEqual(try Data(contentsOf: url!), data)
+        // 경로 탈출 방지
+        XCTAssertNil(WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: "../x", baseDirectory: dir))
+        XCTAssertNil(WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: "a/b", baseDirectory: dir))
+    }
+
+    @MainActor
+    func testArchiveFileNamesSurviveRoundTrip() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        var project = Project(id: UUID(), workspaceId: UUID(), name: "웹")
+        project.blocks = [Block(projectId: project.id, type: .webArchive, title: "문서",
+                                url: "https://example.com",
+                                archiveFile: "archive-abc.webarchive", pdfFile: "archive-abc.pdf")]
+        let fixture = [Workspace(name: "W", projects: [project])]
+        try SwiftDataBackend.save(fixture, directory: dir)
+        let back = SwiftDataBackend.loadOrMigrate(directory: dir)?.first?.projects.first?.blocks.first
+        XCTAssertEqual(back?.archiveFile, "archive-abc.webarchive")
+        XCTAssertEqual(back?.pdfFile, "archive-abc.pdf")
+        XCTAssertEqual(back?.url, "https://example.com")
+    }
+
+    func testWebArchiveErrorMessageLoaded() {
+        XCTAssertEqual(ErrorMessages.shared.message(for: ErrorCode.webArchive), "웹 페이지를 오프라인으로 저장하지 못했습니다.")
     }
 
     @MainActor

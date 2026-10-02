@@ -154,9 +154,14 @@ struct BlockEditorSheet: View {
             }
         case .webLink, .webArchive:
             let isArchive = original.type == .webArchive
-            Text(isArchive ? "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 T-09 예정이며, 지금은 주소·설명·메모만 보관됩니다." : "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다.")
+            Text(isArchive ? "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다." : "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다.")
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.muted)
+            if isArchive, WebArchiveStore.hasOfflineFiles(for: original) {
+                Text("오프라인 파일 있음 (.webarchive/PDF) — 카드에서 보거나 다시 저장할 수 있습니다.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.muted)
+            }
             field("URL") {
                 TextField("https://…", text: $urlText)
                     .textFieldStyle(.roundedBorder)

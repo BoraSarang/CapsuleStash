@@ -13,6 +13,7 @@ enum ErrorCode {
     static let vaultLocked = "E-MAC-VAULT-0001"
     static let clipboardCopy = "E-MAC-CLIP-0001"
     static let webOpen = "E-MAC-WEB-0001"
+    static let webArchive = "E-MAC-WEB-0002"
     static let launchAtLogin = "E-MAC-LAUNCH-0001"
 
     /// error_message_ko.json 에서 한국어 메시지를 읽는다. 없으면 code 자체를 반환.
