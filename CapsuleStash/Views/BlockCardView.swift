@@ -14,6 +14,9 @@ struct BlockCardView: View {
     @State private var isDropTargeted = false
     @State private var isSavingArchive = false
     @State private var showingOffline = false
+    /// 인라인 편집 상태 (T-13, 텍스트·코드 계열만)
+    @State private var isInlineEditing = false
+    @State private var draftContent = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -56,7 +59,9 @@ struct BlockCardView: View {
 
             Spacer(minLength: 8)
 
-            CapsuleIconButton(systemImage: "pencil", tooltip: "편집") { isEditing = true }
+            CapsuleIconButton(systemImage: "pencil", tooltip: "편집") {
+                if canInlineEdit { startInlineEdit() } else { isEditing = true }
+            }
 
             if block.type == .webLink || block.type == .webArchive {
                 if let url = URL(string: block.url ?? "") {
@@ -83,7 +88,12 @@ struct BlockCardView: View {
             }
 
             Menu {
-                Button("편집…") { isEditing = true }
+                Button(canInlineEdit ? "편집" : "편집…") {
+                    if canInlineEdit { startInlineEdit() } else { isEditing = true }
+                }
+                if canInlineEdit {
+                    Button("전체 편집…") { isEditing = true }
+                }
                 Divider()
                 Button("위로") { store.moveBlock(block, offset: -1) }.disabled(isFirst)
                 Button("아래로") { store.moveBlock(block, offset: 1) }.disabled(isLast)
@@ -116,7 +126,12 @@ struct BlockCardView: View {
     private var bodyView: some View {
         switch block.type {
         case .code, .shell:
-            codeBody
+            if isInlineEditing {
+                inlineEditor(mono: true)
+            } else {
+                codeBody
+                    .onTapGesture(count: 2) { startInlineEdit() }
+            }
         case .webLink, .webArchive:
             webBody
         case .image, .file:
@@ -124,13 +139,66 @@ struct BlockCardView: View {
         case .credential:
             credentialBody
         default:
-            Text(block.content)
-                .font(.system(size: 14))
-                .foregroundStyle(Theme.ink)
-                .lineSpacing(3)
-                .textSelection(.enabled)
-                .frame(maxWidth: .infinity, alignment: .leading)
+            if isInlineEditing {
+                inlineEditor(mono: false)
+            } else {
+                Text(block.content)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.ink)
+                    .lineSpacing(3)
+                    .textSelection(.enabled)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .onTapGesture(count: 2) { startInlineEdit() }
+            }
         }
+    }
+
+    /// T-13 인라인 편집기. 코드 계열은 줄번호+모노+다크 박스, 텍스트는 시스템 폰트.
+    private func inlineEditor(mono: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            BlockTextEditor(
+                text: $draftContent,
+                font: mono
+                    ? .monospacedSystemFont(ofSize: 13, weight: .regular)
+                    : .systemFont(ofSize: 14),
+                textColor: NSColor(mono ? Theme.codeForeground : Theme.ink),
+                backgroundColor: .clear,
+                showLineNumbers: mono,
+                onSave: saveInlineEdit,
+                onCancel: { isInlineEditing = false }
+            )
+            .frame(minHeight: 140, maxHeight: 420)
+            HStack(spacing: 8) {
+                Text("⌘Enter 저장 · esc 취소 · 더블클릭으로 편집 시작")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.muted)
+                Spacer(minLength: 0)
+                CapsuleButton(title: "취소") { isInlineEditing = false }
+                CapsuleButton(title: "저장", style: .primary, action: saveInlineEdit)
+            }
+        }
+        .padding(mono ? 12 : 0)
+        .background(mono ? Theme.codeBackground : .clear, in: RoundedRectangle(cornerRadius: 10))
+    }
+
+    /// 텍스트·코드 계열만 인라인 편집 (구조형 블록은 시트 유지).
+    private var canInlineEdit: Bool {
+        [.text, .markdown, .code, .shell].contains(block.type)
+    }
+
+    private func startInlineEdit() {
+        guard canInlineEdit, !isInlineEditing else { return }
+        draftContent = block.content
+        isInlineEditing = true
+    }
+
+    private func saveInlineEdit() {
+        var updated = block
+        updated.content = draftContent
+        updated.updatedAt = Date()
+        store.updateBlock(updated)
+        isInlineEditing = false
+        DebugLogger.feature("인라인 편집 저장: \(block.title)")
     }
 
     private var codeBody: some View {

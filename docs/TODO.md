@@ -39,7 +39,7 @@
 - [x] T-09 Web Archive/PDF 저장 + 오프라인 보기 (헤드리스 WKWebView `createWebArchiveData`+`createPDF`, 카드 저장·다시 저장·보기, 실파일 뱃지, 삭제 시 정리, `E-MAC-WEB-0002`)
 - [x] T-12 이미지·파일 블록 실제 바이너리 보관 (`Application Support/CapsuleStash/images`, `files`)
       - 파일 선택기 + 카드 드래그앤드롭 + 썸네일 + 고아 파일 정리 + 삭제 시 동반 정리(`removeBlockFiles`, 블록·Project·Workspace) + 대용량 리사이즈(긴 변 2048, 알파 유지)
-- [ ] T-13 블록 편집 UI (본문 인라인 편집, 코드 편집기)
+- [x] T-13 블록 편집 UI (카드 인라인 편집 + 코드 에디터: 줄번호 룰러, Tab→공백, ⌘Enter 저장·esc 취소, 연필/더블클릭 진입, 구조형은 시트 유지)
 - [ ] T-14 드래그 앤 드롭으로 블록/이미지 추가
 - [x] T-18 다크모드 대응 (외관 고정 해제, `ThemeToken.all` 단일 테이블 적응형 토큰 24종, 설정 모양 선택, 하드코딩 색상 제거, 버튼 대비 수정, 토큰 테스트 확장)
 

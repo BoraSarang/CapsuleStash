@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0F502AA85FFC3C3346C826EB /* BlockTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B7A52589017DB1AC54B6C /* BlockTextEditor.swift */; };
 		16938C9858F5F09DBED29040 /* NameInputSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A4F034330E57982C863E24 /* NameInputSheet.swift */; };
 		2F71853CFB02558049F32B60 /* CapsuleStashTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2E87FA2A526B7112B538525 /* CapsuleStashTests.swift */; };
 		35E1D54957D09E11943321A4 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E4E5C0FCE874021DADB73A /* SidebarView.swift */; };
@@ -67,6 +68,7 @@
 		6F96A0B1203F492482BCD81E /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 		75DB023F2B58C6526883F119 /* AttachmentStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AttachmentStore.swift; sourceTree = "<group>"; };
 		7E1650D1CF51D4DAAAF447E6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		884B7A52589017DB1AC54B6C /* BlockTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockTextEditor.swift; sourceTree = "<group>"; };
 		89A9EAE15E27D143381029DE /* CapsuleStashTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CapsuleStashTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		99846DCFAEABEC1E5BBB583C /* SwiftDataBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBackend.swift; sourceTree = "<group>"; };
 		ADCE112067036AC049857931 /* BlockTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockTypePicker.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 			children = (
 				BADDCAE234C5633F26800EF1 /* BlockCardView.swift */,
 				BEA4234E5CA6F6A0AF337DE9 /* BlockEditorSheet.swift */,
+				884B7A52589017DB1AC54B6C /* BlockTextEditor.swift */,
 				ADCE112067036AC049857931 /* BlockTypePicker.swift */,
 				6F96A0B1203F492482BCD81E /* CommandPaletteView.swift */,
 				6E9C5FAEDC8B18D2AFFEF1D4 /* ContentView.swift */,
@@ -290,6 +293,7 @@
 				37F40425974B258D9C9505DE /* AttachmentStore.swift in Sources */,
 				A94B6D11B96EEA812B42BA91 /* BlockCardView.swift in Sources */,
 				4B3111CA3E1207E661EED248 /* BlockEditorSheet.swift in Sources */,
+				0F502AA85FFC3C3346C826EB /* BlockTextEditor.swift in Sources */,
 				B8EBD1A98ED44664E5DEF1E7 /* BlockTypePicker.swift in Sources */,
 				F51096436DD39786169AEACD /* CapsuleStashApp.swift in Sources */,
 				5C05194385C271820FAD9ECD /* ClipboardService.swift in Sources */,
