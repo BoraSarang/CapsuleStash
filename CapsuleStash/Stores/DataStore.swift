@@ -17,6 +17,8 @@ final class DataStore: ObservableObject {
 
     private var saveTask: Task<Void, Never>?
     private let persistEnabled: Bool
+    /// 첨부·아카이브 정리용 기준 폴더. 테스트 격리용 (기본 nil = 실제 Application Support).
+    private let attachmentBaseDirectory: URL?
 
     // MARK: - 초기화
 
@@ -24,9 +26,11 @@ final class DataStore: ObservableObject {
     ///   - samples: 저장소(DB 우선, 없으면 library.json 마이그레이션)를 먼저 읽는다 (기본 true)
     ///   - loadSeeds: 저장소가 없거나 비어 있으면 시드 데이터를 채운다
     ///   - persist: 변경 시 디스크에 기록한다. 테스트는 `false` 로 지정해 사용자 데이터를 오염시키지 않는다.
-    init(samples: Bool = true, loadSeeds: Bool = true, persist: Bool = true) {
+    ///   - attachmentBase: 첨부 정리 기준 폴더. 테스트는 임시 폴더를 지정한다.
+    init(samples: Bool = true, loadSeeds: Bool = true, persist: Bool = true, attachmentBase: URL? = nil) {
         let start = CFAbsoluteTimeGetCurrent()
         self.persistEnabled = persist
+        self.attachmentBaseDirectory = attachmentBase
 
         let loaded: [Workspace]? = samples ? SwiftDataBackend.loadOrMigrate() : nil
         if let loaded, !loaded.isEmpty {
@@ -205,15 +209,7 @@ final class DataStore: ObservableObject {
         if let ws = workspaces.first(where: { $0.id == id }) {
             for project in ws.projects {
                 for block in project.blocks {
-                    if block.credential != nil {
-                        KeychainStore.delete(blockId: block.id)
-                    }
-                    if let name = block.archiveFile {
-                        WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
-                    }
-                    if let name = block.pdfFile {
-                        WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
-                    }
+                    removeBlockFiles(block)
                 }
             }
         }
@@ -246,15 +242,7 @@ final class DataStore: ObservableObject {
 
     func deleteProject(_ project: Project) {
         for block in project.blocks {
-            if block.credential != nil {
-                KeychainStore.delete(blockId: block.id)
-            }
-            if let name = block.archiveFile {
-                WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
-            }
-            if let name = block.pdfFile {
-                WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
-            }
+            removeBlockFiles(block)
         }
         for wsIndex in workspaces.indices {
             workspaces[wsIndex].projects.removeAll { $0.id == project.id }
@@ -332,20 +320,31 @@ final class DataStore: ObservableObject {
     }
 
     func deleteBlock(_ block: Block) {
-        if block.credential != nil {
-            KeychainStore.delete(blockId: block.id)
-        }
-        // T-09 아카이브 실파일 정리 (이미지·파일 첨부 정리는 T-12)
-        if let name = block.archiveFile {
-            WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name)
-        }
-        if let name = block.pdfFile {
-            WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name)
-        }
+        removeBlockFiles(block)
         mutateProject(block.projectId) { project in
             project.blocks.removeAll { $0.id == block.id }
         }
         DebugLogger.feature("블록 삭제")
+    }
+
+    /// 블록 삭제 시 동반 정리: Keychain 시크릿 + 아카이브 실파일 + 이미지·파일 첨부.
+    /// [HARD] 값 자체를 로그에 남기지 않는다.
+    private func removeBlockFiles(_ block: Block) {
+        if block.credential != nil {
+            KeychainStore.delete(blockId: block.id)
+        }
+        if let name = block.archiveFile {
+            WebArchiveStore.remove(kind: WebArchiveStore.archiveKind, name: name,
+                                   baseDirectory: attachmentBaseDirectory)
+        }
+        if let name = block.pdfFile {
+            WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name,
+                                   baseDirectory: attachmentBaseDirectory)
+        }
+        let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
+        for name in block.imageNames {
+            AttachmentStore.remove(kind: kind, name: name, baseDirectory: attachmentBaseDirectory)
+        }
     }
 
     func moveBlock(_ block: Block, offset: Int) {

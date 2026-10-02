@@ -1,5 +1,7 @@
 import AppKit
+import ImageIO
 import SwiftUI
+import UniformTypeIdentifiers
 import XCTest
 @testable import CapsuleStash
 
@@ -645,6 +647,77 @@ final class CapsuleStashTests: XCTestCase {
 
     func testWebArchiveErrorMessageLoaded() {
         XCTAssertEqual(ErrorMessages.shared.message(for: ErrorCode.webArchive), "웹 페이지를 오프라인으로 저장하지 못했습니다.")
+    }
+
+    // MARK: - 첨부 정리·리사이즈 (T-12, 임시 폴더 격리)
+
+    private func makeTestPNG(width: Int, height: Int) throws -> URL {
+        let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8,
+                                bytesPerRow: 0, space: CGColorSpaceCreateDeviceRGB(),
+                                bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.setFillColor(CGColor(red: 0.2, green: 0.4, blue: 0.8, alpha: 1))
+        context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        let image = context.makeImage()!
+        let url = FileManager.default.temporaryDirectory.appendingPathComponent("\(UUID().uuidString).png")
+        let dest = CGImageDestinationCreateWithURL(url as CFURL, UTType.png.identifier as CFString, 1, nil)!
+        CGImageDestinationAddImage(dest, image, nil)
+        XCTAssertTrue(CGImageDestinationFinalize(dest))
+        return url
+    }
+
+    private func imageSize(at url: URL) -> (Int, Int)? {
+        guard let source = CGImageSourceCreateWithURL(url as CFURL, nil),
+              let image = CGImageSourceCreateImageAtIndex(source, 0, nil) else { return nil }
+        return (image.width, image.height)
+    }
+
+    func testImportDownscalesLargeImages() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let big = try makeTestPNG(width: 4000, height: 3000)
+        defer { try? FileManager.default.removeItem(at: big) }
+        let stored = AttachmentStore.importFiles(from: [big], kind: AttachmentStore.imagesKind, baseDirectory: dir)
+        XCTAssertEqual(stored.count, 1)
+        let url = dir.appendingPathComponent(AttachmentStore.imagesKind, isDirectory: true)
+            .appendingPathComponent(stored[0])
+        let size = imageSize(at: url)
+        XCTAssertEqual(max(size?.0 ?? 0, size?.1 ?? 0), Int(AttachmentStore.maxImageDimension), "긴 변은 제한까지만")
+    }
+
+    func testImportKeepsSmallImagesIntact() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let small = try makeTestPNG(width: 800, height: 600)
+        defer { try? FileManager.default.removeItem(at: small) }
+        let original = try Data(contentsOf: small)
+        let stored = AttachmentStore.importFiles(from: [small], kind: AttachmentStore.imagesKind, baseDirectory: dir)
+        XCTAssertEqual(stored.count, 1)
+        let url = dir.appendingPathComponent(AttachmentStore.imagesKind, isDirectory: true)
+            .appendingPathComponent(stored[0])
+        XCTAssertEqual(try Data(contentsOf: url), original, "제한 이하는 바이트 그대로")
+    }
+
+    @MainActor
+    func testDeleteBlockClearsAttachments() throws {
+        KeychainStore.inMemory = [:]
+        defer { KeychainStore.inMemory = nil }
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let imgDir = dir.appendingPathComponent(AttachmentStore.imagesKind, isDirectory: true)
+        try FileManager.default.createDirectory(at: imgDir, withIntermediateDirectories: true)
+        try "x".write(to: imgDir.appendingPathComponent("gone.png"), atomically: true, encoding: .utf8)
+
+        let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
+        store.createWorkspace(name: "W")
+        guard let ws = store.workspaces.first,
+              let project = store.createProject(title: "P", in: ws.id) else {
+            return XCTFail("Workspace·Project 필요")
+        }
+        let block = Block(projectId: project.id, type: .image, title: "I", imageNames: ["gone.png"])
+        store.insertBlock(block)
+        store.deleteBlock(block)
+        XCTAssertFalse(FileManager.default.fileExists(atPath: imgDir.appendingPathComponent("gone.png").path),
+                       "삭제된 블록의 첨부는 함께 지워야 함")
     }
 
     @MainActor

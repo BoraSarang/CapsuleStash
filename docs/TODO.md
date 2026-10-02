@@ -37,8 +37,8 @@
 
 - [x] T-11 SwiftData (하이브리드) 영구 저장소 + 마이그레이션 (DataStore 인터페이스 유지, `SwiftDataBackend` 경계 변환, library.json 1회 이관 후 동결, 블록 ID 승계·시크릿 제외, 순서 보존)
 - [x] T-09 Web Archive/PDF 저장 + 오프라인 보기 (헤드리스 WKWebView `createWebArchiveData`+`createPDF`, 카드 저장·다시 저장·보기, 실파일 뱃지, 삭제 시 정리, `E-MAC-WEB-0002`)
-- [ ] T-12 이미지·파일 블록 실제 바이너리 보관 (`Application Support/CapsuleStash/images`, `files`)
-      - 1차 구현됨: 파일 선택기 + 카드 드래그앤드롭 + 썸네일 + 고아 파일 정리. 남은 것: 블록 삭제 시 첨부 정리, 대용량 리사이즈
+- [x] T-12 이미지·파일 블록 실제 바이너리 보관 (`Application Support/CapsuleStash/images`, `files`)
+      - 파일 선택기 + 카드 드래그앤드롭 + 썸네일 + 고아 파일 정리 + 삭제 시 동반 정리(`removeBlockFiles`, 블록·Project·Workspace) + 대용량 리사이즈(긴 변 2048, 알파 유지)
 - [ ] T-13 블록 편집 UI (본문 인라인 편집, 코드 편집기)
 - [ ] T-14 드래그 앤 드롭으로 블록/이미지 추가
 - [ ] T-18 다크모드 대응 (appearance 고정 해제 + 다크 토큰 세트, 토큰 테스트 확장)

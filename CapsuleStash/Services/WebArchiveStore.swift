@@ -38,9 +38,10 @@ enum WebArchiveStore {
         return FileManager.default.fileExists(atPath: url.path) ? url : nil
     }
 
-    static func remove(kind: String, name: String) {
+    static func remove(kind: String, name: String, baseDirectory: URL? = nil) {
         guard !name.isEmpty, !name.contains("/"), !name.contains("..") else { return }
-        let url = PersistenceStore.directoryURL
+        let base = baseDirectory ?? PersistenceStore.directoryURL
+        let url = base
             .appendingPathComponent(kind, isDirectory: true).appendingPathComponent(name)
         try? FileManager.default.removeItem(at: url)
     }
