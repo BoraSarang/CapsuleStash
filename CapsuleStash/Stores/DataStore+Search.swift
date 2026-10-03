@@ -4,8 +4,10 @@ import Foundation
 extension DataStore {
     var parsedQuery: SearchQuery { SearchQuery.parse(searchQuery) }
 
-    var searchHits: [SearchHit] {
-        let query = parsedQuery
+    var searchHits: [SearchHit] { hits(for: parsedQuery) }
+
+    /// T-55 스마트 그룹이 같은 검색 파이프를 쓴다. 저장 조건 = 검색 문법 그대로.
+    func hits(for query: SearchQuery) -> [SearchHit] {
         guard !query.isEmpty else { return [] }
 
         var hits: [SearchHit] = []
@@ -16,8 +18,11 @@ extension DataStore {
                 continue
             }
             // T-16 태그 필터: 문서 태그 중 하나라도 포함해야 한다
+            // T-56 중첩 태그: `tag:부모`는 `부모`와 `부모/자식`을 모두 잡는다 (접두 매칭)
             if !query.tags.isEmpty,
-               !entry.project.tags.contains(where: { query.tags.contains($0.normalizedForSearch) }) {
+               !entry.project.tags.contains(where: { tag in
+                   query.tags.contains { Self.tagMatches(queryTag: $0, tag: tag) }
+               }) {
                 continue
             }
 
@@ -79,6 +84,15 @@ extension DataStore {
         if term.isEmpty { return true }
         let normalized = term.normalizedForSearch
         return candidates.contains { $0.normalizedForSearch.contains(normalized) }
+    }
+
+    /// T-56 중첩 태그 접두 매칭. `tag:업무`는 `업무`·`업무/진행중`에 닿고 `업무용`에는 안 닿는다.
+    /// 쿼리·태그 모두 정규화(전각·소문자) 후 비교한다. 순수 함수.
+    nonisolated static func tagMatches(queryTag: String, tag: String) -> Bool {
+        let query = queryTag.normalizedForSearch
+        let candidate = tag.normalizedForSearch
+        guard !query.isEmpty else { return false }
+        return candidate == query || candidate.hasPrefix(query + "/")
     }
 
     static func snippet(for block: Block, term: String) -> String {

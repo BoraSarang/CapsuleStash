@@ -60,6 +60,36 @@ struct SidebarView: View {
                     smartRow("즐겨찾기", systemImage: "star", count: store.favoriteProjects.count)
                     smartRow("최근 사용", systemImage: "clock", count: store.recents.count)
                     smartRow("계정 / Credential", systemImage: "lock", count: store.credentialCount)
+                    // T-55 스마트 그룹 (저장된 검색 조건)
+                    ForEach(store.smartGroups) { group in
+                        smartGroupRow(group)
+                    }
+                    if !store.searchQuery.trimmingCharacters(in: .whitespaces).isEmpty {
+                        Button {
+                            let query = store.searchQuery.trimmingCharacters(in: .whitespaces)
+                            namePrompt = NamePrompt(
+                                title: "스마트 그룹 저장",
+                                subtitle: nil,
+                                placeholder: "스마트 그룹 이름",
+                                initial: String(query.prefix(30)),
+                                confirmTitle: "저장",
+                                onConfirm: {
+                                    if store.addSmartGroup(name: $0, query: query) != nil {
+                                        appState.notify("저장됨")
+                                    }
+                                }
+                            )
+                        } label: {
+                            HStack(spacing: 6) {
+                                Image(systemName: "plus").imageScale(.small)
+                                Text("현재 검색 저장").font(.system(size: 12))
+                            }
+                            .foregroundStyle(Theme.sidebarMuted)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                    }
                 }
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
@@ -254,8 +284,52 @@ struct SidebarView: View {
         .onTapGesture { DebugLogger.feature("Smart 필터: \(title)") }
     }
 
-    // MARK: - 푸터 (Vault 잠금 상태)
+    /// T-55 스마트 그룹 행. 이름은 사용자 데이터라 번역하지 않는다.
+    /// 눌리면 조건을 검색창에 채우고 팔레트를 연다.
+    private func smartGroupRow(_ group: SmartGroup) -> some View {
+        Button {
+            store.searchQuery = group.query
+            appState.showPalette()
+        } label: {
+            HStack(spacing: 6) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 10))
+                    .frame(width: 11)
+                    .foregroundStyle(Theme.sidebarMuted)
+                Text(group.name)
+                    .font(.system(size: 13))
+                    .foregroundStyle(Theme.sidebarMuted)
+                    .lineLimit(1)
+                Spacer()
+                Text("\(store.hitCount(for: group))")
+                    .font(.system(size: 11, design: .monospaced))
+                    .foregroundStyle(Theme.sidebarMuted)
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 8)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .contextMenu {
+            Button("이름 바꾸기…") {
+                namePrompt = NamePrompt(
+                    title: "스마트 그룹 이름 변경",
+                    subtitle: nil,
+                    placeholder: "스마트 그룹 이름",
+                    initial: group.name,
+                    confirmTitle: "저장",
+                    onConfirm: { store.renameSmartGroup(group.id, to: $0) }
+                )
+            }
+            Button("삭제", role: .destructive) {
+                store.deleteSmartGroup(group.id)
+                appState.notify("삭제됨")
+            }
+        }
+        .help(group.query)
+    }
 
+    // MARK: - 푸터 (Vault 잠금 상태)
     private var sidebarFooter: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {

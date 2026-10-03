@@ -14,6 +14,10 @@ final class DataStore: ObservableObject {
 
     /// 사이드바 펼침 상태
     @Published var expandedWorkspaces: Set<UUID> = []
+    /// T-55 스마트 그룹 (검색 조건 저장, UserDefaults 영속화)
+    @Published var smartGroups: [SmartGroup] = []
+
+    private static let smartGroupsKey = "smartGroups"
 
     private var saveTask: Task<Void, Never>?
     private let persistEnabled: Bool
@@ -47,6 +51,7 @@ final class DataStore: ObservableObject {
         restoreSecretsFromKeychain()
         expandDefaults()
         selectFirstProject()
+        loadSmartGroups()
         DebugLogger.perf(String(format: "저장소 준비 %.0fms", (CFAbsoluteTimeGetCurrent() - start) * 1000))
     }
 
@@ -242,10 +247,14 @@ final class DataStore: ObservableObject {
     }
 
     /// 태그 추가. 앞뒤 공백과 `#` 접두어를 제거하고 중복을 막는다.
+    /// T-56 중첩 태그: `부모 / 자식`처럼 띄어 쓴 슬래시는 `부모/자식`으로 접는다.
     func addTag(_ tag: String, to project: Project) {
         var cleaned = tag.trimmingCharacters(in: .whitespacesAndNewlines)
         if cleaned.hasPrefix("#") { cleaned.removeFirst() }
-        cleaned = cleaned.trimmingCharacters(in: .whitespacesAndNewlines)
+        cleaned = cleaned.split(separator: "/")
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+            .joined(separator: "/")
         guard !cleaned.isEmpty else { return }
         mutateProject(project.id) { project in
             guard !project.tags.contains(cleaned) else { return }
@@ -259,6 +268,59 @@ final class DataStore: ObservableObject {
             project.tags.removeAll { $0 == tag }
         }
         DebugLogger.feature("태그 제거: \(tag)")
+    }
+
+    // MARK: - T-55 스마트 그룹
+
+    /// 스마트 그룹 추가. 빈 이름·빈 조건은 무시한다. 같은 조건이 있으면 이름만 바꾼다.
+    @discardableResult
+    func addSmartGroup(name: String, query: String) -> SmartGroup? {
+        let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        let trimmedQuery = query.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedName.isEmpty, !trimmedQuery.isEmpty,
+              !SearchQuery.parse(trimmedQuery).isEmpty else { return nil }
+        if let index = smartGroups.firstIndex(where: { $0.query == trimmedQuery }) {
+            smartGroups[index].name = trimmedName
+            persistSmartGroups()
+            return smartGroups[index]
+        }
+        let group = SmartGroup(name: trimmedName, query: trimmedQuery)
+        smartGroups.append(group)
+        persistSmartGroups()
+        DebugLogger.feature("스마트 그룹 추가: \(trimmedName)")
+        return group
+    }
+
+    func renameSmartGroup(_ id: UUID, to name: String) {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty,
+              let index = smartGroups.firstIndex(where: { $0.id == id }) else { return }
+        smartGroups[index].name = trimmed
+        persistSmartGroups()
+    }
+
+    func deleteSmartGroup(_ id: UUID) {
+        smartGroups.removeAll { $0.id == id }
+        persistSmartGroups()
+        DebugLogger.feature("스마트 그룹 삭제")
+    }
+
+    /// 그룹 조건으로 돌린 결과 수 (사이드바 뱃지용).
+    func hitCount(for group: SmartGroup) -> Int {
+        hits(for: SearchQuery.parse(group.query)).count
+    }
+
+    private func loadSmartGroups() {
+        guard let data = UserDefaults.standard.data(forKey: Self.smartGroupsKey),
+              let groups = try? JSONDecoder().decode([SmartGroup].self, from: data) else { return }
+        smartGroups = groups
+    }
+
+    private func persistSmartGroups() {
+        guard persistEnabled else { return }
+        if let data = try? JSONEncoder().encode(smartGroups) {
+            UserDefaults.standard.set(data, forKey: Self.smartGroupsKey)
+        }
     }
 
     /// 새 블록 삽입. sortOrder는 맨 끝으로 지정한다.

@@ -359,7 +359,7 @@ struct SearchQuery: Equatable {
     var isEmpty: Bool { freeText.isEmpty && types.isEmpty && projectName == nil && tags.isEmpty }
 
     /// 팔레트 빈 결과 화면에 보여줄 사용법
-    static let usageHint = "예: type:code · project:\"Docker 배포\" · tag:swift · docker"
+    static let usageHint = "예: type:code · project:\"Docker 배포\" · tag:업무/진행중 · docker"
 }
 
 // MARK: - 검색 정규화 (T-16)
@@ -398,6 +398,23 @@ struct SearchHit: Identifiable {
 
     var path: String { "\(workspaceName) / \(project.name)" }
     var title: String { block?.title ?? project.name }
+}
+
+// MARK: - 스마트 그룹 (T-55)
+
+// T-55 스마트 그룹: 검색 문법을 저장 조건으로 재사용한다.
+// 조건 자체가 데이터라 Workspace가 아니라 UserDefaults에 둔다 (문서 export 대상 아님).
+struct SmartGroup: Identifiable, Hashable, Codable {
+    let id: UUID
+    var name: String
+    /// `SearchQuery.parse` 그대로 먹는 조건 문자열.
+    var query: String
+
+    init(id: UUID = UUID(), name: String, query: String) {
+        self.id = id
+        self.name = name
+        self.query = query
+    }
 }
 
 // MARK: 최근 사용 항목
