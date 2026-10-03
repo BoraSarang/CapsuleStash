@@ -4,6 +4,7 @@ import SwiftUI
 struct MenuBarContentView: View {
     @EnvironmentObject private var store: DataStore
     @EnvironmentObject private var appState: AppState
+    @Environment(\.openWindow) private var openWindow
 
     var body: some View {
         Group {
@@ -12,7 +13,7 @@ struct MenuBarContentView: View {
 
             Divider()
 
-            Button("Capsule Stash 열기") { appState.showPalette() }
+            Button("Capsule Stash 열기") { openMainWindow() }
 
             Menu("최근 사용") {
                 if store.recents.isEmpty {
@@ -53,10 +54,16 @@ struct MenuBarContentView: View {
         }
     }
 
+    /// 메인 창만 연다 (팔레트 없이). "열기"·최근 항목용.
+    private func openMainWindow() {
+        NSApp.activate(ignoringOtherApps: true)
+        openWindow(id: AppState.mainWindowID)
+    }
+
     private func open(_ entry: RecentEntry) {
         guard let located = store.allProjects.first(where: { $0.project.id == entry.id }) else { return }
         store.select(located.project)
-        appState.showPalette()
+        openMainWindow()
         DebugLogger.feature("메뉴바 최근 항목 이동: \(entry.title)")
     }
 
