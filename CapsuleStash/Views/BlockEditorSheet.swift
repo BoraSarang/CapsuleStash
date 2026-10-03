@@ -30,6 +30,7 @@ struct BlockEditorSheet: View {
     @State private var revealSecondSecret = false
     /// 이번 시트에서 새로 가져온 첨부. 취소 시 삭제해 고아 파일을 남기지 않는다.
     @State private var sessionAdded: [String] = []
+    @State private var isDropTargeted = false
 
     /// 기존 블록 편집
     init(block: Block) {
@@ -176,43 +177,56 @@ struct BlockEditorSheet: View {
             }
         case .image, .file:
             let isImage = original.type == .image
-            field("\(isImage ? "이미지" : "파일") (\(imageNames.count)개)") {
-                if imageNames.isEmpty {
-                    Text(isImage ? "아직 첨부된 이미지가 없습니다." : "아직 첨부된 파일이 없습니다.")
-                        .font(.system(size: 13))
-                        .foregroundStyle(Theme.muted)
-                } else {
-                    LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                        ForEach(imageNames, id: \.self) { name in
-                            ZStack(alignment: .topTrailing) {
-                                attachmentThumbnail(for: name, isImage: isImage)
-                                Button {
-                                    imageNames.removeAll { $0 == name }
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .font(.system(size: 18))
-                                        .foregroundStyle(Theme.ink)
-                                        .background(Theme.card, in: Circle())
+            field(isImage ? "이미지" : "파일") {
+                VStack(alignment: .leading, spacing: 10) {
+                    if imageNames.isEmpty {
+                        Text(isImage ? "아직 첨부된 이미지가 없습니다." : "아직 첨부된 파일이 없습니다.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.muted)
+                    } else {
+                        Text(isImage ? "이미지 \(imageNames.count)개" : "파일 \(imageNames.count)개")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.muted)
+                        LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
+                            ForEach(imageNames, id: \.self) { name in
+                                ZStack(alignment: .topTrailing) {
+                                    attachmentThumbnail(for: name, isImage: isImage)
+                                    Button {
+                                        imageNames.removeAll { $0 == name }
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .font(.system(size: 18))
+                                            .foregroundStyle(Theme.ink)
+                                            .background(Theme.card, in: Circle())
+                                    }
+                                    .buttonStyle(.plain)
+                                    .padding(6)
+                                    .help("제거")
                                 }
-                                .buttonStyle(.plain)
-                                .padding(6)
-                                .help("제거")
                             }
                         }
                     }
-                }
-                HStack(spacing: 10) {
-                    CapsuleIconButton(
-                        systemImage: "plus",
-                        tooltip: isImage ? "이미지 추가" : "파일 추가"
-                    ) {
-                        pickFiles()
+                    HStack(spacing: 10) {
+                        CapsuleIconButton(
+                            systemImage: "plus",
+                            tooltip: isImage ? "이미지 추가" : "파일 추가"
+                        ) {
+                            pickFiles()
+                        }
+                        Text("Finder에서 끌어다 놓을 수도 있습니다")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Theme.muted)
                     }
-                    Text("Finder에서 끌어다 놓을 수도 있습니다")
-                        .font(.system(size: 12))
-                        .foregroundStyle(Theme.muted)
+                    .padding(.top, 4)
                 }
-                .padding(.top, 4)
+                .padding(10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(isDropTargeted ? Theme.accentSoft : Color.clear, in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2))
+                .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
+                    dropFiles(providers, imageOnly: isImage)
+                    return true
+                }
             }
         case .credential:
             Text("Secret 1·2는 Vault 해제 후에만 보이고 복사됩니다. Naver API처럼 키가 2개면 둘에 나눠 입력하세요.")
@@ -325,6 +339,21 @@ struct BlockEditorSheet: View {
         let names = AttachmentStore.importFiles(from: urls, kind: attachmentKind)
         imageNames += names
         sessionAdded += names
+    }
+
+    /// T-34 편집 시트에 파일 드롭 → 바로 첨부 (취소 시 sessionAdded로 정리됨).
+    private func dropFiles(_ providers: [NSItemProvider], imageOnly: Bool) {
+        AttachmentStore.urls(from: providers) { urls in
+            var accepted = urls.filter { $0.isFileURL }
+            if imageOnly {
+                accepted = accepted.filter { AttachmentStore.isImageFile($0) }
+            }
+            guard !accepted.isEmpty else { return }
+            let names = AttachmentStore.importFiles(from: accepted, kind: attachmentKind)
+            guard !names.isEmpty else { return }
+            imageNames += names
+            sessionAdded += names
+        }
     }
 
     @ViewBuilder

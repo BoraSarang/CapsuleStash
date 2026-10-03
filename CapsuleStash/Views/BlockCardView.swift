@@ -48,9 +48,6 @@ struct BlockCardView: View {
             RoundedRectangle(cornerRadius: Theme.cardRadius)
                 .strokeBorder(isDropTargeted || isBlockDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
         )
-        .onDrag {
-            NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
-        }
         .onDrop(of: [.plainText], isTargeted: $isBlockDropTargeted) { providers in
             providers.first?.loadObject(ofClass: NSString.self) { object, _ in
                 guard let raw = object as? String,
@@ -82,18 +79,26 @@ struct BlockCardView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            TypeBadge(text: block.badgeLabel, type: block.type)
+            // T-34 드래그는 타이틀 영역으로 한정 (카드 전체 드래그가 헤더 버튼 클릭을 삼킴)
+            HStack(spacing: 10) {
+                TypeBadge(text: block.badgeLabel, type: block.type)
 
-            Text(block.title)
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Theme.ink)
-                .lineLimit(1)
-                // T-31 접힌 카드의 제목을 누르면 바로 펼친다
-                .onTapGesture {
-                    if block.isCollapsed {
-                        store.toggleBlockCollapsed(block)
+                Text(block.title)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                    .lineLimit(1)
+                    // T-31 접힌 카드의 제목을 누르면 바로 펼친다
+                    .onTapGesture {
+                        if block.isCollapsed {
+                            store.toggleBlockCollapsed(block)
+                        }
                     }
-                }
+            }
+            .contentShape(Rectangle())
+            .onDrag {
+                NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+            }
+            .help("드래그로 순서 변경")
 
             Spacer(minLength: 8)
 

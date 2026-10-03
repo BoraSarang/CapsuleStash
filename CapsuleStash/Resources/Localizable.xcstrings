@@ -2161,6 +2161,16 @@
         }
       }
     },
+    "파일 %lld개" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld files"
+          }
+        }
+      }
+    },
     "DebugPanel 열기" : {
       "localizations" : {
         "en" : {
