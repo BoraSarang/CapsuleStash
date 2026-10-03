@@ -918,6 +918,25 @@ final class CapsuleStashTests: XCTestCase {
                        [.paragraph(lines: ["| a | b |"])])
     }
 
+    // MARK: - 마크다운 인라인 (T-40: 굵게·기울임·코드·`·` 불릿)
+    func testMarkdownInlineTokenize() {
+        XCTAssertEqual(MarkdownInline.tokenize("**굵게** 일반 `코드` *기울임*"), [
+            .bold("굵게"), .plain(" 일반 "), .code("코드"), .plain(" "), .italic("기울임")
+        ])
+        // 닫히지 않거나 비어 있는 마커는 리터럴 유지
+        XCTAssertEqual(MarkdownInline.tokenize("**열림"), [.plain("**열림")])
+        XCTAssertEqual(MarkdownInline.tokenize("`코드"), [.plain("`코드")])
+        XCTAssertEqual(MarkdownInline.tokenize("*하나"), [.plain("*하나")])
+        XCTAssertEqual(MarkdownInline.tokenize(""), [])
+    }
+
+    func testMarkdownDotBullets() {
+        XCTAssertEqual(MarkdownSegment.parse("· 하나\n· 둘"), [.bullet(items: ["하나", "둘"])])
+        XCTAssertEqual(MarkdownSegment.parse("• 하나"), [.bullet(items: ["하나"])])
+        // 마커 뒤 공백이 여러 개여도 내용은 trim
+        XCTAssertEqual(MarkdownSegment.parse("·  `KEY` 설명"), [.bullet(items: ["`KEY` 설명"])])
+    }
+
     // MARK: - 웹 단일 타입 (T-28)
 
     func testWebPickableHidesLegacyLink() {
