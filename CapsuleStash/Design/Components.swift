@@ -14,16 +14,21 @@ struct LText: View {
 }
 
 /// 블록 타입 배지 (`<span class="type …">`)
+/// T-45 고정 폭: 카드 헤더 타이틀 시작점을 맞춘다. 긴 문구는 축소해서 한 줄 유지.
 struct TypeBadge: View {
     let text: String
     let type: BlockType
     var size: CGFloat = 11
+    var width: CGFloat = 92
 
     var body: some View {
         Text(text)
             .font(.system(size: size, weight: .semibold, design: .monospaced))
             .kerning(0.5)
             .foregroundStyle(.white)
+            .lineLimit(1)
+            .minimumScaleFactor(0.75)
+            .frame(width: width)
             .padding(.horizontal, 8)
             .padding(.vertical, 4)
             .background(Theme.badgeColor(for: type), in: RoundedRectangle(cornerRadius: 6))
