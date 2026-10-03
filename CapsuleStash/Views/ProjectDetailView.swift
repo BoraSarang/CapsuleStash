@@ -96,6 +96,7 @@ struct ProjectDetailView: View {
     /// 우측 플로팅 블록 바로가기 (T-38).
     /// 평소엔 ≡ 버튼만, 누르면 네모 패널에 아이콘·점·제목 목록. 행 호버하면 전체 제목 툴팁.
     /// 클릭하면 해당 블록으로 이동 (접혀 있으면 먼저 펼친다).
+    /// T-44 패널은 고정 폭(꽉 채우지 않음) + 본문과 다른 배경 + 벗어나면 자동 닫기.
     private func blockRail(proxy: ScrollViewProxy) -> some View {
         VStack {
             if railOpen {
@@ -110,7 +111,7 @@ struct ProjectDetailView: View {
                                     Image(systemName: block.type.symbolName)
                                         .font(.system(size: 12))
                                         .foregroundStyle(Theme.muted)
-                                        .frame(width: 16)
+                                        .frame(width: 16, alignment: .leading)
                                     Circle()
                                         .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
                                         .frame(width: 6, height: 6)
@@ -119,8 +120,8 @@ struct ProjectDetailView: View {
                                         .foregroundStyle(Theme.ink)
                                         .lineLimit(1)
                                         .truncationMode(.tail)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
                                 }
-                                .frame(width: 150, alignment: .leading)
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 7)
                                 .contentShape(Rectangle())
@@ -133,9 +134,10 @@ struct ProjectDetailView: View {
                         }
                     }
                 }
+                .frame(width: 210)
                 .frame(maxHeight: 280)
                 .padding(.vertical, 4)
-                .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+                .background(Theme.tagBackground, in: RoundedRectangle(cornerRadius: 10))
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
                 .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
             }
@@ -151,12 +153,20 @@ struct ProjectDetailView: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+            .background(Theme.tagBackground, in: RoundedRectangle(cornerRadius: 10))
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
             .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
             .help("블록 바로가기")
         }
         .padding(.trailing, 10)
+        // T-44 패널 영역에서 벗어나면 자동으로 닫는다
+        .onHover { hovering in
+            if !hovering {
+                withAnimation(.easeOut(duration: 0.12)) {
+                    railOpen = false
+                }
+            }
+        }
     }
 
     // MARK: - 헤더
