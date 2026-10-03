@@ -15,7 +15,9 @@ ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT="CapsuleStash.xcodeproj"
 SCHEME="CapsuleStash"
 DERIVED="$ROOT/.build/dd"
-APP_DEST="$HOME/Applications/CapsuleStash.app"
+APP_DEST="$HOME/Applications/Capsule Stash.app"
+# 구 이름 잔재 제거 (표시 이름 통일 전 설치분)
+APP_LEGACY="$HOME/Applications/CapsuleStash.app"
 
 MODE="${1:-debug}"
 PLATFORM="${2:-macos}"
@@ -54,6 +56,10 @@ do_deploy() {
 
   # rules/platforms/AGENTS.macos.md: 배포 복사 시 기존 .app 삭제는 예외적으로 허용
   mkdir -p "$HOME/Applications"
+  if [[ -e "$APP_LEGACY" ]]; then
+    log "구 이름 잔재 삭제: $APP_LEGACY"
+    rm -rf "$APP_LEGACY"
+  fi
   if [[ -e "$APP_DEST" ]]; then
     log "기존 앱 삭제 후 교체: $APP_DEST"
     rm -rf "$APP_DEST"

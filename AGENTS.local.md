@@ -21,7 +21,7 @@
 ## 4. 프로젝트 특화 예외 규칙
 - Credential 블록은 일반 텍스트 검색 인덱스에 비밀값 포함 금지, Keychain 또는 별도 암호화 DB 사용
 - Shell 명령어 자동 실행 금지 (1차 버전은 복사만 지원)
-- `~/Applications/CapsuleStash.app` 복사 시 기존 파일 삭제만 예외적으로 허용 (rules/platforms/AGENTS.macos.md)
+- `~/Applications/Capsule Stash.app` 복사 시 기존 파일 삭제만 예외적으로 허용 (rules/platforms/AGENTS.macos.md)
 - 시스템 UI (설정창·디버그 패널·권한 요청)는 native 규칙 준수 (custom 프로필과 무관)
 - 원본 기획: `/Users/lee/Documents/AGENTS/apps-docs/CapsuleStash.md`
 

@@ -32,7 +32,7 @@
 
 ## 6. 빌드 & 검증 계획
 - 문서 작성 → 코드 구현 → 테스트 → `./build_and_run.sh debug macos` (프로젝트 생성 후 스크립트 도입 예정, 당장은 `xcodebuild` 직접 빌드)
-- 결과물: `~/Applications/CapsuleStash.app` 복사
+- 결과물: `~/Applications/Capsule Stash.app` 복사 (구 `CapsuleStash.app` 잔재는 배포 시 제거)
 - 테스트: smoke/unit 우선, full은 변경 범위 클 때
 - DebugPanel 검증 항목: ERROR 0, PERF/CACHE 예산, 로그 마스킹 (토큰·비밀번호 미출력)
 - 다음 단계: Xcode 프로젝트 생성 후 빌드 게이트 확정
