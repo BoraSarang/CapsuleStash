@@ -61,8 +61,25 @@ final class AppState: ObservableObject {
         isPalettePresented = false
     }
 
-    func notify(_ message: String) {
-        toast = ToastMessage(text: message)
+    /// Vault 잠금/해제 토글 (메뉴바·사이드바 공유).
+    func toggleVault(_ store: DataStore) {
+        if store.isVaultUnlocked {
+            store.lockVault()
+            notify("Vault 잠금")
+        } else {
+            store.requestVaultUnlock { [weak self] _ in
+                self?.notify(store.isVaultUnlocked ? "Vault 잠금 해제" : "Vault 잠금 해제 실패")
+            }
+        }
+    }
+
+    /// 외부 링크를 기본 브라우저로 연다 (카드·본문 공유).
+    func openExternal(_ url: URL) {
+        DebugLogger.feature("외부 링크 열기: \(url.host() ?? url.absoluteString)")
+        NSWorkspace.shared.open(url)
+    }
+
+    func notify(_ message: String) {        toast = ToastMessage(text: message)
         toastTask?.cancel()
         toastTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 1_800_000_000)

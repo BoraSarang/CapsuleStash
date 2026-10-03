@@ -215,7 +215,7 @@ struct SidebarView: View {
             Button(project.isFavorite ? "즐겨찾기 해제" : "즐겨찾기") { store.toggleFavorite(project) }
             Button("이름 바꾸기…") { rename(project: project) }
             Button("복사") {
-                if ClipboardService.copy(plainText(of: project), label: project.name) {
+                if ClipboardService.copy(project.plainText(includeTitle: true, includeSecrets: store.isVaultUnlocked), label: project.name) {
                     appState.notifyCopy(project.name)
                 }
             }
@@ -264,7 +264,7 @@ struct SidebarView: View {
                 CapsuleButton(
                     title: store.isVaultUnlocked ? "잠금" : "해제",
                     style: .primary,
-                    action: toggleVault
+                    action: { appState.toggleVault(store) }
                 )
             }
         }
@@ -276,17 +276,6 @@ struct SidebarView: View {
     }
 
     // MARK: - 동작
-
-    private func toggleVault() {
-        if store.isVaultUnlocked {
-            store.lockVault()
-            appState.notify("Vault 잠금")
-        } else {
-            store.requestVaultUnlock { _ in
-                appState.notify(store.isVaultUnlocked ? "Vault 잠금 해제" : "Vault 잠금 해제 실패")
-            }
-        }
-    }
 
     /// 사이드바 드롭: Project 행을 다른 Workspace에 떨어뜨리면 이동한다.
     /// 같은 Workspace 행에 떨어뜨리면 행 드롭(moveProjectTo)이 순서 변경을 담당한다.
@@ -349,9 +338,5 @@ struct SidebarView: View {
                 appState.notify("이름 변경됨")
             }
         )
-    }
-
-    private func plainText(of project: Project) -> String {
-        ([project.name] + project.sortedBlocks.map { "## \($0.title)\n\($0.copyPayload(includeSecrets: store.isVaultUnlocked))" }).joined(separator: "\n\n")
     }
 }

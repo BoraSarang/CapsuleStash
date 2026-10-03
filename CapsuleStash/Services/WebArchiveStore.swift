@@ -38,17 +38,13 @@ enum WebArchiveStore {
 
     /// 경로 탈출(`..`, `/`) 방지 후 보관 파일 URL 반환. 없으면 nil.
     static func fileURL(kind: String, name: String, baseDirectory: URL? = nil) -> URL? {
-        guard !name.isEmpty, !name.contains("/"), !name.contains("..") else { return nil }
-        let base = baseDirectory ?? PersistenceStore.directoryURL
-        let url = base.appendingPathComponent(kind, isDirectory: true).appendingPathComponent(name)
-        return FileManager.default.fileExists(atPath: url.path) ? url : nil
+        guard let url = PersistenceStore.safeFileURL(kind: kind, name: name, baseDirectory: baseDirectory),
+              FileManager.default.fileExists(atPath: url.path) else { return nil }
+        return url
     }
 
     static func remove(kind: String, name: String, baseDirectory: URL? = nil) {
-        guard !name.isEmpty, !name.contains("/"), !name.contains("..") else { return }
-        let base = baseDirectory ?? PersistenceStore.directoryURL
-        let url = base
-            .appendingPathComponent(kind, isDirectory: true).appendingPathComponent(name)
+        guard let url = PersistenceStore.safeFileURL(kind: kind, name: name, baseDirectory: baseDirectory) else { return }
         try? FileManager.default.removeItem(at: url)
     }
 

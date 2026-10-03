@@ -211,10 +211,7 @@ struct SettingsView: View {
     }
 
     private var bundleVersion: String {
-        let info = Bundle.main.infoDictionary
-        let version = info?["CFBundleShortVersionString"] as? String ?? "-"
-        let build = info?["CFBundleVersion"] as? String ?? "-"
-        return "v\(version) (\(build))"
+        Bundle.main.capsuleVersionString
     }
 }
 
