@@ -51,6 +51,16 @@ struct MenuBarContentView: View {
 
             Divider()
 
+            // T-47 평소엔 회색 버전 표시, 새 버전이 있으면 주황 버튼으로 바뀐다
+            if let update = appState.availableUpdate {
+                Button(L10n.format("%@ 사용 가능", update.tag)) {
+                    openMainWindow()
+                    appState.updateSheetPresented = true
+                }
+            } else {
+                Text(L10n.format("현재 버전 %@", Bundle.main.capsuleVersionString))
+            }
+
             Button("종료") { NSApp.terminate(nil) }
                 .keyboardShortcut("q", modifiers: [.command])
         }

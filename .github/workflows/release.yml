@@ -1,0 +1,51 @@
+name: Release
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions:
+  contents: write
+jobs:
+  build-and-release:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: xcodebuild -version
+      # 태그와 번들 버전 일치 검증 (불일치 시 조기 실패).
+      # 버전은 project.yml MARKETING_VERSION 단일 출처 (Info.plist는 생성 파일).
+      - name: Verify tag matches bundle version
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          EXPECTED="${TAG#v}"
+          ACTUAL="$(grep -E '^\s*MARKETING_VERSION:' project.yml | sed 's/.*: //')"
+          echo "tag=$EXPECTED marketing=$ACTUAL"
+          [ "$EXPECTED" = "$ACTUAL" ]
+      - run: brew install xcodegen
+      - name: Unit tests
+        run: |
+          xcodegen generate
+          xcodebuild test -project CapsuleStash.xcodeproj -scheme CapsuleStash \
+            -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO
+      - name: Release build
+        run: |
+          xcodebuild build -project CapsuleStash.xcodeproj -scheme CapsuleStash \
+            -destination 'platform=macOS' -configuration Release \
+            -derivedDataPath build CODE_SIGNING_ALLOWED=NO
+      - name: Ad-hoc sign and zip
+        run: |
+          APP_PATH="$(find build -name 'CapsuleStash.app' -type d | head -1)"
+          codesign --force --deep --sign - "$APP_PATH"  # 첫 실행은 우클릭→열기
+          ditto -c -k --sequesterRsrc --keepParent \
+            "$APP_PATH" "Capsule-Stash-${GITHUB_REF_NAME}.zip"
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          # release-notes/<tag>.md가 있으면 그것을 본문으로, 없으면 자동 생성
+          if [ -f "release-notes/${TAG}.md" ]; then
+            gh release create "$TAG" --title "Capsule Stash $TAG" \
+              --notes-file "release-notes/${TAG}.md" "Capsule-Stash-${TAG}.zip"
+          else
+            gh release create "$TAG" --title "Capsule Stash $TAG" \
+              --generate-notes "Capsule-Stash-${TAG}.zip"
+          fi

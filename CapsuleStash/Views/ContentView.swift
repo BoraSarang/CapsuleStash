@@ -77,6 +77,13 @@ struct ContentView: View {
         .toolbarBackground(.visible, for: .windowToolbar)
         .onAppear {
             DebugLogger.feature("ContentView 표시")
+            Task { await appState.maybeAutoCheckForUpdate() }
+        }
+        // T-47 새 버전 시트 (설정·메뉴바가 함께 띄운다)
+        .sheet(isPresented: $appState.updateSheetPresented) {
+            if let update = appState.availableUpdate {
+                UpdateAvailableSheet(tag: update.tag, htmlURL: update.htmlURL, notes: update.notes)
+            }
         }
         // T-17 종료 시 Vault 잠금 + 클립보드 비밀값 정리
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in

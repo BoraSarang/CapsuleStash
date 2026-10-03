@@ -4336,6 +4336,262 @@
           }
         }
       }
+    },
+    "아직 확인하지 않음": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not checked yet"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 확인하지 않음"
+          }
+        }
+      }
+    },
+    "확인 중…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인 중…"
+          }
+        }
+      }
+    },
+    "최신 버전입니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You're up to date"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최신 버전입니다"
+          }
+        }
+      }
+    },
+    "게시된 릴리스가 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No published releases yet"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "게시된 릴리스가 없습니다"
+          }
+        }
+      }
+    },
+    "업데이트 확인 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to check for updates"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트 확인 실패"
+          }
+        }
+      }
+    },
+    "새 버전 %@ 사용 가능": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New version %@ available"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 버전 %@ 사용 가능"
+          }
+        }
+      }
+    },
+    "현재 버전 %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Current version %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 버전 %@"
+          }
+        }
+      }
+    },
+    "%@ 사용 가능": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ available"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 사용 가능"
+          }
+        }
+      }
+    },
+    "업데이트": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Updates"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트"
+          }
+        }
+      }
+    },
+    "업데이트 확인": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check for Updates"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "업데이트 확인"
+          }
+        }
+      }
+    },
+    "자동 확인": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-check"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 확인"
+          }
+        }
+      }
+    },
+    "앱 실행 시": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "At launch"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 실행 시"
+          }
+        }
+      }
+    },
+    "매일": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Daily"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "매일"
+          }
+        }
+      }
+    },
+    "매주": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Weekly"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "매주"
+          }
+        }
+      }
+    },
+    "다운로드": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다운로드"
+          }
+        }
+      }
+    },
+    "릴리스 페이지에서 ZIP을 내려받아 압축을 풀고, Capsule Stash를 Applications 폴더에 옮긴 뒤 우클릭→열기로 실행하세요. 공증 없는 배포라 첫 실행은 우클릭→열기가 필요합니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download the ZIP from the release page, unzip it, move Capsule Stash to Applications, then right-click → Open to launch. Unsigned builds require right-click → Open on first launch."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "릴리스 페이지에서 ZIP을 내려받아 압축을 풀고, Capsule Stash를 Applications 폴더에 옮긴 뒤 우클릭→열기로 실행하세요. 공증 없는 배포라 첫 실행은 우클릭→열기가 필요합니다."
+          }
+        }
+      }
     }
   },
   "version": "1.0"

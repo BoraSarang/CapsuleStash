@@ -29,6 +29,7 @@ final class AppState: ObservableObject {
         self.isSidebarVisible = UserDefaults.standard.object(forKey: Self.sidebarVisibleKey) as? Bool ?? true
         let saved = UserDefaults.standard.object(forKey: Self.sidebarWidthKey) as? Double ?? 200
         self.sidebarWidth = min(Self.sidebarMaxWidth, max(Self.sidebarMinWidth, saved))
+        self.updateFrequency = Self.savedUpdateFrequency()
     }
 
     func setSidebarWidth(_ width: CGFloat) {
@@ -94,6 +95,84 @@ final class AppState: ObservableObject {
     func notifyCopy(_ label: String, isSecret: Bool = false) {
         let base = L10n.format("%@ 복사됨", label)
         notify(isSecret ? "\(base) — \(ClipboardService.clearDelayDescription)" : base)
+    }
+
+    // MARK: - 업데이트 확인 (T-47)
+
+    /// 확인 상태. 설정 행·메뉴바 하단·시트가 함께 본다.
+    @Published var updateState: UpdateState = .idle
+    /// 새 버전 시트 (ContentView에 산다).
+    @Published var updateSheetPresented = false
+    @Published var updateFrequency: UpdateFrequency {
+        didSet { UserDefaults.standard.set(updateFrequency.rawValue, forKey: Self.updateFrequencyKey) }
+    }
+
+    private static let updateFrequencyKey = "updateFrequency"
+    private static let updateCheckedAtKey = "updateCheckedAt"
+    private let launchDate = Date()
+
+    /// 저장된 주기 (기본 매주). 테스트가 실설정을 오염시키지 않게 저장·복원한다.
+    nonisolated static func savedUpdateFrequency() -> UpdateFrequency {
+        UpdateFrequency(rawValue: UserDefaults.standard.string(forKey: updateFrequencyKey) ?? "") ?? .weekly
+    }
+
+    nonisolated private static func savedUpdateCheckedAt() -> Date? {
+        let timestamp = UserDefaults.standard.double(forKey: updateCheckedAtKey)
+        return timestamp > 0 ? Date(timeIntervalSince1970: timestamp) : nil
+    }
+
+    /// 주기에 따라 필요하면 조용히 확인한다. 앱 실행 시 1회.
+    /// 자동 확인은 시트를 띄우지 않는다 (메뉴바 표시만 바뀐다).
+    func maybeAutoCheckForUpdate() async {
+        let lastChecked = Self.savedUpdateCheckedAt()
+        guard ReleaseChecker.isDue(frequency: updateFrequency, lastChecked: lastChecked,
+                                   now: Date(), launchDate: launchDate) else { return }
+        await checkForUpdate()
+    }
+
+    /// 설정의 확인 버튼용. 새 버전이면 시트를 바로 띄운다.
+    func checkForUpdate(manual: Bool = false) async {
+        guard updateState != .checking else { return }
+        updateState = .checking
+        UserDefaults.standard.set(Date().timeIntervalSince1970, forKey: Self.updateCheckedAtKey)
+        do {
+            let release = try await ReleaseChecker.fetchLatest()
+            if ReleaseChecker.isNewer(tag: release.tagName, than: Bundle.main.capsuleVersionString) {
+                updateState = .updateAvailable(tag: release.tagName, htmlURL: release.htmlURL,
+                                               notes: release.body ?? "")
+                if manual { updateSheetPresented = true }
+            } else {
+                updateState = .upToDate
+            }
+        } catch ReleaseCheckError.noPublishedRelease {
+            updateState = .unavailable("게시된 릴리스가 없습니다")
+        } catch {
+            updateState = .unavailable("업데이트 확인 실패")
+        }
+    }
+
+    /// 새 버전이 있으면 (태그·페이지·노트).
+    var availableUpdate: (tag: String, htmlURL: String, notes: String)? {
+        if case .updateAvailable(let tag, let htmlURL, let notes) = updateState {
+            return (tag, htmlURL, notes)
+        }
+        return nil
+    }
+
+    /// 설정 행 표시문. 키는 카탈로그에 있다.
+    var updateStatusText: String {
+        switch updateState {
+        case .idle:
+            return L10n.string("아직 확인하지 않음")
+        case .checking:
+            return L10n.string("확인 중…")
+        case .upToDate:
+            return L10n.string("최신 버전입니다")
+        case .updateAvailable(let tag, _, _):
+            return L10n.format("새 버전 %@ 사용 가능", tag)
+        case .unavailable(let message):
+            return L10n.string(message)
+        }
     }
 }
 
