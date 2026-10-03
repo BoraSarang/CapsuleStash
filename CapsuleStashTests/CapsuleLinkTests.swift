@@ -32,4 +32,11 @@ final class CapsuleLinkTests: XCTestCase {
         let save = CapsuleLink.saveURL(text: "메모", url: "https://example.com/a?b=c")!
         XCTAssertEqual(CapsuleLink.parse(save), .save(text: "메모", url: "https://example.com/a?b=c"))
     }
+
+    /// Safari 확장이 만드는 URL(JS URLSearchParams 규격)을 앱이 그대로 푼다.
+    func testParsesSafariExtensionURL() {
+        let url = URL(string: "capsule://save?text=%ED%95%9C%EA%B8%80%20%EC%A0%9C%EB%AA%A9&url=https%3A%2F%2Fexample.com%2Fa%3Fb%3Dc")!
+        XCTAssertEqual(CapsuleLink.parse(url),
+                       .save(text: "한글 제목", url: "https://example.com/a?b=c"))
+    }
 }

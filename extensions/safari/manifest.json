@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Capsule Stash에 저장",
+  "version": "0.5.0",
+  "description": "현재 탭을 Capsule Stash 수신함에 저장합니다 (capsule:// scheme 경유, App Group 불필요)",
+  "action": {
+    "default_title": "Capsule Stash에 저장",
+    "default_popup": "popup.html"
+  },
+  "permissions": ["activeTab", "tabs"],
+  "icons": {
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png"
+  }
+}
