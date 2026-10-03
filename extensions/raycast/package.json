@@ -1,0 +1,42 @@
+{
+  "name": "capsule-stash",
+  "title": "Capsule Stash",
+  "description": "메뉴바 지식 저장소 검색·저장 (capsule:// scheme 경유)",
+  "icon": "assets/capsule.png",
+  "author": "BoraSarang",
+  "license": "MIT",
+  "commands": [
+    {
+      "name": "search-capsules",
+      "title": "Search Capsules",
+      "description": "Capsule Stash를 열고 검색합니다",
+      "mode": "no-view",
+      "arguments": [
+        {
+          "name": "query",
+          "placeholder": "검색어 (type:code · tag:업무/진행중 지원)",
+          "type": "text",
+          "required": true
+        }
+      ]
+    },
+    {
+      "name": "save-clipboard",
+      "title": "Save Clipboard to Inbox",
+      "description": "클립보드 텍스트를 수신함에 저장합니다",
+      "mode": "no-view"
+    }
+  ],
+  "dependencies": {
+    "@raycast/api": "^1.89.0"
+  },
+  "devDependencies": {
+    "@raycast/eslint-config": "^1.0.0",
+    "typescript": "^5.5.0"
+  },
+  "scripts": {
+    "build": "ray build",
+    "dev": "ray develop",
+    "lint": "ray lint"
+  }
+}

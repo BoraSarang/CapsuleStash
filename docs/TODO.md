@@ -94,7 +94,10 @@
       - xcodegen 교훈: `info`·`entitlements`는 `path`+`properties` 필수 (Plist 규격)
 - [ ] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
 - [ ] M3 어디서든 → v0.4.0: T-52 CloudKit 동기화 (시크릿 제외 [HARD] 유지)
-- [ ] M4 꺼내기 확장 → v0.5.0: T-54 Raycast 확장 + Alfred 워크플로, T-55 스마트 그룹(검색 문법 재사용), T-56 중첩 태그
+- [x] M4 꺼내기 확장 → v0.5.0: T-54 Raycast 확장 + Alfred 워크플로, T-55 스마트 그룹(검색 문법 재사용), T-56 중첩 태그
+      - T-56: `tagMatches` 접두 매칭(`tag:부모`→`부모/…`) + `addTag` 슬래시 접기, 힌트 문구 갱신
+      - T-55: `SmartGroup` + `hits(for:)` 공용 파이프 + 사이드바 SMART 행(개수·팔레트 점프·현재 검색 저장·이름 변경·삭제) + UserDefaults 영속화, 테스트 7건
+      - T-54: `alfred/` (Script Filter sqlite 읽기 전용·Enter 복사·⌘Enter 열기·계정은 홈페이지/아이디만, 실DB 검증) + `extensions/raycast/` (검색·클립보드 저장, tsc 통과·수신함 규격 Swift 테스트). 키 311개
 - [ ] M5 브라우저 → v1.0: T-49 Safari Web Extension (App Group 파일 교환)
 
 ## 1.0 이후 (연기)

@@ -14,6 +14,7 @@
 		10F0A6D9AA2E83F099A1E277 /* BackupTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106FD8208075D0BDFE522178 /* BackupTests.swift */; };
 		113DE531AD3064DCBBFF23DF /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68667610BC99B452D6762DF /* L10n.swift */; };
 		16938C9858F5F09DBED29040 /* NameInputSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A4F034330E57982C863E24 /* NameInputSheet.swift */; };
+		19712657EEF3A4A85B00CE00 /* SmartOrganizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98C64F42E645CEC6B848589 /* SmartOrganizeTests.swift */; };
 		24B6F2704CE4C753C67B1587 /* CapsuleLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98279E8437685D4B9521EAD /* CapsuleLink.swift */; };
 		35E1D54957D09E11943321A4 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E4E5C0FCE874021DADB73A /* SidebarView.swift */; };
 		37F40425974B258D9C9505DE /* AttachmentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DB023F2B58C6526883F119 /* AttachmentStore.swift */; };
@@ -177,6 +178,7 @@
 		F1F62D237FAA61838CF9D3C9 /* InboxTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxTests.swift; sourceTree = "<group>"; };
 		F42C96C86478288A1CA9BF74 /* BlockThumbnailGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockThumbnailGrid.swift; sourceTree = "<group>"; };
 		F659890372BCB913E55FED65 /* SharedContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedContainer.swift; sourceTree = "<group>"; };
+		F98C64F42E645CEC6B848589 /* SmartOrganizeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmartOrganizeTests.swift; sourceTree = "<group>"; };
 		FC25596027CD3D99DAE48D0D /* KeychainBackendTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainBackendTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -193,6 +195,7 @@
 				D12E2CB2920F3EEAECED20FD /* MarkdownTests.swift */,
 				8773A9578C2F08AFEBB86A75 /* ModelTests.swift */,
 				E9AB2E13764A39D4644C4F7C /* SearchTests.swift */,
+				F98C64F42E645CEC6B848589 /* SmartOrganizeTests.swift */,
 				C94A63D7B049CB166911719B /* StoreCRUDTests.swift */,
 				4B2AC078BCFA83B1B959A210 /* TestHelpers.swift */,
 				4F4819B99436D4AA5FC695F9 /* ThemeTests.swift */,
@@ -525,6 +528,7 @@
 				8AB18B713851EE88AE8A0E1F /* MarkdownTests.swift in Sources */,
 				AE305C99B9B014408A0E21A6 /* ModelTests.swift in Sources */,
 				9A5A7B46AA8F52D53E8CFBFD /* SearchTests.swift in Sources */,
+				19712657EEF3A4A85B00CE00 /* SmartOrganizeTests.swift in Sources */,
 				91C7AE032393C351AA476C40 /* StoreCRUDTests.swift in Sources */,
 				B859B3022E40C2E3B7D6ED42 /* TestHelpers.swift in Sources */,
 				CA7E6889CDA65B5201889FA6 /* ThemeTests.swift in Sources */,

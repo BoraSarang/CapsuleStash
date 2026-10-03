@@ -4896,6 +4896,86 @@
           }
         }
       }
+    },
+    "스마트 그룹 저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Smart Group"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스마트 그룹 저장"
+          }
+        }
+      }
+    },
+    "스마트 그룹 이름": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smart group name"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스마트 그룹 이름"
+          }
+        }
+      }
+    },
+    "현재 검색 저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Current Search"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "현재 검색 저장"
+          }
+        }
+      }
+    },
+    "스마트 그룹 이름 변경": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename Smart Group"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "스마트 그룹 이름 변경"
+          }
+        }
+      }
+    },
+    "예: type:code · project:\"Docker 배포\" · tag:업무/진행중 · docker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E.g. type:code · project:\"Docker Docs\" · tag:work/in-progress · docker"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예: type:code · project:\"Docker 배포\" · tag:업무/진행중 · docker"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Capsule Stash Alfred 워크플로 (T-54). `cs <검색어>` → Enter 복사 · ⌘Enter 앱에서 열기.
+  더블클릭으로 가져오기가 안 되면 README의 수동 연결을 따라 하세요 (2분).
+-->
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.borasarang.capsulestash</string>
+	<key>name</key>
+	<string>Capsule Stash</string>
+	<key>description</key>
+	<string>메뉴바 지식 저장소 검색·복사 (cs 키워드, ⌘Enter 앱 열기)</string>
+	<key>disabled</key>
+	<false/>
+	<key>version</key>
+	<string>0.5.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/BoraSarang/CapsuleStash</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>uid</key>
+			<string>CS-KEYWORD-001</string>
+			<key>type</key>
+			<string>input.keyword</string>
+			<key>version</key>
+			<integer>1</integer>
+			<key>config</key>
+			<dict>
+				<key>keyword</key>
+				<string>cs</string>
+				<key>subtext</key>
+				<string>Capsule Stash 검색</string>
+				<key>text</key>
+				<string>cs</string>
+				<key>withspace</key>
+				<true/>
+			</dict>
+		</dict>
+		<dict>
+			<key>uid</key>
+			<string>CS-FILTER-001</string>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>version</key>
+			<integer>3</integer>
+			<key>config</key>
+			<dict>
+				<key>script</key>
+				<string>./search.py "{query}"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>withspace</key>
+				<true/>
+				<key>runningsubtext</key>
+				<string>검색 중…</string>
+			</dict>
+		</dict>
+		<dict>
+			<key>uid</key>
+			<string>CS-ACTION-001</string>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>version</key>
+			<integer>2</integer>
+			<key>config</key>
+			<dict>
+				<key>script</key>
+				<string>./copy-or-open.sh</string>
+				<key>type</key>
+				<integer>2</integer>
+			</dict>
+		</dict>
+	</array>
+	<key>connections</key>
+	<dict>
+		<key>CS-KEYWORD-001</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CS-FILTER-001</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>viable</key>
+				<true/>
+			</dict>
+		</array>
+		<key>CS-FILTER-001</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>CS-ACTION-001</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>viable</key>
+				<true/>
+			</dict>
+		</array>
+	</dict>
+	<key>uidata</key>
+	<dict>
+		<key>CS-KEYWORD-001</key>
+		<dict>
+			<key>xpos</key>
+			<real>100</real>
+			<key>ypos</key>
+			<real>100</real>
+		</dict>
+		<key>CS-FILTER-001</key>
+		<dict>
+			<key>xpos</key>
+			<real>300</real>
+			<key>ypos</key>
+			<real>100</real>
+		</dict>
+		<key>CS-ACTION-001</key>
+		<dict>
+			<key>xpos</key>
+			<real>500</real>
+			<key>ypos</key>
+			<real>100</real>
+		</dict>
+	</dict>
+</dict>
+</plist>

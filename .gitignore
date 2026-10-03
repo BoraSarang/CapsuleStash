@@ -2,3 +2,6 @@
 .build/
 DerivedData/
 *.xcuserdata
+
+# Raycast 확장 의존성 (타입체크용 로컬 설치)
+extensions/raycast/node_modules/

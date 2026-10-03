@@ -40,6 +40,17 @@ final class InboxTests: XCTestCase {
         XCTAssertNotEqual(InboxPayload.filename(), InboxPayload.filename(), "동시 저장 충돌 방지")
     }
 
+    /// Raycast 확장이 쓰는 규격 그대로 읽히는지 (url 키 없음·source 다름).
+    func testRaycastPayloadShape() throws {
+        let raw = #"{"version":1,"text":"클립 메모","source":"Raycast"}"#
+        let file = tempDir!.appendingPathComponent("inbox-raycast.json")
+        try Data(raw.utf8).write(to: file)
+        let payload = try InboxPayload.read(from: file)
+        XCTAssertEqual(payload.text, "클립 메모")
+        XCTAssertNil(payload.url)
+        XCTAssertTrue(payload.hasContent)
+    }
+
     // MARK: - Inbox 문서·소비
 
     @MainActor
