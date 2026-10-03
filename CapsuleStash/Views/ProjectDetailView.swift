@@ -15,6 +15,7 @@ struct ProjectDetailView: View {
     @State private var newTagText = ""
     @State private var isAddingBlock = false
     @State private var isDropTargeted = false
+    @State private var railExpanded = false
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -70,9 +71,10 @@ struct ProjectDetailView: View {
         }
     }
 
-    /// 우측 플로팅 점 레일. 타입 색으로 구분, 접힘은 흐리게.
+    /// 우측 플로팅 점 레일. 호버하면 타이틀로 펼쳐진다.
+    /// 클릭하면 해당 블록으로 이동 (접혀 있으면 먼저 펼친다).
     private func blockRail(proxy: ScrollViewProxy) -> some View {
-        VStack(spacing: 8) {
+        VStack(alignment: .leading, spacing: 8) {
             ForEach(project.sortedBlocks) { block in
                 Button {
                     if block.isCollapsed {
@@ -84,9 +86,19 @@ struct ProjectDetailView: View {
                         }
                     }
                 } label: {
-                    Circle()
-                        .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
-                        .frame(width: 7, height: 7)
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
+                            .frame(width: 7, height: 7)
+                        if railExpanded {
+                            Text(block.title)
+                                .font(.system(size: 12))
+                                .foregroundStyle(Theme.ink)
+                                .lineLimit(1)
+                        }
+                    }
+                    .frame(maxWidth: railExpanded ? 170 : nil, alignment: .leading)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .help(block.title)
@@ -94,9 +106,14 @@ struct ProjectDetailView: View {
         }
         .padding(.horizontal, 9)
         .padding(.vertical, 12)
-        .background(Theme.card.opacity(0.9), in: Capsule())
+        .background(Theme.card.opacity(0.92), in: Capsule())
         .overlay(Capsule().strokeBorder(Theme.line, lineWidth: 1))
         .padding(.trailing, 10)
+        .onHover { hovering in
+            withAnimation(.easeOut(duration: 0.15)) {
+                railExpanded = hovering
+            }
+        }
     }
 
     // MARK: - 헤더
