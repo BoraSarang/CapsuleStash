@@ -3616,6 +3616,54 @@
           }
         }
       }
+    },
+    "폴더 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Folder"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더 열기"
+          }
+        }
+      }
+    },
+    "블록 바로가기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block Shortcuts"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 바로가기"
+          }
+        }
+      }
+    },
+    "클릭으로 접기/펼치기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Click to collapse/expand"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "클릭으로 접기/펼치기"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

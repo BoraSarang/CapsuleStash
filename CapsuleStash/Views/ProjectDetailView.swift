@@ -15,50 +15,150 @@ struct ProjectDetailView: View {
     @State private var newTagText = ""
     @State private var isAddingBlock = false
     @State private var isDropTargeted = false
+    @State private var railOpen = false
     @Environment(\.locale) private var locale
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                if project.sortedBlocks.isEmpty {
-                    emptyBlocks
-                } else {
-                    VStack(spacing: Theme.blockSpacing) {
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                    if project.sortedBlocks.isEmpty {
+                        emptyBlocks
+                    } else {
+                        VStack(spacing: Theme.blockSpacing) {
+                            ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                                BlockCardView(
+                                    block: block,
+                                    isFirst: index == 0,
+                                    isLast: index == project.sortedBlocks.count - 1
+                                )
+                                .id(block.id)
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+                    addBlockRow
+                }
+                .padding(.horizontal, Theme.contentPadding)
+                .padding(.vertical, 26)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .background(Theme.paper)
+            // T-43 팔레트에서 온 블록 이동 요청 처리 (프로젝트 전환·같은 문서 모두 onChange로 받는다)
+            .onAppear { consumePendingScroll(proxy) }
+            .onChange(of: appState.pendingBlockScroll) { _, _ in consumePendingScroll(proxy) }
+            // T-38 본문 우측 플로팅 블록 바로가기 (···). 접힌 블록은 펼치고 이동.
+            .overlay(alignment: .trailing) {
+                if project.sortedBlocks.count > 1 {
+                    blockRail(proxy: proxy)
+                }
+            }
+            // T-14 외부 드롭으로 블록 추가 (파일·텍스트·웹URL). 카드가 파일을 선점하면 건너뛴다.
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.cardRadius)
+                    .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
+                    .padding(8)
+            )
+            .onDrop(of: [.fileURL, .plainText, .url], isTargeted: $isDropTargeted) { providers in
+                let cardClaimedFiles = appState.fileDropHandled
+                appState.fileDropHandled = false
+                handleExternalDrop(providers, skipFiles: cardClaimedFiles)
+                return true
+            }
+            .sheet(item: $appState.blockCreation) { request in
+                BlockEditorSheet(create: request)
+                    .environmentObject(store)
+                    .environmentObject(appState)
+            }
+        }
+    }
+
+    /// T-43 팔레트에서 온 블록 이동 요청 처리. 펼치고 해당 위치로 스크롤한다.
+    /// 요청은 한 번만 소비한다 (nil로 비움). 펼친 뒤 레이아웃이 잡히고 이동한다.
+    private func consumePendingScroll(_ proxy: ScrollViewProxy) {
+        guard let id = appState.pendingBlockScroll,
+              project.sortedBlocks.contains(where: { $0.id == id }) else { return }
+        appState.pendingBlockScroll = nil
+        store.expandBlock(id)
+        DispatchQueue.main.async {
+            withAnimation(.easeOut(duration: 0.25)) {
+                proxy.scrollTo(id, anchor: .top)
+            }
+        }
+    }
+
+    /// 우측 플로팅 블록 바로가기 (T-38).
+    /// 평소엔 ≡ 버튼만, 누르면 네모 패널에 아이콘·점·제목 목록. 행 호버하면 전체 제목 툴팁.
+    /// 클릭하면 해당 블록으로 이동 (접혀 있으면 먼저 펼친다).
+    private func blockRail(proxy: ScrollViewProxy) -> some View {
+        VStack {
+            if railOpen {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
                         ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
-                            BlockCardView(
-                                block: block,
-                                isFirst: index == 0,
-                                isLast: index == project.sortedBlocks.count - 1
-                            )
+                            Button {
+                                railOpen = false
+                                if block.isCollapsed {
+                                    store.toggleBlockCollapsed(block)
+                                }
+                                DispatchQueue.main.async {
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        proxy.scrollTo(block.id, anchor: .top)
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: block.type.symbolName)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Theme.muted)
+                                        .frame(width: 16)
+                                    Circle()
+                                        .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
+                                        .frame(width: 6, height: 6)
+                                    Text(block.title)
+                                        .font(.system(size: 13))
+                                        .foregroundStyle(Theme.ink)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                }
+                                .frame(width: 150, alignment: .leading)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .help(block.title)
+                            if index < project.sortedBlocks.count - 1 {
+                                Divider().overlay(Theme.line)
+                            }
                         }
                     }
-                    .padding(.top, 4)
                 }
-                addBlockRow
+                .frame(maxHeight: 280)
+                .padding(.vertical, 4)
+                .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+                .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
             }
-            .padding(.horizontal, Theme.contentPadding)
-            .padding(.vertical, 26)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            Button {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    railOpen.toggle()
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+            .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+            .help("블록 바로가기")
         }
-        .background(Theme.paper)
-        // T-14 외부 드롭으로 블록 추가 (파일·텍스트·웹URL). 카드가 파일을 선점하면 건너뛴다.
-        .overlay(
-            RoundedRectangle(cornerRadius: Theme.cardRadius)
-                .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
-                .padding(8)
-        )
-        .onDrop(of: [.fileURL, .plainText, .url], isTargeted: $isDropTargeted) { providers in
-            let cardClaimedFiles = appState.fileDropHandled
-            appState.fileDropHandled = false
-            handleExternalDrop(providers, skipFiles: cardClaimedFiles)
-            return true
-        }
-        .sheet(item: $appState.blockCreation) { request in
-            BlockEditorSheet(create: request)
-                .environmentObject(store)
-                .environmentObject(appState)
-        }
+        .padding(.trailing, 10)
     }
 
     // MARK: - 헤더

@@ -286,6 +286,11 @@ struct CommandPaletteView: View {
 
     private func activate(_ hit: SearchHit) {
         store.select(hit.project)
+        // T-43 블록 히트는 프로젝트만 고르지 않고 해당 위치로 이동한다 (접혔으면 펼치고 스크롤).
+        if let block = hit.block {
+            store.expandBlock(block.id)
+            appState.pendingBlockScroll = block.id
+        }
         DebugLogger.feature("팔레트 이동: \(hit.title)")
         appState.hidePalette()
     }

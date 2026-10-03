@@ -131,6 +131,8 @@ struct BlockEditorSheet: View {
         }
         .frame(width: 560, height: 600)
         .background(Theme.paper)
+        // T-37 시트는 창 환경을 못 물려받을 수 있어 로케일 명시
+        .environment(\.locale, AppLanguage.effectiveLocale)
         .onAppear { titleFocused = true }
     }
 

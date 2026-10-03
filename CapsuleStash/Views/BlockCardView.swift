@@ -21,6 +21,7 @@ struct BlockCardView: View {
     @State private var draftTitle = ""
     @State private var draftContent = ""
     @State private var showDeleteConfirm = false
+    @State private var showMoreMenu = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -79,26 +80,28 @@ struct BlockCardView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            // T-34 드래그는 타이틀 영역으로 한정 (카드 전체 드래그가 헤더 버튼 클릭을 삼킴)
+            // T-41 타이틀 칸 전체 클릭으로 접기/펼치기 (버튼 제외, 버튼은 각자 동작).
+            // 드래그는 배지로 한정 유지 (T-39).
             HStack(spacing: 10) {
                 TypeBadge(text: block.badgeLabel, type: block.type)
+                    .contentShape(Rectangle())
+                    .onDrag {
+                        NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+                    }
+                    .help("드래그로 순서 변경")
 
                 Text(block.title)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                     .lineLimit(1)
-                    // T-31 접힌 카드의 제목을 누르면 바로 펼친다
-                    .onTapGesture {
-                        if block.isCollapsed {
-                            store.toggleBlockCollapsed(block)
-                        }
-                    }
+
+                Spacer(minLength: 0)
             }
             .contentShape(Rectangle())
-            .onDrag {
-                NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+            .onTapGesture {
+                store.toggleBlockCollapsed(block)
             }
-            .help("드래그로 순서 변경")
+            .help("클릭으로 접기/펼치기")
 
             Spacer(minLength: 8)
 
@@ -116,7 +119,7 @@ struct BlockCardView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Theme.muted)
             } else if block.type == .image || block.type == .file {
-                CapsuleIconButton(systemImage: "folder", tooltip: "경로 복사") { copyImagePaths() }
+                CapsuleIconButton(systemImage: "folder", tooltip: "폴더 열기") { openAttachmentFolder() }
             } else {
                 CapsuleIconButton(systemImage: "doc.on.doc", tooltip: "복사", style: .primary) { copyBlockContent() }
             }
@@ -128,21 +131,9 @@ struct BlockCardView: View {
                 store.toggleBlockCollapsed(block)
             }
 
-            Menu {
-                Button(canInlineEdit ? LocalizedStringKey("편집") : LocalizedStringKey("편집…"), action: beginEdit)
-                if canInlineEdit {
-                    Button("전체 편집…") { isEditing = true }
-                }
-                Divider()
-                Button("위로") { store.moveBlock(block, offset: -1) }.disabled(isFirst)
-                Button("아래로") { store.moveBlock(block, offset: 1) }.disabled(isLast)
-                Button("이 Project 즐겨찾기") { toggleProjectFavorite() }
-                Divider()
-                Button("복사", action: copyBlockContent)
-                if block.type == .image {
-                    Button("이미지 복사", action: copyImages)
-                }
-                Button("삭제", role: .destructive) { showDeleteConfirm = true }
+            // T-37 Menu 대신 Button+팝오버 (이미지 카드에서 Menu가 안 열리는 문제 회피)
+            Button {
+                showMoreMenu = true
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 12, weight: .semibold))
@@ -150,10 +141,12 @@ struct BlockCardView: View {
                     .frame(width: 24, height: 22)
                     .contentShape(Rectangle())
             }
-            .menuStyle(.borderlessButton)
-            .menuIndicator(.hidden)
-            .fixedSize()
+            .buttonStyle(.plain)
             .help("더 보기")
+            .popover(isPresented: $showMoreMenu) {
+                cardMoreMenu
+                    .environment(\.locale, AppLanguage.effectiveLocale)
+            }
         }
         .padding(.horizontal, Theme.blockPadding)
         .padding(.vertical, 12)
@@ -167,6 +160,92 @@ struct BlockCardView: View {
         } message: {
             Text("첨부·아카이브 파일도 함께 사라집니다.")
         }
+    }
+
+    // MARK: - 더보기 팝오버 (T-37)
+
+    /// 카드 ··· 메뉴. Menu 대신 팝오버로 띄운다.
+    private var cardMoreMenu: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Button(canInlineEdit ? LocalizedStringKey("편집") : LocalizedStringKey("편집…")) {
+                showMoreMenu = false
+                beginEdit()
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            if canInlineEdit {
+                Button("전체 편집…") {
+                    showMoreMenu = false
+                    isEditing = true
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            Divider()
+            Button("위로") {
+                showMoreMenu = false
+                store.moveBlock(block, offset: -1)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .disabled(isFirst)
+            Button("아래로") {
+                showMoreMenu = false
+                store.moveBlock(block, offset: 1)
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .disabled(isLast)
+            Button("이 Project 즐겨찾기") {
+                showMoreMenu = false
+                toggleProjectFavorite()
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            Divider()
+            Button("복사") {
+                showMoreMenu = false
+                copyBlockContent()
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            if block.type == .image {
+                Button("이미지 복사") {
+                    showMoreMenu = false
+                    copyImages()
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            if block.type == .image || block.type == .file {
+                Button("경로 복사") {
+                    showMoreMenu = false
+                    copyImagePaths()
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+            }
+            Button("삭제", role: .destructive) {
+                showMoreMenu = false
+                showDeleteConfirm = true
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(.red)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+        }
+        .font(.system(size: 13))
+        .foregroundStyle(Theme.ink)
+        .padding(.vertical, 6)
+        .frame(width: 200)
     }
 
     // MARK: - 본문
@@ -545,22 +624,30 @@ struct BlockCardView: View {
 
     /// 카드 썸네일. 실파일이 있으면 미리보기, 없으면 파일명 타일.
     /// 더블클릭: 이미지 → QuickLook, 파일 → 기본 앱으로 열기 (T-32).
+    /// T-42 썸네일 크기를 행에 고정. fill 원본의 이상 크기가 히트 영역까지
+    /// 커지면 펼친 이미지 카드의 헤더 버튼을 덮는다 (위로 오버플로).
+    private static let thumbnailHeight: CGFloat = 120
+
     @ViewBuilder
     private func cardThumbnail(for name: String, index: Int) -> some View {
         if block.type == .image,
            let url = AttachmentStore.fileURL(kind: AttachmentStore.imagesKind, name: name),
            FileManager.default.fileExists(atPath: url.path),
            let nsImage = NSImage(contentsOf: url) {
-            Image(nsImage: nsImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 120)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
-                .onTapGesture(count: 2) {
-                    QuickLookController.shared.show(urls: existingAttachmentURLs, index: index)
-                }
+            GeometryReader { geo in
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geo.size.width, height: Self.thumbnailHeight)
+                    .clipped()
+            }
+            .frame(height: Self.thumbnailHeight)
+            .contentShape(Rectangle())
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+            .onTapGesture(count: 2) {
+                QuickLookController.shared.show(urls: existingAttachmentURLs, index: index)
+            }
         } else {
             RoundedRectangle(cornerRadius: 10)
                 .fill(
@@ -597,6 +684,20 @@ struct BlockCardView: View {
             return
         }
         NSWorkspace.shared.open(url)
+    }
+
+    /// 폴더 버튼: 보관 폴더를 Finder에 보여준다 (T-37, 아이콘 기대치에 맞춤).
+    /// 경로는 ··· 메뉴의 ‘경로 복사’로 복사한다.
+    private func openAttachmentFolder() {
+        let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
+        let first = block.imageNames.compactMap { name in
+            AttachmentStore.fileURL(kind: kind, name: name)
+        }.first { FileManager.default.fileExists(atPath: $0.path) }
+        if let first {
+            NSWorkspace.shared.activateFileViewerSelecting([first])
+        } else {
+            NSWorkspace.shared.activateFileViewerSelecting([PersistenceStore.attachmentsURL(kind: kind)])
+        }
     }
 
     /// 이미지 원본을 클립보드에 복사 (다른 앱에 붙여넣기용, T-32).

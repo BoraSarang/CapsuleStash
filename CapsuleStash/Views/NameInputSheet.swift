@@ -57,6 +57,8 @@ struct NameInputSheet: View {
         .padding(20)
         .frame(width: 400)
         .background(Theme.paper)
+        // T-37 시트는 창 환경을 못 물려받을 수 있어 로케일 명시
+        .environment(\.locale, AppLanguage.effectiveLocale)
         .onAppear { fieldFocused = true }
         .onKeyPress(.escape) {
             dismiss()
