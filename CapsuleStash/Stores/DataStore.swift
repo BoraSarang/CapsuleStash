@@ -148,6 +148,19 @@ final class DataStore: ObservableObject {
         DebugLogger.feature("Workspace 삭제")
     }
 
+    /// T-50 가져오기: 외부 JSON의 Workspace들을 새 복사본으로 편입한다.
+    /// - Returns: 편입한 Workspace 수.
+    @discardableResult
+    func importWorkspaces(_ workspaces: [Workspace]) -> Int {
+        let mapped = LibraryTransfer.remapForImport(workspaces)
+        self.workspaces.append(contentsOf: mapped)
+        for ws in mapped { expandedWorkspaces.insert(ws.id) }
+        if let first = mapped.first?.projects.first { select(first) }
+        commit()
+        DebugLogger.feature("Workspace 가져오기: \(mapped.count)개")
+        return mapped.count
+    }
+
     /// 문서(Project) 생성 후 자동 선택. 색은 워크스페이스 내 순서대로 순환.
     @discardableResult
     func createProject(title: String, in workspaceId: UUID) -> Project? {
@@ -519,7 +532,8 @@ final class DataStore: ObservableObject {
 
     /// [HARD] 시크릿(password/secondSecret)은 디스크에 내려가지 않는다.
     /// 홈페이지·아이디(비밀값 아님)는 보관하고 시크릿만 비운다. 시크릿은 Keychain에 별도 보관.
-    static func persistableSnapshot(from workspaces: [Workspace]) -> [Workspace] {
+    /// 순수 함수라 내보내기·백업 경로(비격리)에서도 부른다.
+    nonisolated static func persistableSnapshot(from workspaces: [Workspace]) -> [Workspace] {
         workspaces.map { ws in
             Workspace(id: ws.id, name: ws.name, projects: ws.projects.map { project in
                 var copy = project

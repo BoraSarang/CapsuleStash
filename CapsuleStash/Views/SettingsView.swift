@@ -5,6 +5,7 @@ import SwiftUI
 /// 설정 (⌘,). 네이티브 Settings 씬 — 일반 / Command Palette / 보안 / 저장소 / 정보.
 /// 모든 항목은 실제 동작한다 (더미 스위치 없음).
 struct SettingsView: View {
+    @EnvironmentObject private var store: DataStore
     @EnvironmentObject private var appState: AppState
     @Environment(\.openWindow) private var openWindow
     @AppStorage("clipboardClearDelay") private var clearDelay: Double = 30
@@ -14,6 +15,8 @@ struct SettingsView: View {
     @AppStorage("showDockIcon") private var showDockIcon = false
     @AppStorage("appLanguage") private var appLanguage = "system"
     @AppStorage("appearanceMode") private var appearanceMode = Theme.AppearanceMode.system.rawValue
+    @AppStorage("autoBackupEnabled") private var autoBackupEnabled = true
+    @State private var lastBackupText: String = ""
 
     @State private var launchAtLogin = false
     @State private var launchError: String?
@@ -123,6 +126,26 @@ struct SettingsView: View {
                 Text("홈페이지·아이디는 로컬 파일에, 시크릿 2종은 Keychain에 암호화 보관됩니다.")
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.muted)
+                HStack {
+                    Button("전체 내보내기 (JSON)") { exportAll() }
+                    Button("가져오기 (JSON)") { importJSON() }
+                    Spacer()
+                }
+                .padding(.top, 2)
+                Divider()
+                Toggle("자동 백업", isOn: $autoBackupEnabled)
+                    .help("앱 실행 시 하루 1회 스냅샷을 저장하고 7세대만 보관합니다")
+                HStack {
+                    Text("마지막 백업")
+                    Spacer()
+                    Text(lastBackupText).foregroundStyle(Theme.muted)
+                }
+                HStack {
+                    Button("지금 백업") { manualBackup() }
+                    Button("백업 복원") { restoreBackup() }
+                    Spacer()
+                }
+                .padding(.top, 2)
             }
 
             Section("정보") {
@@ -170,6 +193,7 @@ struct SettingsView: View {
         .onAppear {
             refreshLaunchStatus()
             refreshHotkeyStatus()
+            refreshBackupText()
         }
         .onDisappear {
             hotkeyRecorder.stop()
@@ -239,6 +263,89 @@ struct SettingsView: View {
 
     private var bundleVersion: String {
         Bundle.main.capsuleVersionString
+    }
+
+    // MARK: - T-50 전체 내보내기·가져오기 (시크릿 제외는 전송 계층이 보장)
+
+    private func exportAll() {
+        guard let data = try? LibraryTransfer.exportJSON(workspaces: store.workspaces) else {
+            appState.notify("내보내기 실패")
+            return
+        }
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "CapsuleStash-backup.json"
+        panel.allowedContentTypes = [.json]
+        panel.canCreateDirectories = true
+        guard panel.runModal() == .OK, let dest = panel.url else { return }
+        do {
+            try data.write(to: dest, options: .atomic)
+            DebugLogger.feature("전체 내보내기: \(dest.lastPathComponent)")
+            appState.notify("내보냄")
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "내보내기 실패")
+            appState.notify("내보내기 실패")
+        }
+    }
+
+    private func importJSON() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            let data = try Data(contentsOf: url)
+            let workspaces = try LibraryTransfer.decodeJSON(data)
+            let count = store.importWorkspaces(workspaces)
+            appState.notify(L10n.format("Workspace %lld개 가져옴", count))
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "가져오기 실패")
+            appState.notify("가져오기 실패")
+        }
+    }
+
+    // MARK: - T-51 백업 (스냅샷이라 시크릿 제외는 전송 계층이 보장)
+
+    private func refreshBackupText() {
+        if let last = BackupStore.savedLastBackupAt() {
+            let formatter = DateFormatter()
+            formatter.locale = AppLanguage.effectiveLocale
+            formatter.dateStyle = .medium
+            formatter.timeStyle = .short
+            lastBackupText = formatter.string(from: last)
+        } else {
+            lastBackupText = L10n.string("백업 없음")
+        }
+    }
+
+    private func manualBackup() {
+        do {
+            try BackupStore.performBackup(workspaces: store.workspaces)
+            refreshBackupText()
+            appState.notify("백업됨")
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "수동 백업 실패")
+            appState.notify("백업 실패")
+        }
+    }
+
+    private func restoreBackup() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        panel.directoryURL = BackupStore.directoryURL
+        panel.message = L10n.string("복원할 백업 파일을 고르세요. 새 복사본으로 들어옵니다.")
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        do {
+            let data = try Data(contentsOf: url)
+            let workspaces = try LibraryTransfer.decodeJSON(data)
+            let count = store.importWorkspaces(workspaces)
+            appState.notify(L10n.format("Workspace %lld개 가져옴", count))
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "백업 복원 실패")
+            appState.notify("가져오기 실패")
+        }
     }
 }
 

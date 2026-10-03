@@ -78,6 +78,11 @@ struct ContentView: View {
         .onAppear {
             DebugLogger.feature("ContentView 표시")
             Task { await appState.maybeAutoCheckForUpdate() }
+            // T-51 기동 시 1일 1회 자동 백업 (조용히, 7세대 보관)
+            let snapshot = store.workspaces
+            Task.detached(priority: .utility) {
+                BackupStore.maybeBackupIfDue(workspaces: snapshot)
+            }
         }
         // T-47 새 버전 시트 (설정·메뉴바가 함께 띄운다)
         .sheet(isPresented: $appState.updateSheetPresented) {
