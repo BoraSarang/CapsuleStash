@@ -138,12 +138,8 @@ struct CapsuleStashApp: App {
     private func showAbout() {
         let alert = NSAlert()
         alert.messageText = "Capsule Stash"
-        alert.informativeText = """
-        Personal Knowledge Workspace for Mac
-        텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,
-        메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다.
-        """
-        alert.addButton(withTitle: "확인")
+        alert.informativeText = L10n.string("Personal Knowledge Workspace for Mac\n텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다.")
+        alert.addButton(withTitle: L10n.string("확인"))
         alert.runModal()
     }
 
@@ -157,8 +153,8 @@ struct CapsuleStashApp: App {
                     Text("Workspace 없음")
                 } else {
                     ForEach(store.workspaces.prefix(8)) { ws in
-                        Button("\(ws.name)에 새 Project") {
-                            _ = store.createProject(title: "새 Project", in: ws.id)
+                        Button(L10n.format("%@에 새 Project", ws.name)) {
+                            _ = store.createProject(title: L10n.string("새 Project"), in: ws.id)
                         }
                     }
                 }

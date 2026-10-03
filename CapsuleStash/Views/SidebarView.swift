@@ -39,7 +39,7 @@ struct SidebarView: View {
                             title: "새 Workspace",
                             subtitle: nil,
                             placeholder: "Workspace 이름",
-                            initial: "새 Workspace \(store.workspaces.count + 1)",
+                            initial: L10n.format("새 Workspace %lld", store.workspaces.count + 1),
                             confirmTitle: "추가",
                             onConfirm: { store.createWorkspace(name: $0) }
                         )
@@ -74,8 +74,8 @@ struct SidebarView: View {
             switch target {
             case .workspace(let ws):
                 return Alert(
-                    title: Text("'\(ws.name)' 삭제"),
-                    message: Text("포함된 Project \(ws.projects.count)개가 모두 사라집니다."),
+                    title: Text(L10n.format("'%@' 삭제", ws.name)),
+                    message: Text(L10n.format("포함된 Project %lld개가 모두 사라집니다.", ws.projects.count)),
                     primaryButton: .destructive(Text("삭제")) {
                         store.deleteWorkspace(ws.id)
                         appState.notify("삭제됨")
@@ -84,8 +84,8 @@ struct SidebarView: View {
                 )
             case .project(let project):
                 return Alert(
-                    title: Text("'\(project.name)' 삭제"),
-                    message: Text("포함된 블록 \(project.blocks.count)개가 모두 사라집니다."),
+                    title: Text(L10n.format("'%@' 삭제", project.name)),
+                    message: Text(L10n.format("포함된 블록 %lld개가 모두 사라집니다.", project.blocks.count)),
                     primaryButton: .destructive(Text("삭제")) {
                         store.deleteProject(project)
                         appState.notify("삭제됨")
@@ -289,7 +289,7 @@ struct SidebarView: View {
             Task { @MainActor in
                 guard let project = store.allProjects.first(where: { $0.project.id == projectId })?.project else { return }
                 if store.moveProject(projectId, to: ws.id) {
-                    appState.notify("'\(project.name)' → '\(ws.name)'으로 이동")
+                    appState.notify(L10n.format("'%@' → '%@'으로 이동", project.name, ws.name))
                 }
             }
         }
@@ -303,13 +303,13 @@ struct SidebarView: View {
     private func newProject(in ws: Workspace) {
         namePrompt = NamePrompt(
             title: "새 Project",
-            subtitle: "'\(ws.name)' 워크스페이스에 추가됩니다",
+            subtitle: LocalizedStringKey(L10n.format("'%@' 워크스페이스에 추가됩니다", ws.name)),
             placeholder: "Project 이름",
-            initial: "새 Project \(ws.projects.count + 1)",
+            initial: L10n.format("새 Project %lld", ws.projects.count + 1),
             confirmTitle: "추가",
             onConfirm: {
                 if let project = store.createProject(title: $0, in: ws.id) {
-                    appState.notify("“\(project.name)” 생성됨")
+                    appState.notify(L10n.format("“%@” 생성됨", project.name))
                 }
             }
         )

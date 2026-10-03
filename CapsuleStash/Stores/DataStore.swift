@@ -272,7 +272,7 @@ final class DataStore: ObservableObject {
                                                     baseDirectory: attachmentBaseDirectory)
             if !names.isEmpty {
                 insertBlock(Block(projectId: projectId, type: .image,
-                                  title: "이미지 \(names.count)개", imageNames: names))
+                                  title: L10n.format("이미지 %lld개", names.count), imageNames: names))
                 created += 1
             }
         }
@@ -424,7 +424,7 @@ final class DataStore: ObservableObject {
 
     /// Vault 해제 요청. 생체 인증 가능하면 Touch ID·Face ID를 먼저 거친다.
     /// 미지원 기기·스위치 OFF면 기존처럼 바로 해제한다.
-    func requestVaultUnlock(reason: String = "Vault 잠금을 해제합니다", completion: @escaping (Bool) -> Void) {
+    func requestVaultUnlock(reason: String = L10n.string("Vault 잠금을 해제합니다"), completion: @escaping (Bool) -> Void) {
         guard vaultBiometricEnabled else {
             unlockVault()
             completion(true)
@@ -627,7 +627,7 @@ extension Block {
         case .image:
             return imageNames.joined(separator: ", ")
         case .credential:
-            return credential?.homepage ?? "홈페이지 없음"
+            return credential?.homepage ?? L10n.string("홈페이지 없음")
         default:
             return content.split(separator: "\n").first.map(String.init) ?? ""
         }

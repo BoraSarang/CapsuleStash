@@ -158,7 +158,7 @@ struct BlockCardView: View {
         .padding(.horizontal, Theme.blockPadding)
         .padding(.vertical, 12)
         // T-29 삭제 확인 (실수 방지 — Workspace·Project와 동일)
-        .alert(Text(LocalizedStringKey("'\(block.title)' 삭제")), isPresented: $showDeleteConfirm) {
+        .alert(Text(L10n.format("'%@' 삭제", block.title)), isPresented: $showDeleteConfirm) {
             Button("삭제", role: .destructive) {
                 store.deleteBlock(block)
                 appState.notify("블록 삭제됨")
@@ -395,7 +395,7 @@ struct BlockCardView: View {
         NSPasteboard.general.writeObjects(images)
         // [HARD] paths are user data — log count only, never names.
         DebugLogger.feature("이미지 복사: \(images.count)개")
-        appState.notifyCopy("이미지 \(images.count)개")
+        appState.notifyCopy(L10n.format("이미지 %lld개", images.count))
     }
 
 
@@ -432,7 +432,7 @@ struct BlockCardView: View {
             updated.imageNames += names
             updated.updatedAt = Date()
             self.store.updateBlock(updated)
-            self.appState.notify("\(names.count)개 \(self.block.type.displayName) 추가됨")
+            self.appState.notify(L10n.format("%lld개 %@ 추가됨", names.count, L10n.string(self.block.type.displayName)))
         }
     }
 
@@ -455,8 +455,8 @@ struct BlockCardView: View {
         }
         let base = PersistenceStore.attachmentsURL(kind: block.type == .image ? "images" : "files").path
         let text = block.imageNames.map { base + "/" + $0 }.joined(separator: "\n")
-        if ClipboardService.copy(text, label: "\(block.title) 경로") {
-            appState.notifyCopy("\(block.title) 경로")
+        if ClipboardService.copy(text, label: "\(block.title) \(L10n.string("경로"))") {
+            appState.notifyCopy("\(block.title) \(L10n.string("경로"))")
         }
     }
 

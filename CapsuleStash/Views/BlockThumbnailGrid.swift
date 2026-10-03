@@ -73,7 +73,7 @@ struct BlockThumbnailGrid: View {
                 .padding(8)
             }
             .frame(height: 120)
-            .help("파일 위치: Application Support/CapsuleStash/\(block.type == .image ? "images" : "files")/\(name)")
+            .help(L10n.format("파일 위치: %@", "Application Support/CapsuleStash/\(block.type == .image ? "images" : "files")/\(name)"))
             .onTapGesture(count: 2) { openAttachment(named: name) }
         }
     }

@@ -124,6 +124,6 @@ enum KeychainStore {
     }
 
     private static func storeError(_ status: OSStatus) -> CapsuleError {
-        CapsuleError.store(code: ErrorCode.keychain, message: "Keychain 오류 \(status)")
+        CapsuleError.store(code: ErrorCode.keychain, message: L10n.format("Keychain 오류 %lld", Int(status)))
     }
 }

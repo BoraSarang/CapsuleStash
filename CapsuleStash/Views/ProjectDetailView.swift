@@ -193,12 +193,12 @@ struct ProjectDetailView: View {
             }
 
             HStack(spacing: 12) {
-                Text("수정 \(relativeDate)")
+                Text(L10n.format("수정 %@", relativeDate))
                 Text("•")
-                Text("블록 \(project.blocks.count)개")
+                Text(L10n.format("블록 %lld개", project.blocks.count))
                 if project.codeCount > 0 {
                     Text("•")
-                    Text("코드 \(project.codeCount)개")
+                    Text(L10n.format("코드 %lld개", project.codeCount))
                 }
                 tagRow
                 Spacer(minLength: 0)
@@ -374,7 +374,7 @@ struct ProjectDetailView: View {
                 guard !urls.isEmpty else { return }
                 let created = self.store.importFileDrops(urls, to: self.project.id)
                 if created > 0 {
-                    self.appState.notify("블록 \(created)개 추가됨")
+                    self.appState.notify(L10n.format("블록 %lld개 추가됨", created))
                 }
             }
         }

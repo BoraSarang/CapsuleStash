@@ -223,9 +223,13 @@ final class AttachmentTests: XCTestCase {
     }
 
     func testClipboardClearDelayDisabled() {
+        let savedLang = UserDefaults.standard.string(forKey: "appLanguage")
+        UserDefaults.standard.set("ko", forKey: "appLanguage")
         UserDefaults.standard.set(0.0, forKey: "clipboardClearDelay")
         XCTAssertEqual(ClipboardService.clearDelayDescription, "자동 삭제 안 함")
         UserDefaults.standard.removeObject(forKey: "clipboardClearDelay")
+        if let savedLang { UserDefaults.standard.set(savedLang, forKey: "appLanguage") }
+        else { UserDefaults.standard.removeObject(forKey: "appLanguage") }
     }
 
     func testClipboardClearDelayDefault() {
