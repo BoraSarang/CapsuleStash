@@ -1,5 +1,5 @@
 # TODO — Capsule Stash (macos)
-> PLAN: docs/plans/PLAN_v0.1_macos.md | 프로필: custom | 최종 갱신 2026-10-02
+> PLAN: docs/plans/PLAN_v0.1_macos.md | 프로필: custom | 최종 갱신 2026-10-03
 
 ## MVP (완료)
 
@@ -17,7 +17,7 @@
 - [x] T-05 메뉴바 상주(`MenuBarExtra`) + 글로벌 단축키(Carbon `RegisterEventHotKey`, `⌘⇧Space`) + Command Palette
 - [x] T-06 검색 시스템 (전체 텍스트 + `type:` / `project:` 필터, 따옴표 지원)
 - [x] T-07 DESIGN 토큰 확정 (`docs/DESIGN.md` §2 ↔ `CapsuleStash/Design/Theme.swift`)
-- [x] T-08 `build_and_run.sh` + DebugPanel(`⌘⇧D`) + `error_message_ko.json` 10개 코드
+- [x] T-08 `build_and_run.sh` + DebugPanel(`⌘⇧D`) + `error_message_ko.json` 11개 코드
 - [x] 설정(`⌘,`, 네이티브 Settings 씬): 로그인 시 실행 / 단축키 상태·재등록 / 클립보드 자동 삭제 간격(안 함·10초·30초·1분) / 백그라운드 Vault 잠금 / 생체 인증 해제 / 저장소 경로·Finder / 버전·번들
 - [x] T-19 앱 아이콘·메뉴바 아이콘 적용 (`KnowledgeVault-macOS26-Icons.zip` README 기준, `Assets.xcassets/AppIcon.appiconset` Light/Dark + `MenuBar.imageset` 템플릿, `MenuBarExtra(image: "MenuBar")`)
 - [x] T-20 블록 추가 메뉴 정렬 (`BlockTypeLabel` 아이콘 22pt 고정폭, popover+타이틀바 메뉴 공통, 빈 상태 문구 정리)
