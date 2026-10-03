@@ -12,10 +12,12 @@ struct BlockCardView: View {
     @EnvironmentObject private var appState: AppState
     @State private var isEditing = false
     @State private var isDropTargeted = false
+    @State private var isBlockDropTargeted = false
     @State private var isSavingArchive = false
     @State private var showingOffline = false
     /// 인라인 편집 상태 (T-13, 텍스트·코드 계열만)
     @State private var isInlineEditing = false
+    @State private var draftTitle = ""
     @State private var draftContent = ""
 
     var body: some View {
@@ -33,8 +35,23 @@ struct BlockCardView: View {
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).strokeBorder(Theme.line, lineWidth: 1))
         .overlay(
             RoundedRectangle(cornerRadius: Theme.cardRadius)
-                .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
+                .strokeBorder(isDropTargeted || isBlockDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
         )
+        .onDrag {
+            NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+        }
+        .onDrop(of: [.plainText], isTargeted: $isBlockDropTargeted) { providers in
+            providers.first?.loadObject(ofClass: NSString.self) { object, _ in
+                guard let raw = object as? String,
+                      raw.hasPrefix(DataStore.blockDragPrefix),
+                      let draggedId = UUID(uuidString: String(raw.dropFirst(DataStore.blockDragPrefix.count)))
+                else { return }
+                Task { @MainActor in
+                    _ = self.store.moveBlockTo(draggedId, before: self.block.id, in: self.block.projectId)
+                }
+            }
+            return true
+        }
         .onDrop(of: [.fileURL], isTargeted: $isDropTargeted) { providers in
             // 이미지·파일 블록이 소비를 선언하면 상세 화면의 파일 드롭이 건너뛴다 (T-14 중복 방지)
             if block.type == .image || block.type == .file {
@@ -142,6 +159,13 @@ struct BlockCardView: View {
             imageBody
         case .credential:
             credentialBody
+        case .markdown:
+            if isInlineEditing {
+                inlineEditor(mono: false)
+            } else {
+                MarkdownBody(text: block.content)
+                    .onTapGesture(count: 2) { startInlineEdit() }
+            }
         default:
             if isInlineEditing {
                 inlineEditor(mono: false)
@@ -157,9 +181,12 @@ struct BlockCardView: View {
         }
     }
 
-    /// T-13 인라인 편집기. 코드 계열은 줄번호+모노+다크 박스, 텍스트는 시스템 폰트.
+    /// T-13 인라인 편집기. 제목 + 본문, 코드 계열은 줄번호+모노+다크 박스, 텍스트는 시스템 폰트.
     private func inlineEditor(mono: Bool) -> some View {
         VStack(alignment: .leading, spacing: 8) {
+            TextField("블록 제목", text: $draftTitle)
+                .textFieldStyle(.roundedBorder)
+                .font(.system(size: 14, weight: .semibold))
             BlockTextEditor(
                 text: $draftContent,
                 font: mono
@@ -192,12 +219,17 @@ struct BlockCardView: View {
 
     private func startInlineEdit() {
         guard canInlineEdit, !isInlineEditing else { return }
+        draftTitle = block.title
         draftContent = block.content
         isInlineEditing = true
     }
 
     private func saveInlineEdit() {
         var updated = block
+        let trimmedTitle = draftTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        if !trimmedTitle.isEmpty {
+            updated.title = trimmedTitle
+        }
         updated.content = draftContent
         updated.updatedAt = Date()
         store.updateBlock(updated)

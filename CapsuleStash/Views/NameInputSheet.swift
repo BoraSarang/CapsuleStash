@@ -6,7 +6,8 @@ import SwiftUI
 struct NamePrompt: Identifiable {
     let id = UUID()
     let title: String
-    let subtitle: String
+    /// 템플릿 키(`'%@' 워크스페이스에...`)가 살아야 해서 합성된 String이 아니라 키 그대로 받는다.
+    let subtitle: LocalizedStringKey?
     let placeholder: String
     let initial: String
     let confirmTitle: String
@@ -31,8 +32,8 @@ struct NameInputSheet: View {
                 .font(.system(size: 16, weight: .semibold))
                 .foregroundStyle(Theme.ink)
 
-            if !prompt.subtitle.isEmpty {
-                LText(key: prompt.subtitle)
+            if let subtitle = prompt.subtitle {
+                Text(subtitle)
                     .font(.system(size: 13))
                     .foregroundStyle(Theme.muted)
             }

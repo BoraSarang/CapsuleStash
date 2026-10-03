@@ -24,7 +24,7 @@ struct SidebarView: View {
                     Button {
                         namePrompt = NamePrompt(
                             title: "새 Workspace",
-                            subtitle: "",
+                            subtitle: nil,
                             placeholder: "Workspace 이름",
                             initial: "새 Workspace \(store.workspaces.count + 1)",
                             confirmTitle: "추가",
@@ -296,7 +296,7 @@ struct SidebarView: View {
     private func rename(workspace ws: Workspace) {
         namePrompt = NamePrompt(
             title: "Workspace 이름 변경",
-            subtitle: "",
+            subtitle: nil,
             placeholder: "Workspace 이름",
             initial: ws.name,
             confirmTitle: "저장",
@@ -307,7 +307,7 @@ struct SidebarView: View {
     private func rename(project: Project) {
         namePrompt = NamePrompt(
             title: "Project 이름 변경",
-            subtitle: "",
+            subtitle: nil,
             placeholder: "Project 이름",
             initial: project.name,
             confirmTitle: "저장",

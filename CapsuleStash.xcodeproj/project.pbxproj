@@ -27,6 +27,7 @@
 		8534C0C731D6D921B3894787 /* Components.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36F6E6FB6B9D6DA758C98D67 /* Components.swift */; };
 		89881E99F5ED788BE7B6E1F6 /* SwiftDataBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99846DCFAEABEC1E5BBB583C /* SwiftDataBackend.swift */; };
 		8E602F4A7E6F623777DC16D3 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9140DC46D3C738A777FDBB7 /* AppState.swift */; };
+		8F54E754353B3F87FA55E7B7 /* MarkdownBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1F3A106F68228C0E61EB754 /* MarkdownBody.swift */; };
 		A94B6D11B96EEA812B42BA91 /* BlockCardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BADDCAE234C5633F26800EF1 /* BlockCardView.swift */; };
 		A9C14F3B35170A005D022CB0 /* OfflineWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C440407E192919A7B1CC670B /* OfflineWebView.swift */; };
 		AD4E5C247E305B754DF3CED1 /* PersistenceStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = B569B7A7AD2A68DE3AA07E57 /* PersistenceStore.swift */; };
@@ -75,6 +76,7 @@
 		89A9EAE15E27D143381029DE /* CapsuleStashTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CapsuleStashTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		99846DCFAEABEC1E5BBB583C /* SwiftDataBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataBackend.swift; sourceTree = "<group>"; };
 		ADCE112067036AC049857931 /* BlockTypePicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockTypePicker.swift; sourceTree = "<group>"; };
+		B1F3A106F68228C0E61EB754 /* MarkdownBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBody.swift; sourceTree = "<group>"; };
 		B4DCEF7D17016C685CB9C058 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		B569B7A7AD2A68DE3AA07E57 /* PersistenceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceStore.swift; sourceTree = "<group>"; };
 		BADDCAE234C5633F26800EF1 /* BlockCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockCardView.swift; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 				6F96A0B1203F492482BCD81E /* CommandPaletteView.swift */,
 				6E9C5FAEDC8B18D2AFFEF1D4 /* ContentView.swift */,
 				49F9ECD0E97AC372C6CEAC08 /* DebugPanelView.swift */,
+				B1F3A106F68228C0E61EB754 /* MarkdownBody.swift */,
 				16A6E2A516D84262D150C39C /* MenuBarContentView.swift */,
 				59A4F034330E57982C863E24 /* NameInputSheet.swift */,
 				C440407E192919A7B1CC670B /* OfflineWebView.swift */,
@@ -313,6 +316,7 @@
 				DA4850FF83DCE9FEF8400FFD /* DebugPanelView.swift in Sources */,
 				8046BFD7FD13F7DE8566F338 /* GlobalHotKeyCenter.swift in Sources */,
 				ADF422B51B40DBACEF38AA6B /* KeychainStore.swift in Sources */,
+				8F54E754353B3F87FA55E7B7 /* MarkdownBody.swift in Sources */,
 				6B2FD72F3F913D75FDCC2378 /* MenuBarContentView.swift in Sources */,
 				3D8A5E4E05F4012761D2243B /* Models.swift in Sources */,
 				16938C9858F5F09DBED29040 /* NameInputSheet.swift in Sources */,

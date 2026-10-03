@@ -379,6 +379,16 @@ final class DataStore: ObservableObject {
         mutateBlock(block.id) { $0.isCollapsed.toggle() }
     }
 
+    /// 문서의 모든 블록을 접거나 펼친다 (T-27).
+    func setAllBlocksCollapsed(_ collapsed: Bool, in projectId: UUID) {
+        mutateProject(projectId) { project in
+            for index in project.blocks.indices {
+                project.blocks[index].isCollapsed = collapsed
+            }
+        }
+        DebugLogger.feature(collapsed ? "블록 모두 접기" : "블록 모두 펼치기")
+    }
+
     func deleteBlock(_ block: Block) {
         removeBlockFiles(block)
         mutateProject(block.projectId) { project in
@@ -419,6 +429,36 @@ final class DataStore: ObservableObject {
                 if project.blocks[i].id == b.id { project.blocks[i].sortOrder = a.sortOrder }
             }
         }
+    }
+
+    /// T-27 블록 드래그 페이로드 접두사 (`capsule-block:<uuid>`).
+    /// 상세 화면의 텍스트 드롭과 구분한다.
+    static let blockDragPrefix = "capsule-block:"
+
+    /// 드래그한 블록을 대상 블록 앞으로 이동한다 (T-27, 같은 문서 안에서만).
+    /// - Returns: 실제 이동 여부.
+    @discardableResult
+    func moveBlockTo(_ draggedId: UUID, before targetId: UUID, in projectId: UUID) -> Bool {
+        guard draggedId != targetId else { return false }
+        var moved = false
+        mutateProject(projectId) { project in
+            var order = project.blocks.sorted { $0.sortOrder < $1.sortOrder }
+            guard let fromIndex = order.firstIndex(where: { $0.id == draggedId }),
+                  let toIndex = order.firstIndex(where: { $0.id == targetId }) else { return }
+            let dragged = order.remove(at: fromIndex)
+            let adjusted = fromIndex < toIndex ? toIndex - 1 : toIndex
+            order.insert(dragged, at: adjusted)
+            for (index, element) in order.enumerated() {
+                if let i = project.blocks.firstIndex(where: { $0.id == element.id }) {
+                    project.blocks[i].sortOrder = index
+                }
+            }
+            moved = true
+        }
+        if moved {
+            DebugLogger.feature("블록 순서 이동")
+        }
+        return moved
     }
 
     // MARK: - Vault

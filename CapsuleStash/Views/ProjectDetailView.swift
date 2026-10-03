@@ -15,6 +15,7 @@ struct ProjectDetailView: View {
     @State private var newTagText = ""
     @State private var isAddingBlock = false
     @State private var isDropTargeted = false
+    @Environment(\.locale) private var locale
 
     var body: some View {
         ScrollView {
@@ -93,6 +94,13 @@ struct ProjectDetailView: View {
                 }
                 tagRow
                 Spacer(minLength: 0)
+                // T-27 모두 접기/펼치기 (상태에 따라 한 버튼만)
+                CapsuleButton(
+                    title: project.blocks.allSatisfy(\.isCollapsed) ? "모두 펼치기" : "모두 접기"
+                ) {
+                    let collapsed = !project.blocks.allSatisfy(\.isCollapsed)
+                    store.setAllBlocksCollapsed(collapsed, in: project.id)
+                }
                 CapsuleIconButton(
                     systemImage: project.isFavorite ? "star.fill" : "star",
                     tooltip: project.isFavorite ? "즐겨찾기됨" : "즐겨찾기",
@@ -113,7 +121,8 @@ struct ProjectDetailView: View {
 
     private var relativeDate: String {
         let formatter = RelativeDateTimeFormatter()
-        formatter.locale = AppLanguage.effectiveLocale
+        // 템플릿("Modified %@")과 같은 로케일을 써서 언어가 엇갈리지 않게 한다
+        formatter.locale = locale
         formatter.unitsStyle = .short
         return formatter.localizedString(for: project.updatedAt, relativeTo: Date())
     }
@@ -267,7 +276,9 @@ struct ProjectDetailView: View {
             let isFile = provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier)
             if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier), !isFile {
                 provider.loadObject(ofClass: NSString.self) { object, _ in
-                    guard let text = object as? String else { return }
+                    guard let text = object as? String,
+                          // 블록 순서 드롭은 카드가 처리 (T-27)
+                          !text.hasPrefix(DataStore.blockDragPrefix) else { return }
                     Task { @MainActor in
                         if self.store.importTextDrop(text, to: self.project.id) {
                             self.appState.notify("텍스트 블록 추가됨")

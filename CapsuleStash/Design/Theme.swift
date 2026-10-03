@@ -127,7 +127,9 @@ enum Theme {
 
     static func badgeColor(for type: BlockType) -> Color {
         switch type {
-        case .text, .markdown: return ink
+        case .text, .markdown:
+            // 잉크 토큰은 다크에서 밝아져 흰 글자가 묻힌다 — 배지는 양쪽 모두 어두운 고정색
+            return Color(hex: 0x16150F)
         case .code, .shell: return accent
         case .webLink, .webArchive: return webBlue
         case .image, .file: return sage

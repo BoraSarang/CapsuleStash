@@ -1741,6 +1741,26 @@
         }
       }
     },
+    "모두 접기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Collapse All"
+          }
+        }
+      }
+    },
+    "모두 펼치기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Expand All"
+          }
+        }
+      }
+    },
     "한국어" : {
       "localizations" : {
         "en" : {

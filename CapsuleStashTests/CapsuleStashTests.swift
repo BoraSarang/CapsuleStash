@@ -806,7 +806,6 @@ final class CapsuleStashTests: XCTestCase {
     }
 
     // MARK: - 외부 드롭 가져오기 (T-14, 임시 폴더 격리)
-
     @MainActor
     private func makeStoreWithProject(dir: URL) throws -> (DataStore, Project) {
         let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
@@ -863,6 +862,55 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(block?.title, "첫 줄")
         XCTAssertEqual(block?.content, "첫 줄\n둘째 줄")
         XCTAssertFalse(store.importTextDrop("   \n  ", to: project.id), "빈 텍스트 무시")
+    }
+
+    // MARK: - 마크다운 파서 (T-26)
+
+    func testMarkdownParse() {
+        let segments = MarkdownSegment.parse("# 제목\n## 부제\n### 소제\n본문\n> 인용\n- 하나\n- 둘\n```swift\nlet a = 1\n```\n")
+        XCTAssertEqual(segments[0], .heading(level: 1, text: "제목"))
+        XCTAssertEqual(segments[1], .heading(level: 2, text: "부제"))
+        XCTAssertEqual(segments[2], .heading(level: 3, text: "소제"))
+        XCTAssertEqual(segments[3], .paragraph(lines: ["본문"]))
+        XCTAssertEqual(segments[4], .quote(lines: ["인용"]))
+        XCTAssertEqual(segments[5], .bullet(items: ["하나", "둘"]))
+        XCTAssertEqual(segments[6], .code(language: "swift", lines: ["let a = 1"]))
+        // # 뒤 공백 없으면 제목 아님, 닫히지 않은 펜스는 코드로
+        XCTAssertEqual(MarkdownSegment.parse("#태그"), [.paragraph(lines: ["#태그"])])
+        XCTAssertEqual(MarkdownSegment.parse("```\nabc"), [.code(language: "", lines: ["abc"])])
+        XCTAssertEqual(MarkdownSegment.parse(""), [])
+    }
+
+    // MARK: - 모두 접기·순서 이동 (T-27)
+
+    @MainActor
+    func testSetAllBlocksCollapsed() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+        store.insertBlock(Block(projectId: project.id, type: .text, title: "A", content: "a"))
+        store.insertBlock(Block(projectId: project.id, type: .text, title: "B", content: "b"))
+        store.setAllBlocksCollapsed(true, in: project.id)
+        XCTAssertTrue(store.selectedProject?.blocks.allSatisfy(\.isCollapsed) == true)
+        store.setAllBlocksCollapsed(false, in: project.id)
+        XCTAssertTrue(store.selectedProject?.blocks.allSatisfy { !$0.isCollapsed } == true)
+    }
+
+    @MainActor
+    func testMoveBlockTo() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+        for title in ["A", "B", "C"] {
+            store.insertBlock(Block(projectId: project.id, type: .text, title: title, content: title))
+        }
+        let ids = store.selectedProject?.sortedBlocks.map(\.id) ?? []
+        XCTAssertEqual(ids.count, 3)
+        XCTAssertTrue(store.moveBlockTo(ids[2], before: ids[0], in: project.id))
+        XCTAssertEqual(store.selectedProject?.sortedBlocks.map(\.title), ["C", "A", "B"])
+        XCTAssertFalse(store.moveBlockTo(ids[0], before: ids[0], in: project.id), "자기 자신은 무시")
+        XCTAssertFalse(store.moveBlockTo(UUID(), before: ids[0], in: project.id), "없는 블록 무시")
+        XCTAssertFalse(store.moveBlockTo(ids[0], before: ids[1], in: UUID()), "없는 문서 무시")
     }
 
     @MainActor
