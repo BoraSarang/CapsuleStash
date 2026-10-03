@@ -918,6 +918,26 @@ final class CapsuleStashTests: XCTestCase {
                        [.paragraph(lines: ["| a | b |"])])
     }
 
+    // MARK: - 검색 이동 (T-43)
+
+    @MainActor
+    func testExpandBlockUnfoldsForPaletteJump() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+        XCTAssertTrue(store.importTextDrop("점프 대상", to: project.id))
+        guard var block = store.selectedProject?.blocks.first(where: { $0.type == .text }) else {
+            return XCTFail("텍스트 블록 필요")
+        }
+        block.isCollapsed = true
+        store.updateBlock(block)
+        XCTAssertTrue(store.selectedProject?.blocks.first(where: { $0.id == block.id })?.isCollapsed == true)
+        store.expandBlock(block.id)
+        XCTAssertFalse(store.selectedProject?.blocks.first(where: { $0.id == block.id })?.isCollapsed ?? true,
+                       "팔레트 이동 전 펼침")
+        store.expandBlock(UUID()) // 없는 id는 무시 (크래시 없이)
+    }
+
     // MARK: - 마크다운 인라인 (T-40: 굵게·기울임·코드·`·` 불릿)
     func testMarkdownInlineTokenize() {
         XCTAssertEqual(MarkdownInline.tokenize("**굵게** 일반 `코드` *기울임*"), [

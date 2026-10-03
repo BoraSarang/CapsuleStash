@@ -7,6 +7,8 @@ final class AppState: ObservableObject {
     @Published var isPalettePresented: Bool = false
     @Published var toast: ToastMessage?
     @Published var blockCreation: BlockCreationRequest?
+    /// T-43 팔레트에서 선택한 블록으로 이동 요청 (ProjectDetailView가 소비 후 nil로 비운다).
+    @Published var pendingBlockScroll: UUID?
 
     /// 사이드바 표시 상태 (UserDefaults 유지)
     @Published var isSidebarVisible: Bool {

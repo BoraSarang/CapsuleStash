@@ -45,6 +45,9 @@ struct ProjectDetailView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .background(Theme.paper)
+            // T-43 팔레트에서 온 블록 이동 요청 처리 (프로젝트 전환·같은 문서 모두 onChange로 받는다)
+            .onAppear { consumePendingScroll(proxy) }
+            .onChange(of: appState.pendingBlockScroll) { _, _ in consumePendingScroll(proxy) }
             // T-38 본문 우측 플로팅 블록 바로가기 (···). 접힌 블록은 펼치고 이동.
             .overlay(alignment: .trailing) {
                 if project.sortedBlocks.count > 1 {
@@ -67,6 +70,20 @@ struct ProjectDetailView: View {
                 BlockEditorSheet(create: request)
                     .environmentObject(store)
                     .environmentObject(appState)
+            }
+        }
+    }
+
+    /// T-43 팔레트에서 온 블록 이동 요청 처리. 펼치고 해당 위치로 스크롤한다.
+    /// 요청은 한 번만 소비한다 (nil로 비움). 펼친 뒤 레이아웃이 잡히고 이동한다.
+    private func consumePendingScroll(_ proxy: ScrollViewProxy) {
+        guard let id = appState.pendingBlockScroll,
+              project.sortedBlocks.contains(where: { $0.id == id }) else { return }
+        appState.pendingBlockScroll = nil
+        store.expandBlock(id)
+        DispatchQueue.main.async {
+            withAnimation(.easeOut(duration: 0.25)) {
+                proxy.scrollTo(id, anchor: .top)
             }
         }
     }

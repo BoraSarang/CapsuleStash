@@ -420,6 +420,11 @@ final class DataStore: ObservableObject {
         mutateBlock(block.id) { $0.isCollapsed.toggle() }
     }
 
+    /// T-43 팔레트 이동 시 접힌 블록을 미리 펼친다 (스크롤 위치 보장).
+    func expandBlock(_ blockId: UUID) {
+        mutateBlock(blockId) { $0.isCollapsed = false }
+    }
+
     /// 문서의 모든 블록을 접거나 펼친다 (T-27).
     func setAllBlocksCollapsed(_ collapsed: Bool, in projectId: UUID) {
         mutateProject(projectId) { project in

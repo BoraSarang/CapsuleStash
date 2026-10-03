@@ -36,7 +36,6 @@ struct BlockCardView: View {
                 HStack {
                     Spacer(minLength: 0)
                     CapsuleIconButton(systemImage: "chevron.up", tooltip: "접기") {
-                        appState.notify("DIAG 하단접기") // TEMP-DIAG
                         store.toggleBlockCollapsed(block)
                     }
                     Spacer(minLength: 0)
@@ -129,14 +128,11 @@ struct BlockCardView: View {
                 systemImage: block.isCollapsed ? "chevron.down" : "chevron.up",
                 tooltip: block.isCollapsed ? "펼치기" : "접기"
             ) {
-                appState.notify("DIAG 위아래") // TEMP-DIAG
                 store.toggleBlockCollapsed(block)
             }
 
             // T-37 Menu 대신 Button+팝오버 (이미지 카드에서 Menu가 안 열리는 문제 회피)
             Button {
-                appState.notify("DIAG 더보기") // TEMP-DIAG
-                DebugLogger.feature("DIAG 더보기 탭") // TEMP-DIAG
                 showMoreMenu = true
             } label: {
                 Image(systemName: "ellipsis")
@@ -325,8 +321,6 @@ struct BlockCardView: View {
 
     /// 편집 진입. 접힌 채로 누르면 펼쳐서 편집으로 간다 (무반응처럼 보여서, T-31).
     private func beginEdit() {
-        appState.notify("DIAG 연필") // TEMP-DIAG
-        DebugLogger.feature("DIAG 연필 탭") // TEMP-DIAG
         if block.isCollapsed {
             store.toggleBlockCollapsed(block)
         }
@@ -695,8 +689,6 @@ struct BlockCardView: View {
     /// 폴더 버튼: 보관 폴더를 Finder에 보여준다 (T-37, 아이콘 기대치에 맞춤).
     /// 경로는 ··· 메뉴의 ‘경로 복사’로 복사한다.
     private func openAttachmentFolder() {
-        appState.notify("DIAG 폴더") // TEMP-DIAG
-        DebugLogger.feature("DIAG 폴더 탭") // TEMP-DIAG
         let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
         let first = block.imageNames.compactMap { name in
             AttachmentStore.fileURL(kind: kind, name: name)
