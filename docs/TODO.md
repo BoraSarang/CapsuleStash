@@ -82,3 +82,15 @@
 ## 보류 / 결정 필요 (해결됨)
 
 - [x] Dock 아이콘 표시 여부 → 설정(⌘,) 일반에 토글 추가, 기본 숨김(아니오, `LSUIElement` YES). 켜면 즉시 `.regular` 전환
+
+## 1.0 (계획, PLAN: docs/plans/PLAN_v1.0_macos.md)
+
+- [ ] M1 안전망 → v0.2.0: T-50 일괄 내보내기(JSON/MD 왕복), T-51 자동 백업(1일 1회·7세대·복원)
+- [ ] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
+- [ ] M3 어디서든 → v0.4.0: T-52 CloudKit 동기화 (시크릿 제외 [HARD] 유지)
+- [ ] M4 꺼내기 확장 → v0.5.0: T-54 Raycast 확장 + Alfred 워크플로, T-55 스마트 그룹(검색 문법 재사용), T-56 중첩 태그
+- [ ] M5 브라우저 → v1.0: T-49 Safari Web Extension (App Group 파일 교환)
+
+## 1.0 이후 (연기)
+
+- [ ] OCR, 휴지통·버전 기록, 모바일(iOS), 협업·공유 금고
