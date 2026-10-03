@@ -14,24 +14,39 @@ targets:
       - path: CapsuleStash
         excludes:
           - "Resources"
+          - "Info.plist"
       - path: CapsuleStash/Resources
         buildPhase: resources
+    # T-48 Share 확장을 앱에 내장한다 (PlugIns).
+    dependencies:
+      - target: ShareExtension
+    entitlements:
+      path: CapsuleStash/CapsuleStash.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.borasarang.CapsuleStash
+    # T-53 URL scheme (capsule://search·save·open).
+    # 생성 Info.plist를 쓰므로 INFOPLIST_KEY_* 대신 properties에 전부 둔다.
+    info:
+      path: CapsuleStash/Info.plist
+      properties:
+        CFBundleDisplayName: Capsule Stash
+        LSApplicationCategoryType: public.app-category.productivity
+        NSHumanReadableCopyright: ""
+        LSUIElement: true
+        CFBundleIconName: AppIcon
+        CFBundleURLTypes:
+          - CFBundleURLName: com.borasarang.CapsuleStash
+            CFBundleURLSchemes: [capsule]
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.borasarang.CapsuleStash
         PRODUCT_NAME: CapsuleStash
-        GENERATE_INFOPLIST_FILE: YES
-        INFOPLIST_KEY_CFBundleDisplayName: Capsule Stash
-        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
-        INFOPLIST_KEY_NSHumanReadableCopyright: ""
         MARKETING_VERSION: 0.1.0
         CURRENT_PROJECT_VERSION: 1
         SWIFT_VERSION: "5.0"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
-        # 메뉴바 상주 앱. Dock 표시 여부는 설정(⌘,)에서 변경 (기본 숨김 = LSUIElement YES)
-        INFOPLIST_KEY_LSUIElement: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-        INFOPLIST_KEY_CFBundleIconName: AppIcon
         COMBINE_HIDPI_IMAGES: YES
         ENABLE_HARDENED_RUNTIME: NO
         CODE_SIGN_STYLE: Automatic
@@ -49,6 +64,40 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         SWIFT_VERSION: "5.0"
         MACOSX_DEPLOYMENT_TARGET: "14.0"
+  # T-48 Share 확장. App Group 프로비저닝(유료 팀) 전에는 빌드만 되고
+  # 실동작은 안 한다 — 확장이 안내를 띄우고 본체는 폴백 경로로 동작한다.
+  ShareExtension:
+    type: app-extension
+    platform: macOS
+    sources:
+      - path: ShareExtension
+        excludes:
+          - "Info.plist"
+          - "*.entitlements"
+    entitlements:
+      path: ShareExtension/ShareExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.borasarang.CapsuleStash
+    info:
+      path: ShareExtension/Info.plist
+      properties:
+        CFBundleDisplayName: Capsule Stash에 저장
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.share-services
+          NSExtensionPrincipalClass: ShareExtension.ShareViewController
+          NSExtensionAttributes:
+            NSExtensionActivationRule:
+              NSExtensionActivationSupportsText: true
+              NSExtensionActivationSupportsWebURLWithMaxCount: 1
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.borasarang.CapsuleStash.ShareExtension
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        MACOSX_DEPLOYMENT_TARGET: "14.0"
+        CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_IDENTITY: "-"
 schemes:
   CapsuleStash:
     build:

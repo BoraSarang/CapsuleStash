@@ -48,7 +48,10 @@ struct CapsuleStashApp: App {
                     registerGlobalHotKey()
                     observeMenuBarRequests()
                     observeHotkeyReregister()
+                    observeCapsuleLinks()
                 }
+                // T-53 URL scheme (capsule://search·save·open)
+                .onOpenURL { url in handleLink(url) }
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didResignActiveNotification)) { _ in
                     // 설정(⌘,)에서 켠 경우: 백그라운드 전환 시 Vault 자동 잠금
                     guard UserDefaults.standard.bool(forKey: "vaultAutoLock"),
@@ -135,6 +138,45 @@ struct CapsuleStashApp: App {
                 MainActor.assumeIsolated { self.registerGlobalHotKey() }
             }
             .store(in: &cancellables)
+    }
+
+    // MARK: - T-53 URL scheme·Shortcuts 처리
+
+    /// Shortcuts 검색 인텐트(`openAppWhenRun`)가 앱 안에서 던지는 내부 통로.
+    private func observeCapsuleLinks() {
+        NotificationCenter.default.publisher(for: .capsuleHandleLink)
+            .sink { note in
+                guard let url = note.object as? URL else { return }
+                MainActor.assumeIsolated { self.handleLink(url) }
+            }
+            .store(in: &cancellables)
+    }
+
+    /// capsule:// 액션 실행. 창이 닫혀 있으면 먼저 연다.
+    private func handleLink(_ url: URL) {
+        guard let action = CapsuleLink.parse(url) else { return }
+        openWindow(id: AppState.mainWindowID)
+        switch action {
+        case .search(let query):
+            store.searchQuery = query
+            appState.showPalette()
+            DebugLogger.feature("URL 검색")
+        case .save(let text, let link):
+            if store.saveInboxText(text, url: link) {
+                appState.notify(L10n.string("수신함에 저장됨"))
+            }
+        case .openProject(let name):
+            let normalized = name.normalizedForSearch
+            if let found = store.allProjects.first(where: {
+                $0.project.name.normalizedForSearch == normalized
+            }) ?? store.allProjects.first(where: {
+                $0.project.name.normalizedForSearch.contains(normalized)
+            }) {
+                store.select(found.project)
+            } else {
+                appState.notify(L10n.string("문서를 찾지 못했습니다"))
+            }
+        }
     }
 
     private func showAbout() {

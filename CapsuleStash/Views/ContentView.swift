@@ -83,6 +83,13 @@ struct ContentView: View {
             Task.detached(priority: .utility) {
                 BackupStore.maybeBackupIfDue(workspaces: snapshot)
             }
+            // T-48 수신함 편입 (Share 확장·URL scheme·Intents가 떨군 파일)
+            Task {
+                let saved = store.consumeInboxFiles()
+                if saved > 0 {
+                    appState.notify(L10n.format("수신함에서 %lld개 저장", saved))
+                }
+            }
         }
         // T-47 새 버전 시트 (설정·메뉴바가 함께 띄운다)
         .sheet(isPresented: $appState.updateSheetPresented) {
