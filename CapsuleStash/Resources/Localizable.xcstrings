@@ -3616,6 +3616,22 @@
           }
         }
       }
+    },
+    "폴더 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Folder"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더 열기"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
