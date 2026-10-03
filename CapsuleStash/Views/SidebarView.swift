@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import UniformTypeIdentifiers
 
@@ -139,6 +140,10 @@ struct SidebarView: View {
             .contextMenu {
                 Button("Project 추가…") { newProject(in: ws) }
                 Button("Workspace 이름 바꾸기…", action: { rename(workspace: ws) })
+                Divider()
+                Button("JSON으로 내보내기") { exportWorkspace(ws, ext: "json") }
+                Button("Markdown으로 내보내기") { exportWorkspace(ws, ext: "md") }
+                Divider()
                 Button("Workspace 삭제", role: .destructive) { deleteTarget = .workspace(ws) }
             }
 
@@ -219,6 +224,9 @@ struct SidebarView: View {
                     appState.notifyCopy(project.name)
                 }
             }
+            Divider()
+            Button("JSON으로 내보내기") { exportProject(project, ext: "json") }
+            Button("Markdown으로 내보내기") { exportProject(project, ext: "md") }
             Divider()
             Button("삭제", role: .destructive) { deleteTarget = .project(project) }
         }
@@ -338,5 +346,66 @@ struct SidebarView: View {
                 appState.notify("이름 변경됨")
             }
         )
+    }
+
+    // MARK: - T-50 내보내기 (NSSavePanel, 시크릿 제외는 전송 계층이 보장)
+
+    private func exportWorkspace(_ ws: Workspace, ext: String) {
+        if ext == "json" {
+            guard let data = try? LibraryTransfer.exportJSON(workspaces: [ws]) else {
+                appState.notify("내보내기 실패")
+                return
+            }
+            saveExport(data: data, filename: LibraryTransfer.safeFilename(ws.name, ext: "json"),
+                       contentType: .json)
+        } else {
+            saveExport(text: LibraryTransfer.markdown(for: ws),
+                       filename: LibraryTransfer.safeFilename(ws.name, ext: "md"),
+                       // UTType.markdown은 구 OS 배포 타깃에서 불가 — 내용은 텍스트라 plainText로 충분
+                       contentType: .plainText)
+        }
+    }
+
+    private func exportProject(_ project: Project, ext: String) {
+        if ext == "json" {
+            guard let ws = store.workspaces.first(where: { $0.id == project.workspaceId }),
+                  let data = try? LibraryTransfer.exportJSON(workspaces: [Workspace(
+                    id: ws.id, name: ws.name,
+                    projects: ws.projects.filter { $0.id == project.id })]) else {
+                appState.notify("내보내기 실패")
+                return
+            }
+            saveExport(data: data, filename: LibraryTransfer.safeFilename(project.name, ext: "json"),
+                       contentType: .json)
+        } else {
+            saveExport(text: LibraryTransfer.markdown(for: project),
+                       filename: LibraryTransfer.safeFilename(project.name, ext: "md"),
+                       contentType: .plainText)
+        }
+    }
+
+    private func saveExport(text: String, filename: String, contentType: UTType) {
+        guard let data = text.data(using: .utf8) else {
+            appState.notify("내보내기 실패")
+            return
+        }
+        saveExport(data: data, filename: filename, contentType: contentType)
+    }
+
+    private func saveExport(data: Data, filename: String, contentType: UTType) {
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = filename
+        panel.allowedContentTypes = [contentType]
+        panel.canCreateDirectories = true
+        guard panel.runModal() == .OK, let dest = panel.url else { return }
+        do {
+            try data.write(to: dest, options: .atomic)
+            // [HARD] paths are user data — log file name only, never contents.
+            DebugLogger.feature("내보내기: \(dest.lastPathComponent)")
+            appState.notify("내보냄")
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "내보내기 실패")
+            appState.notify("내보내기 실패")
+        }
     }
 }
