@@ -84,6 +84,7 @@ struct CapsuleStashApp: App {
         // 설정 (⌘,) — 네이티브 Settings 씬
         Settings {
             SettingsView()
+                .environmentObject(appState)
                 .environment(\.locale, AppLanguage.effectiveLocale)
                 .id("locale-\(appLanguage)")
         }

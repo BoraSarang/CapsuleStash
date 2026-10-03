@@ -5,6 +5,8 @@ import SwiftUI
 /// 설정 (⌘,). 네이티브 Settings 씬 — 일반 / Command Palette / 보안 / 저장소 / 정보.
 /// 모든 항목은 실제 동작한다 (더미 스위치 없음).
 struct SettingsView: View {
+    @EnvironmentObject private var appState: AppState
+    @Environment(\.openWindow) private var openWindow
     @AppStorage("clipboardClearDelay") private var clearDelay: Double = 30
     @AppStorage("vaultAutoLock") private var vaultAutoLock = false
     @AppStorage("vaultBiometric") private var vaultBiometric = true
@@ -128,6 +130,30 @@ struct SettingsView: View {
                     Text("버전")
                     Spacer()
                     Text(bundleVersion).foregroundStyle(Theme.muted)
+                }
+                HStack {
+                    Text("업데이트")
+                    Spacer()
+                    Text(appState.updateStatusText).foregroundStyle(Theme.muted)
+                }
+                Picker("자동 확인", selection: $appState.updateFrequency) {
+                    ForEach(UpdateFrequency.allCases) { frequency in
+                        Text(LocalizedStringKey(frequency.labelKey)).tag(frequency)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                HStack {
+                    Spacer()
+                    Button("업데이트 확인") {
+                        Task {
+                            await appState.checkForUpdate(manual: true)
+                            // 메인 창이 닫혀 있으면 시트가 안 뜨니 먼저 연다
+                            if appState.updateSheetPresented {
+                                openWindow(id: AppState.mainWindowID)
+                            }
+                        }
+                    }
+                    .disabled(appState.updateState == .checking)
                 }
                 HStack {
                     Text("번들 ID")
