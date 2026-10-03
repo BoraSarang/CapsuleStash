@@ -1,2216 +1,3494 @@
 {
-  "sourceLanguage" : "ko",
-  "strings" : {
-    "검색" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search"
+  "sourceLanguage": "ko",
+  "strings": {
+    "검색": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search"
           }
-        }
-      }
-    },
-    "검색: docker, github, swift…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Search: docker, github, swift…"
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "검색"
           }
         }
       }
     },
-    "일치하는 항목이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No results found"
+    "검색: docker, github, swift…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search: docker, github, swift…"
           }
-        }
-      }
-    },
-    "예: type:code · project:\"Docker 배포\" · tag:swift · docker" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "E.g. type:code · project:\"Docker Docs\" · tag:swift · docker"
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "검색: docker, github, swift…"
           }
         }
       }
     },
-    "최근 사용" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Recents"
+    "일치하는 항목이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No results found"
           }
-        }
-      }
-    },
-    "최근 사용 없음" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No recents"
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일치하는 항목이 없습니다"
           }
         }
       }
     },
-    "↵ 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "↵ Open"
+    "예: type:code · project:\"Docker 배포\" · tag:swift · docker": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "E.g. type:code · project:\"Docker Docs\" · tag:swift · docker"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "예: type:code · project:\"Docker 배포\" · tag:swift · docker"
           }
         }
       }
     },
-    "⌘1 ID ⌘2 PW" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘1 ID ⌘2 Secret"
+    "최근 사용": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Recents"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 사용"
+          }
         }
       }
     },
-    "⌘Enter 저장 · esc 취소 · 더블클릭으로 편집 시작" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "⌘Enter to save · esc to cancel · double-click to edit"
+    "최근 사용 없음": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No recents"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "최근 사용 없음"
           }
         }
       }
     },
-    "취소" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cancel"
+    "↵ 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "↵ Open"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "↵ 열기"
+          }
         }
       }
     },
-    "저장" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save"
+    "⌘1 ID ⌘2 PW": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘1 ID ⌘2 Secret"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘1 ID ⌘2 PW"
           }
         }
       }
     },
-    "추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add"
+    "⌘Enter 저장 · esc 취소 · 더블클릭으로 편집 시작": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘Enter to save · esc to cancel · double-click to edit"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "⌘Enter 저장 · esc 취소 · 더블클릭으로 편집 시작"
+          }
         }
       }
     },
-    "삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete"
+    "취소": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cancel"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "취소"
+          }
         }
       }
     },
-    "삭제됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Deleted"
+    "저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장"
           }
         }
       }
     },
-    "확인" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "OK"
+    "추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추가"
+          }
         }
       }
     },
-    "완료" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Done"
+    "삭제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "삭제"
           }
         }
       }
     },
-    "편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit"
+    "삭제됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Deleted"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "삭제됨"
+          }
         }
       }
     },
-    "편집…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit…"
+    "확인": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "OK"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "확인"
           }
         }
       }
     },
-    "전체 편집…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit All…"
+    "완료": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "완료"
+          }
         }
       }
     },
-    "블록 편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Block"
+    "편집": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "편집"
+          }
         }
       }
     },
-    "위로" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move Up"
+    "편집…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "편집…"
           }
         }
       }
     },
-    "아래로" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Move Down"
+    "전체 편집…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit All…"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전체 편집…"
+          }
         }
       }
     },
-    "복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy"
+    "블록 편집": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Block"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 편집"
           }
         }
       }
     },
-    "비우기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clear"
+    "위로": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Up"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "위로"
+          }
         }
       }
     },
-    "다시 등록" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Re-register"
+    "아래로": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Move Down"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아래로"
           }
         }
       }
     },
-    "종료" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quit"
+    "복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사"
+          }
         }
       }
     },
-    "이름 바꾸기…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename…"
+    "비우기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비우기"
+          }
         }
       }
     },
-    "Workspace 이름 바꾸기…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename Workspace…"
+    "다시 등록": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-register"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 등록"
           }
         }
       }
     },
-    "Workspace 이름 변경" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename Workspace"
+    "종료": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quit"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료"
+          }
         }
       }
     },
-    "Project 이름 변경" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rename Project"
+    "이름 바꾸기…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름 바꾸기…"
           }
         }
       }
     },
-    "이 Project 즐겨찾기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorite This Project"
+    "Workspace 이름 바꾸기…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename Workspace…"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 이름 바꾸기…"
+          }
         }
       }
     },
-    "Workspace 삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete Workspace"
+    "Workspace 이름 변경": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename Workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 이름 변경"
           }
         }
       }
     },
-    "새 Workspace" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Workspace"
+    "Project 이름 변경": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rename Project"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project 이름 변경"
+          }
         }
       }
     },
-    "새 Project" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Project"
+    "이 Project 즐겨찾기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorite This Project"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이 Project 즐겨찾기"
+          }
         }
       }
     },
-    "Project 추가…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Project…"
+    "Workspace 삭제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete Workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 삭제"
           }
         }
       }
     },
-    "Workspace 추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Workspace"
+    "새 Workspace": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Workspace"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 Workspace"
+          }
         }
       }
     },
-    "Workspace 이름" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Workspace Name"
+    "새 Project": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Project"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 Project"
           }
         }
       }
     },
-    "Project 이름" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Project Name"
+    "Project 추가…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Project…"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project 추가…"
+          }
         }
       }
     },
-    "'%@' 워크스페이스에 추가됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "'%@' will be added to the workspace"
+    "Workspace 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 추가"
           }
         }
       }
     },
-    "Workspace 없음" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Workspaces"
+    "Workspace 이름": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace Name"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 이름"
+          }
         }
       }
     },
-    "즐겨찾기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorites"
+    "Project 이름": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project Name"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project 이름"
+          }
         }
       }
     },
-    "즐겨찾기됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Favorited"
+    "'%@' 워크스페이스에 추가됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'%@' will be added to the workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'%@' 워크스페이스에 추가됩니다"
           }
         }
       }
     },
-    "계정 / Credential" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Accounts / Credentials"
+    "Workspace 없음": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Workspaces"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace 없음"
+          }
         }
       }
     },
-    "Vault 열림" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vault Unlocked"
+    "즐겨찾기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorites"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기"
           }
         }
       }
     },
-    "Vault 잠김" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Vault Locked"
+    "즐겨찾기됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Favorited"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기됨"
+          }
         }
       }
     },
-    "● Vault 열림" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "● Vault Unlocked"
+    "계정 / Credential": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accounts / Credentials"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계정 / Credential"
           }
         }
       }
     },
-    "●●● 잠금됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "●●● Locked"
+    "Vault 열림": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault Unlocked"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 열림"
+          }
         }
       }
     },
-    "Vault 잠금" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock Vault"
+    "Vault 잠김": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault Locked"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 잠김"
+          }
         }
       }
     },
-    "Vault 잠금 해제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock Vault"
+    "● Vault 열림": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "● Vault Unlocked"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "● Vault 열림"
           }
         }
       }
     },
-    "잠금" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock"
+    "●●● 잠금됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "●●● Locked"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "●●● 잠금됨"
+          }
         }
       }
     },
-    "해제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock"
+    "Vault 잠금": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Vault"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 잠금"
           }
         }
       }
     },
-    "빠른 검색…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Quick Search…"
+    "Vault 잠금 해제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock Vault"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 잠금 해제"
+          }
         }
       }
     },
-    "Capsule Stash 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open Capsule Stash"
+    "잠금": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "잠금"
           }
         }
       }
     },
-    "Capsule Stash 정보" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "About Capsule Stash"
+    "해제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "해제"
+          }
         }
       }
     },
-    "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Groups text, code, web pages, images, and account info into Project documents.\nSearch and copy them anytime from the menu bar and ⌘⇧Space."
+    "빠른 검색…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quick Search…"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "빠른 검색…"
+          }
         }
       }
     },
-    "새로 만들기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New"
+    "Capsule Stash 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Capsule Stash"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capsule Stash 열기"
           }
         }
       }
     },
-    "사이드바 숨기기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide Sidebar"
+    "Capsule Stash 정보": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About Capsule Stash"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capsule Stash 정보"
+          }
         }
       }
     },
-    "사이드바 보이기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Sidebar"
+    "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groups text, code, web pages, images, and account info into Project documents.\nSearch and copy them anytime from the menu bar and ⌘⇧Space."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다."
           }
         }
       }
     },
-    "추가할 블록" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Block"
+    "새로 만들기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새로 만들기"
+          }
         }
       }
     },
-    "텍스트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text"
+    "사이드바 숨기기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide Sidebar"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이드바 숨기기"
           }
         }
       }
     },
-    "마크다운" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Markdown"
+    "사이드바 보이기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Sidebar"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이드바 보이기"
+          }
         }
       }
     },
-    "코드" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code"
+    "추가할 블록": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Block"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "추가할 블록"
+          }
         }
       }
     },
-    "셸 명령" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Shell Command"
+    "텍스트": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "텍스트"
           }
         }
       }
     },
-    "웹 링크" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web Link"
+    "마크다운": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Markdown"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마크다운"
+          }
         }
       }
     },
-    "웹 아카이브" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web Archive"
+    "코드": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "코드"
           }
         }
       }
     },
-    "이미지" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Image"
+    "셸 명령": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Shell Command"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "셸 명령"
+          }
         }
       }
     },
-    "파일" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "File"
+    "웹 링크": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web Link"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 링크"
           }
         }
       }
     },
-    "계정 정보" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Account Info"
+    "웹 아카이브": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web Archive"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 아카이브"
+          }
         }
       }
     },
-    "아직 블록이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No blocks yet"
+    "이미지": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Image"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지"
+          }
         }
       }
     },
-    "아래 + 버튼에서 텍스트·코드·웹·이미지·파일·계정 정보 블록을 추가해 보세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add text, code, web, image, file, or account blocks with the + button below."
+    "파일": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일"
           }
         }
       }
     },
-    "수정 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modified %@"
+    "계정 정보": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Account Info"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계정 정보"
+          }
         }
       }
     },
-    "블록 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld blocks"
+    "아직 블록이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No blocks yet"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 블록이 없습니다"
           }
         }
       }
     },
-    "코드 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld code blocks"
+    "아래 + 버튼에서 텍스트·코드·웹·이미지·파일·계정 정보 블록을 추가해 보세요.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add text, code, web, image, file, or account blocks with the + button below."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아래 + 버튼에서 텍스트·코드·웹·이미지·파일·계정 정보 블록을 추가해 보세요."
+          }
         }
       }
     },
-    "+ 태그" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "+ Tag"
+    "수정 %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Modified %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수정 %@"
           }
         }
       }
     },
-    "태그" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tags"
+    "블록 %lld개": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld blocks"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 %lld개"
+          }
         }
       }
     },
-    "태그 편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Tags"
+    "코드 %lld개": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld code blocks"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "코드 %lld개"
+          }
         }
       }
     },
-    "태그 추가 후 Enter" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add tag then Enter"
+    "+ 태그": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ Tag"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+ 태그"
           }
         }
       }
     },
-    "태그 제거" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove tag"
+    "태그": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tags"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태그"
+          }
         }
       }
     },
-    "제목 편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Title"
+    "태그 편집": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Tags"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태그 편집"
           }
         }
       }
     },
-    "전체 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy All"
+    "태그 추가 후 Enter": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add tag then Enter"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태그 추가 후 Enter"
+          }
         }
       }
     },
-    "복사할 블록이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing to copy"
+    "태그 제거": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove tag"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "태그 제거"
           }
         }
       }
     },
-    "'%@' 삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Delete '%@'"
+    "제목 편집": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Edit Title"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제목 편집"
+          }
         }
       }
     },
-    "포함된 블록 %lld개가 모두 사라집니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All %lld blocks will be deleted."
+    "전체 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy All"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "전체 복사"
+          }
         }
       }
     },
-    "포함된 Project %lld개가 모두 사라집니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "All %lld projects will be deleted."
+    "복사할 블록이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to copy"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사할 블록이 없습니다"
           }
         }
       }
     },
-    "홈페이지" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Homepage"
+    "'%@' 삭제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete '%@'"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'%@' 삭제"
+          }
         }
       }
     },
-    "아이디" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID"
+    "포함된 블록 %lld개가 모두 사라집니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All %lld blocks will be deleted."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포함된 블록 %lld개가 모두 사라집니다."
           }
         }
       }
     },
-    "Secret 1" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secret 1"
+    "포함된 Project %lld개가 모두 사라집니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All %lld projects will be deleted."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "포함된 Project %lld개가 모두 사라집니다."
+          }
         }
       }
     },
-    "Secret 2" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secret 2"
+    "홈페이지": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Homepage"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홈페이지"
           }
         }
       }
     },
-    "Secret 1 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Secret 1"
+    "아이디": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디"
+          }
         }
       }
     },
-    "%@ 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy %@"
+    "Secret 1": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1"
+          }
         }
       }
     },
-    "Secret 2 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Secret 2"
+    "Secret 2": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 2"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 2"
           }
         }
       }
     },
-    "아이디 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy ID"
+    "Secret 1 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Secret 1"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1 복사"
+          }
         }
       }
     },
-    "URL 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy URL"
+    "%@ 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 복사"
           }
         }
       }
     },
-    "경로 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Path"
+    "Secret 2 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Secret 2"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 2 복사"
+          }
         }
       }
     },
-    "브라우저로 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open in Browser"
+    "아이디 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy ID"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디 복사"
           }
         }
       }
     },
-    "더 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "More"
+    "URL 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy URL"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL 복사"
+          }
         }
       }
     },
-    "접기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collapse"
+    "경로 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Path"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로 복사"
+          }
         }
       }
     },
-    "펼치기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expand"
+    "브라우저로 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open in Browser"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "브라우저로 열기"
           }
         }
       }
     },
-    "제거" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Remove"
+    "더 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "More"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "더 보기"
+          }
         }
       }
     },
-    "제목" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Title"
+    "접기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "접기"
           }
         }
       }
     },
-    "블록 제목" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Block Title"
+    "펼치기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "펼치기"
+          }
         }
       }
     },
-    "제목을 입력하세요" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enter a title"
+    "제거": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제거"
           }
         }
       }
     },
-    "내용" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Body"
+    "제목": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Title"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제목"
+          }
         }
       }
     },
-    "코드" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Code"
+    "블록 제목": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block Title"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 제목"
+          }
         }
       }
     },
-    "언어 (예: swift, bash)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language (e.g. swift, bash)"
+    "제목을 입력하세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter a title"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "제목을 입력하세요"
           }
         }
       }
     },
-    "URL" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "URL"
+    "내용": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Body"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내용"
+          }
         }
       }
     },
-    "사이트명 (비우면 주소에서 자동 표시)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Site name (auto from URL if empty)"
+    "언어 (예: swift, bash)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language (e.g. swift, bash)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어 (예: swift, bash)"
           }
         }
       }
     },
-    "설명" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Description"
+    "URL": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL"
+          }
         }
       }
     },
-    "페이지 설명" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Page description"
+    "사이트명 (비우면 주소에서 자동 표시)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Site name (auto from URL if empty)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이트명 (비우면 주소에서 자동 표시)"
           }
         }
       }
     },
-    "https://…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://…"
+    "설명": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Description"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "설명"
+          }
         }
       }
     },
-    "https://… (없으면 비워두기)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "https://… (leave empty if none)"
+    "페이지 설명": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page description"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이지 설명"
+          }
         }
       }
     },
-    "홈페이지 (선택)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Homepage (Optional)"
+    "https://…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://…"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://…"
           }
         }
       }
     },
-    "아이디 / 키 이름" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID / Key Name"
+    "https://… (없으면 비워두기)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://… (leave empty if none)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "https://… (없으면 비워두기)"
+          }
         }
       }
     },
-    "아이디 또는 키 이름 (예: OPENAI_API_KEY)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID or key name (e.g. OPENAI_API_KEY)"
+    "홈페이지 (선택)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Homepage (Optional)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홈페이지 (선택)"
           }
         }
       }
     },
-    "Secret 1 (패스워드·API Key·Client ID)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secret 1 (Password · API Key · Client ID)"
+    "아이디 / 키 이름": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID / Key Name"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디 / 키 이름"
+          }
         }
       }
     },
-    "Secret 2 (선택, 예: Client Secret)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secret 2 (Optional, e.g. Client Secret)"
+    "아이디 또는 키 이름 (예: OPENAI_API_KEY)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID or key name (e.g. OPENAI_API_KEY)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디 또는 키 이름 (예: OPENAI_API_KEY)"
           }
         }
       }
     },
-    "sk-… 또는 패스워드" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sk-… or password"
+    "Secret 1 (패스워드·API Key·Client ID)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1 (Password · API Key · Client ID)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1 (패스워드·API Key·Client ID)"
+          }
         }
       }
     },
-    "두 번째 시크릿 (없으면 비움)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Second secret (leave empty if none)"
+    "Secret 2 (선택, 예: Client Secret)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 2 (Optional, e.g. Client Secret)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 2 (선택, 예: Client Secret)"
+          }
         }
       }
     },
-    "Secret 1·2는 Vault 해제 후에만 보이고 복사됩니다. Naver API처럼 키가 2개면 둘에 나눠 입력하세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secrets 1 and 2 are shown and copied only after Vault unlock. Split two-part keys across both."
+    "sk-… 또는 패스워드": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sk-… or password"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "sk-… 또는 패스워드"
           }
         }
       }
     },
-    "시크릿은 이 기기의 Keychain에 암호화 보관됩니다. 홈페이지·아이디만 일반 저장소에 기록됩니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Secrets are encrypted in this Mac's Keychain. Only homepage and ID go to regular storage."
+    "두 번째 시크릿 (없으면 비움)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Second secret (leave empty if none)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "두 번째 시크릿 (없으면 비움)"
+          }
         }
       }
     },
-    "홈페이지·아이디는 로컬 파일에, 시크릿 2종은 Keychain에 암호화 보관됩니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Homepage and ID are stored locally; both Secrets go to the Keychain."
+    "Secret 1·2는 Vault 해제 후에만 보이고 복사됩니다. Naver API처럼 키가 2개면 둘에 나눠 입력하세요.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secrets 1 and 2 are shown and copied only after Vault unlock. Split two-part keys across both."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secret 1·2는 Vault 해제 후에만 보이고 복사됩니다. Naver API처럼 키가 2개면 둘에 나눠 입력하세요."
           }
         }
       }
     },
-    "저장된 계정 정보가 없습니다. 편집에서 입력하면 시크릿은 Keychain에 보관됩니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No saved account info. Enter secrets to store them in the Keychain."
+    "시크릿은 이 기기의 Keychain에 암호화 보관됩니다. 홈페이지·아이디만 일반 저장소에 기록됩니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Secrets are encrypted in this Mac's Keychain. Only homepage and ID go to regular storage."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시크릿은 이 기기의 Keychain에 암호화 보관됩니다. 홈페이지·아이디만 일반 저장소에 기록됩니다."
+          }
         }
       }
     },
-    "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stores the page body for offline reading. Save files with Save Archive on the card, view with View Offline."
+    "홈페이지·아이디는 로컬 파일에, 시크릿 2종은 Keychain에 암호화 보관됩니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Homepage and ID are stored locally; both Secrets go to the Keychain."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홈페이지·아이디는 로컬 파일에, 시크릿 2종은 Keychain에 암호화 보관됩니다."
           }
         }
       }
     },
-    "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Address and notes for a favorite page. Open launches it in the browser."
+    "저장된 계정 정보가 없습니다. 편집에서 입력하면 시크릿은 Keychain에 보관됩니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No saved account info. Enter secrets to store them in the Keychain."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장된 계정 정보가 없습니다. 편집에서 입력하면 시크릿은 Keychain에 보관됩니다."
+          }
         }
       }
     },
-    "오프라인 파일 있음 (.webarchive/PDF) — 카드에서 보거나 다시 저장할 수 있습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline files available (.webarchive/PDF) — view or re-save from the card."
+    "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stores the page body for offline reading. Save files with Save Archive on the card, view with View Offline."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다."
+          }
         }
       }
     },
-    "URL 없음 — 편집에서 URL을 추가하면 열기·검색이 됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No URL — add one in Edit to enable open and search"
+    "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address and notes for a favorite page. Open launches it in the browser."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다."
           }
         }
       }
     },
-    "오프라인 저장됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved Offline"
+    "오프라인 파일 있음 (.webarchive/PDF) — 카드에서 보거나 다시 저장할 수 있습니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline files available (.webarchive/PDF) — view or re-save from the card."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 파일 있음 (.webarchive/PDF) — 카드에서 보거나 다시 저장할 수 있습니다."
+          }
         }
       }
     },
-    "미저장 — 주소·메모만 보관 중" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Not saved — address and notes only"
+    "URL 없음 — 편집에서 URL을 추가하면 열기·검색이 됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No URL — add one in Edit to enable open and search"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL 없음 — 편집에서 URL을 추가하면 열기·검색이 됩니다"
           }
         }
       }
     },
-    "아카이브 저장" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Save Archive"
+    "오프라인 저장됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved Offline"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 저장됨"
+          }
         }
       }
     },
-    "다시 저장" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Re-save"
+    "미저장 — 주소·메모만 보관 중": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not saved — address and notes only"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "미저장 — 주소·메모만 보관 중"
           }
         }
       }
     },
-    "오프라인 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Offline"
+    "아카이브 저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save Archive"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아카이브 저장"
+          }
         }
       }
     },
-    "아카이브 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View Archive"
+    "다시 저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-save"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다시 저장"
+          }
         }
       }
     },
-    "PDF 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "View PDF"
+    "오프라인 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Offline"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 보기"
           }
         }
       }
     },
-    "PDF 내보내기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Export PDF"
+    "아카이브 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View Archive"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아카이브 보기"
+          }
         }
       }
     },
-    "내보낼 PDF가 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No PDF to export"
+    "PDF 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "View PDF"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF 보기"
           }
         }
       }
     },
-    "PDF 내보냄" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PDF exported"
+    "PDF 내보내기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Export PDF"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF 내보내기"
+          }
         }
       }
     },
-    "PDF 내보내기 실패" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "PDF export failed"
+    "내보낼 PDF가 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No PDF to export"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "내보낼 PDF가 없습니다"
           }
         }
       }
     },
-    "이미지 복사" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Copy Images"
+    "PDF 내보냄": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF exported"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF 내보냄"
+          }
         }
       }
     },
-    "복사할 이미지가 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No images to copy"
+    "PDF 내보내기 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF export failed"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "PDF 내보내기 실패"
+          }
         }
       }
     },
-    "더블클릭으로 보기 · 파일 끌어다 놓으면 이 블록에 추가됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Double-click to view · drop files to add them here"
+    "이미지 복사": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Images"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지 복사"
           }
         }
       }
     },
-    "파일이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "File not found"
+    "복사할 이미지가 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No images to copy"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사할 이미지가 없습니다"
+          }
         }
       }
     },
-    "저장 중… (최대 30초)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saving… (up to 30 seconds)"
+    "더블클릭으로 보기 · 파일 끌어다 놓으면 이 블록에 추가됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Double-click to view · drop files to add them here"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "더블클릭으로 보기 · 파일 끌어다 놓으면 이 블록에 추가됩니다"
           }
         }
       }
     },
-    "URL이 없어 저장할 수 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No URL to save"
+    "파일이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File not found"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일이 없습니다"
+          }
         }
       }
     },
-    "오프라인 저장 실패 — 네트워크·URL 확인 필요" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Offline save failed — check network and URL"
+    "저장 중… (최대 30초)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saving… (up to 30 seconds)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장 중… (최대 30초)"
           }
         }
       }
     },
-    "저장 %@" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved %@"
+    "URL이 없어 저장할 수 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No URL to save"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL이 없어 저장할 수 없습니다"
+          }
         }
       }
     },
-    "이미지 추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Image"
+    "오프라인 저장 실패 — 네트워크·URL 확인 필요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Offline save failed — check network and URL"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "오프라인 저장 실패 — 네트워크·URL 확인 필요"
+          }
         }
       }
     },
-    "파일 추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add File"
+    "저장 %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장 %@"
           }
         }
       }
     },
-    "Finder에서 끌어다 놓을 수도 있습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can also drag and drop from Finder"
+    "이미지 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Image"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지 추가"
+          }
         }
       }
     },
-    "아직 첨부된 이미지가 없습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No images attached yet."
+    "파일 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add File"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 추가"
           }
         }
       }
     },
-    "아직 첨부된 파일이 없습니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No files attached yet."
+    "Finder에서 끌어다 놓을 수도 있습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can also drag and drop from Finder"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder에서 끌어다 놓을 수도 있습니다"
+          }
         }
       }
     },
-    "첨부된 파일이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No files attached"
+    "아직 첨부된 이미지가 없습니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No images attached yet."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 첨부된 이미지가 없습니다."
           }
         }
       }
     },
-    "이미지 파일을 끌어다 놓으세요" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drop image files here"
+    "아직 첨부된 파일이 없습니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No files attached yet."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아직 첨부된 파일이 없습니다."
+          }
         }
       }
     },
-    "이미지·파일 블록에만 끌어다 놓을 수 있습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You can only drop onto image and file blocks"
+    "첨부된 파일이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No files attached"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "첨부된 파일이 없습니다"
+          }
         }
       }
     },
-    "가리기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hide"
+    "이미지 파일을 끌어다 놓으세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drop image files here"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지 파일을 끌어다 놓으세요"
           }
         }
       }
     },
-    "보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show"
+    "이미지·파일 블록에만 끌어다 놓을 수 있습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You can only drop onto image and file blocks"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지·파일 블록에만 끌어다 놓을 수 있습니다"
+          }
         }
       }
     },
-    "일반" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "General"
+    "가리기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가리기"
           }
         }
       }
     },
-    "Command Palette" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Command Palette"
+    "보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보기"
+          }
         }
       }
     },
-    "보안" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Security"
+    "일반": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "General"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "일반"
           }
         }
       }
     },
-    "저장소" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Storage"
+    "Command Palette": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command Palette"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Command Palette"
+          }
         }
       }
     },
-    "정보" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "About"
+    "보안": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Security"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "보안"
+          }
         }
       }
     },
-    "모양" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appearance"
+    "저장소": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장소"
           }
         }
       }
     },
-    "테마" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Theme"
+    "정보": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "About"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "정보"
+          }
         }
       }
     },
-    "버전" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Version"
+    "모양": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모양"
           }
         }
       }
     },
-    "번들 ID" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Bundle ID"
+    "테마": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theme"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "테마"
+          }
         }
       }
     },
-    "글로벌 단축키" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Global Shortcut"
+    "버전": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Version"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "버전"
           }
         }
       }
     },
-    "등록됨 — 다른 앱에서도 호출됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registered — works in other apps"
+    "번들 ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bundle ID"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "번들 ID"
+          }
         }
       }
     },
-    "등록 실패 — 앱 안에서만 동작합니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Registration failed — in-app only"
+    "글로벌 단축키": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Global Shortcut"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "글로벌 단축키"
+          }
         }
       }
     },
-    "비밀값 클립보드 자동 삭제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Auto-clear Clipboard"
+    "등록됨 — 다른 앱에서도 호출됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registered — works in other apps"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "등록됨 — 다른 앱에서도 호출됩니다"
           }
         }
       }
     },
-    "안 함" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Never"
+    "등록 실패 — 앱 안에서만 동작합니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registration failed — in-app only"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "등록 실패 — 앱 안에서만 동작합니다"
+          }
         }
       }
     },
-    "10초" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "10 seconds"
+    "비밀값 클립보드 자동 삭제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-clear Clipboard"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "비밀값 클립보드 자동 삭제"
           }
         }
       }
     },
-    "30초" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "30 seconds"
+    "안 함": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Never"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "안 함"
+          }
         }
       }
     },
-    "1분" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "1 minute"
+    "10초": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10 seconds"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "10초"
           }
         }
       }
     },
-    "백그라운드 전환 시 Vault 잠금" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock Vault in Background"
+    "30초": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30 seconds"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "30초"
+          }
         }
       }
     },
-    "생체 인증으로 Vault 해제" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock Vault with Biometrics"
+    "1분": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1 minute"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1분"
+          }
         }
       }
     },
-    "종료 시 Vault 잠금" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lock Vault on Quit"
+    "백그라운드 전환 시 Vault 잠금": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Vault in Background"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "백그라운드 전환 시 Vault 잠금"
           }
         }
       }
     },
-    "로그인 시 실행" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open at Login"
+    "생체 인증으로 Vault 해제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock Vault with Biometrics"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "생체 인증으로 Vault 해제"
+          }
         }
       }
     },
-    "로그인 시 실행 설정 실패" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Failed to Set Open at Login"
+    "종료 시 Vault 잠금": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lock Vault on Quit"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "종료 시 Vault 잠금"
           }
         }
       }
     },
-    "Dock에 아이콘 표시" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show Dock Icon"
+    "로그인 시 실행": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open at Login"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인 시 실행"
+          }
         }
       }
     },
-    "Finder에서 보기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Reveal in Finder"
+    "로그인 시 실행 설정 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to Set Open at Login"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로그인 시 실행 설정 실패"
           }
         }
       }
     },
-    "시스템 설정 따름" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Follow System"
+    "Dock에 아이콘 표시": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show Dock Icon"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dock에 아이콘 표시"
+          }
         }
       }
     },
-    "라이트" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Light"
+    "Finder에서 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reveal in Finder"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Finder에서 보기"
+          }
         }
       }
     },
-    "다크" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Dark"
+    "시스템 설정 따름": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Follow System"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "시스템 설정 따름"
           }
         }
       }
     },
-    "언어" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Language"
+    "라이트": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "라이트"
+          }
         }
       }
     },
-    "모두 접기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Collapse All"
+    "다크": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dark"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다크"
           }
         }
       }
     },
-    "모두 펼치기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Expand All"
+    "언어": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Language"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어"
+          }
         }
       }
     },
-    "한국어" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "한국어"
+    "모두 접기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Collapse All"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모두 접기"
           }
         }
       }
     },
-    "아이디·패스워드 복사 후 지정 시간이 지나면 클립보드를 비웁니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Clears the clipboard after the set delay"
+    "모두 펼치기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expand All"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "모두 펼치기"
+          }
         }
       }
     },
-    "Touch ID·Face ID를 지원하면 해제 시 인증합니다. 미지원 기기는 바로 해제됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Authenticates on release when Touch ID or Face ID is available"
+    "한국어": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "한국어"
+          }
         }
       }
     },
-    "macOS 로그인 시 Capsule Stash를 자동으로 실행합니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Launches Capsule Stash automatically when you log in"
+    "아이디·패스워드 복사 후 지정 시간이 지나면 클립보드를 비웁니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clears the clipboard after the set delay"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디·패스워드 복사 후 지정 시간이 지나면 클립보드를 비웁니다"
           }
         }
       }
     },
-    "끄면 메뉴바에만 상주합니다. 즉시 적용됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Stays in the menu bar only. Applies immediately"
+    "Touch ID·Face ID를 지원하면 해제 시 인증합니다. 미지원 기기는 바로 해제됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Authenticates on release when Touch ID or Face ID is available"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touch ID·Face ID를 지원하면 해제 시 인증합니다. 미지원 기기는 바로 해제됩니다"
+          }
         }
       }
     },
-    "다른 앱으로 전환되면 Vault를 자동으로 잠급니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Locks the Vault when you switch apps"
+    "macOS 로그인 시 Capsule Stash를 자동으로 실행합니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Launches Capsule Stash automatically when you log in"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "macOS 로그인 시 Capsule Stash를 자동으로 실행합니다"
           }
         }
       }
     },
-    "앱 전체 밝기를 바꾼다. 즉시 적용된다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Changes the app brightness. Applies immediately"
+    "끄면 메뉴바에만 상주합니다. 즉시 적용됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stays in the menu bar only. Applies immediately"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "끄면 메뉴바에만 상주합니다. 즉시 적용됩니다"
+          }
         }
       }
     },
-    "앱을 끝낼 때 Vault를 잠그고 클립보드의 비밀값을 지웁니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Locks the Vault and clears secrets from the clipboard on quit"
+    "다른 앱으로 전환되면 Vault를 자동으로 잠급니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locks the Vault when you switch apps"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "다른 앱으로 전환되면 Vault를 자동으로 잠급니다"
           }
         }
       }
     },
-    "클릭하거나 ⌘⇧Space 로 Command Palette 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Click or press ⌘⇧Space to open Command Palette"
+    "앱 전체 밝기를 바꾼다. 즉시 적용된다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes the app brightness. Applies immediately"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 전체 밝기를 바꾼다. 즉시 적용된다"
+          }
         }
       }
     },
-    "사이드바 숨기기/보이기 (⌥⌘S)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Show/Hide Sidebar (⌥⌘S)"
+    "앱을 끝낼 때 Vault를 잠그고 클립보드의 비밀값을 지웁니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Locks the Vault and clears secrets from the clipboard on quit"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱을 끝낼 때 Vault를 잠그고 클립보드의 비밀값을 지웁니다"
+          }
         }
       }
     },
-    "새 Workspace 추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add Workspace"
+    "클릭하거나 ⌘⇧Space 로 Command Palette 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Click or press ⌘⇧Space to open Command Palette"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "클릭하거나 ⌘⇧Space 로 Command Palette 열기"
           }
         }
       }
     },
-    "새로 만들기 — 현재 Project에 블록 추가" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New — add a block to the current Project"
+    "사이드바 숨기기/보이기 (⌥⌘S)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show/Hide Sidebar (⌥⌘S)"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "사이드바 숨기기/보이기 (⌥⌘S)"
+          }
         }
       }
     },
-    "드래그로 너비 조절 · 더블클릭으로 숨기기/보이기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drag to resize · double-click to hide/show"
+    "새 Workspace 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 Workspace 추가"
           }
         }
       }
     },
-    "태그 편집" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Edit Tags"
+    "새로 만들기 — 현재 Project에 블록 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New — add a block to the current Project"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새로 만들기 — 현재 Project에 블록 추가"
+          }
         }
       }
     },
-    "태그 추가 후 Enter" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Add tag then Enter"
+    "드래그로 너비 조절 · 더블클릭으로 숨기기/보이기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Drag to resize · double-click to hide/show"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "드래그로 너비 조절 · 더블클릭으로 숨기기/보이기"
           }
         }
       }
     },
-    "표시할 로그가 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No logs to show"
+    "표시할 로그가 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No logs to show"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "표시할 로그가 없습니다"
+          }
         }
       }
     },
-    "Project를 선택하세요" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Select a Project"
+    "Project를 선택하세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Select a Project"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project를 선택하세요"
+          }
         }
       }
     },
-    "왼쪽에서 Workspace → Project를 골라보세요." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Pick a Workspace → Project on the left."
+    "왼쪽에서 Workspace → Project를 골라보세요.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pick a Workspace → Project on the left."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "왼쪽에서 Workspace → Project를 골라보세요."
           }
         }
       }
     },
-    "로 어디서든 검색" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : " to search from anywhere"
+    "로 어디서든 검색": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": " to search from anywhere"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "로 어디서든 검색"
+          }
         }
       }
     },
-    "Vault를 먼저 해제하세요" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Unlock the Vault first"
+    "Vault를 먼저 해제하세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock the Vault first"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault를 먼저 해제하세요"
           }
         }
       }
     },
-    "복사할 내용이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nothing to copy"
+    "복사할 내용이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing to copy"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사할 내용이 없습니다"
+          }
         }
       }
     },
-    "복사할 아이디가 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No ID to copy"
+    "복사할 아이디가 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No ID to copy"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사할 아이디가 없습니다"
           }
         }
       }
     },
-    "복사할 Secret 1이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No Secret 1 to copy"
+    "복사할 Secret 1이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No Secret 1 to copy"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "복사할 Secret 1이 없습니다"
+          }
         }
       }
     },
-    "저장된 URL이 없습니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No saved URL"
+    "저장된 URL이 없습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No saved URL"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장된 URL이 없습니다"
+          }
         }
       }
     },
-    "열 수 없는 URL입니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cannot open URL"
+    "열 수 없는 URL입니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot open URL"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "열 수 없는 URL입니다"
           }
         }
       }
     },
-    "블록 삭제됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Block deleted"
+    "블록 삭제됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block deleted"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 삭제됨"
+          }
         }
       }
     },
-    "저장됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Saved"
+    "저장됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "저장됨"
           }
         }
       }
     },
-    "웹 링크 추가됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Web link added"
+    "웹 링크 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Web link added"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 링크 추가됨"
+          }
         }
       }
     },
-    "텍스트 블록 추가됨" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Text block added"
+    "텍스트 블록 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Text block added"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "텍스트 블록 추가됨"
           }
         }
       }
     },
-    "%@에 새 Project" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "New Project in %@"
+    "%@에 새 Project": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Project in %@"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@에 새 Project"
+          }
         }
       }
     },
-    "이미지 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld images"
+    "이미지 %lld개": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld images"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지 %lld개"
+          }
         }
       }
     },
-    "파일 %lld개" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "%lld files"
+    "파일 %lld개": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld files"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 %lld개"
           }
         }
       }
     },
-    "DebugPanel 열기" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Open DebugPanel"
+    "DebugPanel 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open DebugPanel"
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DebugPanel 열기"
+          }
         }
       }
     },
-    "DebugPanel (⌘⇧D)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "DebugPanel (⌘⇧D)"
+    "DebugPanel (⌘⇧D)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DebugPanel (⌘⇧D)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DebugPanel (⌘⇧D)"
           }
         }
       }
     },
-    "첨부·아카이브 파일도 함께 사라집니다." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Attached and archived files go with it."
+    "첨부·아카이브 파일도 함께 사라집니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attached and archived files go with it."
           }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "첨부·아카이브 파일도 함께 사라집니다."
+          }
         }
       }
     },
-    "앱 표시 언어를 바꾼다. 즉시 적용된다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Changes the app language. Applies immediately"
+    "앱 표시 언어를 바꾼다. 즉시 적용된다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changes the app language. Applies immediately"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 표시 언어를 바꾼다. 즉시 적용된다"
           }
         }
       }
     }
   },
-  "version" : "1.0"
+  "version": "1.0"
 }

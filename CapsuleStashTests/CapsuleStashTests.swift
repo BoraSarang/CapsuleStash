@@ -1042,30 +1042,42 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(AppLanguage.resolve(saved: "system", systemCode: "fr"), "en")
     }
 
-    /// 카탈로그 키 정합성. 키 형식이 틀리면 원문(한국어)으로 떨어진다.
-    /// `String(localized:locale:)` 은 Text와 같은 경로로 키를 뽑아 검증한다.
+    /// 카탈로그 키 정합성. `String(localized:locale:)` 의 locale은 서식용이라
+    /// 테이블 선택 검증에는 못 쓴다 — 컴파일된 .strings를 직접 읽는다.
+    private func stringsTable(_ locale: String) -> [String: String] {
+        guard let url = Bundle.main.url(forResource: "Localizable", withExtension: "strings",
+                                        subdirectory: "\(locale).lproj"),
+              let dict = NSDictionary(contentsOf: url) as? [String: String] else { return [:] }
+        return dict
+    }
+
     func testCatalogStaticStrings() {
-        let en = Locale(identifier: "en")
-        XCTAssertEqual(String(localized: "검색", locale: en), "Search")
-        XCTAssertEqual(String(localized: "취소", locale: en), "Cancel")
-        XCTAssertEqual(String(localized: "계정 정보", locale: en), "Account Info")
-        XCTAssertEqual(String(localized: "언어", locale: en), "Language")
-        XCTAssertEqual(String(localized: "검색: docker, github, swift…", locale: en), "Search: docker, github, swift…")
-        XCTAssertEqual(String(localized: "⌘1 ID ⌘2 PW", locale: en), "⌘1 ID ⌘2 Secret")
+        let en = stringsTable("en")
+        let ko = stringsTable("ko")
+        XCTAssertGreaterThan(en.count, 200, "출하 테이블이 비면 안 됨")
+        XCTAssertEqual(Set(en.keys), Set(ko.keys), "한·영 키 대칭 (한쪽만 있으면 반대 언어에서 떨어짐)")
+        XCTAssertEqual(en["검색"], "Search")
+        XCTAssertEqual(en["취소"], "Cancel")
+        XCTAssertEqual(en["계정 정보"], "Account Info")
+        XCTAssertEqual(en["언어"], "Language")
+        XCTAssertEqual(en["검색: docker, github, swift…"], "Search: docker, github, swift…")
+        XCTAssertEqual(en["⌘1 ID ⌘2 PW"], "⌘1 ID ⌘2 Secret")
+        XCTAssertEqual(ko["검색"], "검색")
+        XCTAssertEqual(ko["취소"], "취소")
     }
 
     func testCatalogFormatKeys() {
-        let en = Locale(identifier: "en")
-        XCTAssertEqual(String(localized: "블록 \(3)개", locale: en), "3 blocks")
-        XCTAssertEqual(String(localized: "코드 \(1)개", locale: en), "1 code blocks")
-        XCTAssertEqual(String(localized: "이미지 \(2)개", locale: en), "2 images")
-        XCTAssertEqual(String(localized: "수정 \("5분 전")", locale: en), "Modified 5분 전")
-        XCTAssertEqual(String(localized: "저장 \("2026-10-03")", locale: en), "Saved 2026-10-03")
-        XCTAssertEqual(String(localized: "포함된 블록 \(2)개가 모두 사라집니다.", locale: en), "All 2 blocks will be deleted.")
-        XCTAssertEqual(String(localized: "포함된 Project \(2)개가 모두 사라집니다.", locale: en), "All 2 projects will be deleted.")
-        XCTAssertEqual(String(localized: "'\("W")' 삭제", locale: en), "Delete 'W'")
-        XCTAssertEqual(String(localized: "\("W")에 새 Project", locale: en), "New Project in W")
-        XCTAssertEqual(String(localized: "\("Secret 2") 복사", locale: en), "Copy Secret 2")
+        let en = stringsTable("en")
+        XCTAssertEqual(en["블록 %lld개"], "%lld blocks")
+        XCTAssertEqual(en["코드 %lld개"], "%lld code blocks")
+        XCTAssertEqual(en["이미지 %lld개"], "%lld images")
+        XCTAssertEqual(en["수정 %@"], "Modified %@")
+        XCTAssertEqual(en["저장 %@"], "Saved %@")
+        XCTAssertEqual(en["포함된 블록 %lld개가 모두 사라집니다."], "All %lld blocks will be deleted.")
+        XCTAssertEqual(en["포함된 Project %lld개가 모두 사라집니다."], "All %lld projects will be deleted.")
+        XCTAssertEqual(en["'%@' 삭제"], "Delete '%@'")
+        XCTAssertEqual(en["%@에 새 Project"], "New Project in %@")
+        XCTAssertEqual(en["%@ 복사"], "Copy %@")
     }
 
     // MARK: - 첨부 (이미지/파일)
