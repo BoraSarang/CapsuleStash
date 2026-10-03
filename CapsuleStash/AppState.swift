@@ -7,6 +7,8 @@ final class AppState: ObservableObject {
     @Published var isPalettePresented: Bool = false
     @Published var toast: ToastMessage?
     @Published var blockCreation: BlockCreationRequest?
+    /// T-43 팔레트에서 선택한 블록으로 이동 요청 (ProjectDetailView가 소비 후 nil로 비운다).
+    @Published var pendingBlockScroll: UUID?
 
     /// 사이드바 표시 상태 (UserDefaults 유지)
     @Published var isSidebarVisible: Bool {
@@ -59,8 +61,28 @@ final class AppState: ObservableObject {
         isPalettePresented = false
     }
 
+    /// Vault 잠금/해제 토글 (메뉴바·사이드바 공유).
+    func toggleVault(_ store: DataStore) {
+        if store.isVaultUnlocked {
+            store.lockVault()
+            notify("Vault 잠금")
+        } else {
+            store.requestVaultUnlock { [weak self] _ in
+                self?.notify(store.isVaultUnlocked ? "Vault 잠금 해제" : "Vault 잠금 해제 실패")
+            }
+        }
+    }
+
+    /// 외부 링크를 기본 브라우저로 연다 (카드·본문 공유).
+    func openExternal(_ url: URL) {
+        DebugLogger.feature("외부 링크 열기: \(url.host() ?? url.absoluteString)")
+        NSWorkspace.shared.open(url)
+    }
+
+    /// 토스트 표시. 리터럴은 앱 표시 언어로 푼다 (T-46, 재시작 불필요).
+    /// 키가 없으면(사용자 문구 등) 그대로 둔다.
     func notify(_ message: String) {
-        toast = ToastMessage(text: message)
+        toast = ToastMessage(text: L10n.string(message))
         toastTask?.cancel()
         toastTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
@@ -70,7 +92,8 @@ final class AppState: ObservableObject {
     }
 
     func notifyCopy(_ label: String, isSecret: Bool = false) {
-        notify(isSecret ? "\(label) 복사됨 — \(ClipboardService.clearDelayDescription)" : "\(label) 복사됨")
+        let base = L10n.format("%@ 복사됨", label)
+        notify(isSecret ? "\(base) — \(ClipboardService.clearDelayDescription)" : base)
     }
 }
 

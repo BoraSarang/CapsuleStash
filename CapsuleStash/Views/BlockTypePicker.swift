@@ -32,10 +32,12 @@ struct BlockTypePicker: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(type.purposeHint)
+                .help(L10n.string(type.purposeHint))
             }
         }
         .padding(.bottom, 6)
         .frame(width: 160)
+        // T-37 팝오버는 창 환경을 못 물려받을 수 있어 로케일 명시
+        .environment(\.locale, AppLanguage.effectiveLocale)
     }
 }

@@ -43,12 +43,8 @@ enum ClipboardService {
 
     static var clearDelayDescription: String {
         let delay = secretClearDelay
-        guard delay > 0 else { return "자동 삭제 안 함" }
-        return "\(Int(delay))초 후 자동 삭제"
-    }
-
-    static func read() -> String? {
-        NSPasteboard.general.string(forType: .string)
+        guard delay > 0 else { return L10n.string("자동 삭제 안 함") }
+        return L10n.format("%lld초 후 자동 삭제", Int(delay))
     }
 
     /// T-17 종료 시 정리: 클립보드에 마지막 비밀값이 그대로 있으면 비운다.

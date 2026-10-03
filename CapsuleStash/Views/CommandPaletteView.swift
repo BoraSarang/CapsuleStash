@@ -226,9 +226,7 @@ struct CommandPaletteView: View {
     /// 결과 행의 복사 버튼 동작. Credential 은 비밀값을 직접 복사하지 않는다.
     private func copy(_ hit: SearchHit) {
         guard let block = hit.block else {
-            let text = hit.project.sortedBlocks
-                .map { "## \($0.title)\n\($0.copyPayload())" }
-                .joined(separator: "\n\n")
+            let text = hit.project.plainText()
             if ClipboardService.copy(text, label: hit.project.name) {
                 appState.notifyCopy(hit.project.name)
             }
@@ -238,8 +236,8 @@ struct CommandPaletteView: View {
         // [HARD] Credential 비밀값은 팔레트에서 복사하지 않는다. 잠금 해제 후 본문에서 복사.
         if block.type == .credential, let credential = block.credential {
             let payload = [credential.username, credential.homepage].filter { !$0.isEmpty }.joined(separator: "\n")
-            if ClipboardService.copy(payload, label: "\(block.title) (계정·비밀값 제외)") {
-                appState.notifyCopy("\(block.title) 아이디/홈페이지")
+            if ClipboardService.copy(payload, label: "\(block.title) \(L10n.string("(계정·비밀값 제외)"))") {
+                appState.notifyCopy("\(block.title) \(L10n.string("아이디/홈페이지"))")
             }
             return
         }
@@ -259,7 +257,7 @@ struct CommandPaletteView: View {
         let hit = hits[min(highlightedIndex, hits.count - 1)]
         guard hit.kind == .credential, let block = hit.block else { return false }
         if let text = block.credentialCopyText(secret: secret, vaultUnlocked: store.isVaultUnlocked) {
-            let label = secret ? "\(block.title) Secret 1" : "\(block.title) 아이디"
+            let label = secret ? "\(block.title) Secret 1" : "\(block.title) \(L10n.string("아이디"))"
             if ClipboardService.copy(text, label: label, isSecret: secret) {
                 appState.notifyCopy(label, isSecret: secret)
                 return true
@@ -286,6 +284,11 @@ struct CommandPaletteView: View {
 
     private func activate(_ hit: SearchHit) {
         store.select(hit.project)
+        // T-43 블록 히트는 프로젝트만 고르지 않고 해당 위치로 이동한다 (접혔으면 펼치고 스크롤).
+        if let block = hit.block {
+            store.expandBlock(block.id)
+            appState.pendingBlockScroll = block.id
+        }
         DebugLogger.feature("팔레트 이동: \(hit.title)")
         appState.hidePalette()
     }

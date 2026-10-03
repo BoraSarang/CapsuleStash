@@ -51,6 +51,12 @@ struct Project: Identifiable, Hashable, Codable {
     var sortedBlocks: [Block] { blocks.sorted { $0.sortOrder < $1.sortOrder } }
 
     var codeCount: Int { blocks.filter { $0.type.isCode }.count }
+
+    /// 프로젝트 전체를 플레인텍스트로 (복사·내보내기용).
+    func plainText(includeTitle: Bool = false, includeSecrets: Bool = false) -> String {
+        let blocks = sortedBlocks.map { "## \($0.title)\n\($0.copyPayload(includeSecrets: includeSecrets))" }
+        return ((includeTitle ? [name] : []) + blocks).joined(separator: "\n\n")
+    }
 }
 
 // MARK: BlockType

@@ -99,9 +99,10 @@ enum MarkdownSegment: Equatable {
                 index += 1
                 continue
             }
-            if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
+            if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ")
+                || trimmed.hasPrefix("· ") || trimmed.hasPrefix("• ") {
                 if !paragraphLines.isEmpty { flush() }
-                bulletItems.append(String(trimmed.dropFirst(2)))
+                bulletItems.append(String(trimmed.dropFirst(2)).trimmingCharacters(in: .whitespaces))
                 index += 1
                 continue
             }
@@ -137,9 +138,99 @@ enum MarkdownSegment: Equatable {
     }
 }
 
+/// 인라인 서식 토큰 (`**굵게**`·`*기울임*`·`` `코드` ``).
+/// 닫히지 않거나 비어 있는 마커는 그대로 둔다. 순수 함수라 테스트가 직접 검증한다.
+enum MarkdownInline: Equatable {
+    case plain(String)
+    case bold(String)
+    case italic(String)
+    case code(String)
+
+    static func tokenize(_ raw: String) -> [MarkdownInline] {
+        guard !raw.isEmpty else { return [] }
+        var tokens: [MarkdownInline] = []
+        var plain = ""
+        var index = raw.startIndex
+
+        func flush() {
+            if !plain.isEmpty {
+                tokens.append(.plain(plain))
+                plain = ""
+            }
+        }
+
+        while index < raw.endIndex {
+            let char = raw[index]
+            let next = raw.index(after: index)
+            // `` `코드` `` — 펜스 코드와 달리 한 줄 안에서만 닫힌다
+            if char == "`", next < raw.endIndex,
+               let close = raw[next...].firstIndex(of: "`") {
+                let code = String(raw[next..<close])
+                if !code.isEmpty {
+                    flush()
+                    tokens.append(.code(code))
+                    index = raw.index(after: close)
+                    continue
+                }
+            }
+            if char == "*" {
+                // `**굵게**` 우선, 다음 `**` 가 없으면 리터럴
+                if next < raw.endIndex, raw[next] == "*" {
+                    let from = raw.index(index, offsetBy: 2, limitedBy: raw.endIndex) ?? raw.endIndex
+                    if let range = raw[from...].range(of: "**"),
+                       !raw[from..<range.lowerBound].isEmpty {
+                        flush()
+                        tokens.append(.bold(String(raw[from..<range.lowerBound])))
+                        index = range.upperBound
+                        continue
+                    }
+                    plain += "**"
+                    index = from
+                    continue
+                }
+                // `*기울임*`
+                if next < raw.endIndex, let close = raw[next...].firstIndex(of: "*") {
+                    let text = String(raw[next..<close])
+                    if !text.isEmpty {
+                        flush()
+                        tokens.append(.italic(text))
+                        index = raw.index(after: close)
+                        continue
+                    }
+                }
+            }
+            plain.append(char)
+            index = next
+        }
+        flush()
+        return tokens
+    }
+}
+
 /// 파싱 결과를 카드에 그린다. 색상은 토큰이라 라이트·다크 모두 보인다.
 struct MarkdownBody: View {
     let text: String
+
+    /// 인라인 서식 적용. 기본 글꼴은 호출 쪽이 정하고 굵게·기울임·코드는 토큰마다 입힌다.
+    static func styled(_ raw: String, base: Font) -> Text {
+        var result = Text("")
+        for token in MarkdownInline.tokenize(raw) {
+            switch token {
+            case .plain(let string):
+                result = result + Text(string).font(base)
+            case .bold(let string):
+                result = result + Text(string).font(base).fontWeight(.bold)
+            case .italic(let string):
+                result = result + Text(string).font(base).italic()
+            case .code(let string):
+                // Text 연결을 유지해야 해서 배경 필은 생략 (모노+색상으로 구분)
+                result = result + Text(string)
+                    .font(Theme.monoBody)
+                    .foregroundStyle(Theme.codeForeground)
+            }
+        }
+        return result
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -148,22 +239,23 @@ struct MarkdownBody: View {
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .textSelection(.enabled)
     }
 
     @ViewBuilder
     private func segmentView(_ segment: MarkdownSegment) -> some View {
         switch segment {
         case .heading(let level, let text):
-            Text(text)
-                .font(level == 1 ? Theme.serif(22) : level == 2 ? Theme.serif(18) : .system(size: 15, weight: .semibold))
+            let base: Font = level == 1 ? Theme.serif(22)
+                : level == 2 ? Theme.serif(18) : .system(size: 15, weight: .semibold)
+            Self.styled(text, base: base)
                 .foregroundStyle(Theme.ink)
         case .quote(let lines):
             HStack(alignment: .top, spacing: 8) {
                 RoundedRectangle(cornerRadius: 2)
                     .fill(Theme.muted)
                     .frame(width: 3)
-                Text(lines.joined(separator: "\n"))
-                    .font(.system(size: 14))
+                Self.styled(lines.joined(separator: "\n"), base: .system(size: 14))
                     .italic()
                     .foregroundStyle(Theme.muted)
             }
@@ -172,8 +264,7 @@ struct MarkdownBody: View {
                 ForEach(items.indices, id: \.self) { index in
                     HStack(alignment: .top, spacing: 6) {
                         Text("•").foregroundStyle(Theme.muted)
-                        Text(items[index])
-                            .font(.system(size: 14))
+                        Self.styled(items[index], base: .system(size: 14))
                             .foregroundStyle(Theme.ink)
                     }
                 }
@@ -194,8 +285,7 @@ struct MarkdownBody: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Theme.codeBackground, in: RoundedRectangle(cornerRadius: 10))
         case .paragraph(let lines):
-            Text(lines.joined(separator: "\n"))
-                .font(.system(size: 14))
+            Self.styled(lines.joined(separator: "\n"), base: .system(size: 14))
                 .foregroundStyle(Theme.ink)
                 .lineSpacing(3)
                 .textSelection(.enabled)
@@ -212,8 +302,8 @@ struct MarkdownBody: View {
         return Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
             GridRow {
                 ForEach(0..<columnCount, id: \.self) { index in
-                    Text(index < header.count ? header[index] : "")
-                        .font(.system(size: 13, weight: .semibold))
+                    Self.styled(index < header.count ? header[index] : "",
+                                base: .system(size: 13, weight: .semibold))
                         .foregroundStyle(Theme.ink)
                         .padding(.horizontal, 10)
                         .padding(.vertical, 6)
@@ -225,8 +315,8 @@ struct MarkdownBody: View {
             ForEach(rows.indices, id: \.self) { rowIndex in
                 GridRow {
                     ForEach(0..<columnCount, id: \.self) { colIndex in
-                        Text(colIndex < rows[rowIndex].count ? rows[rowIndex][colIndex] : "")
-                            .font(.system(size: 13))
+                        Self.styled(colIndex < rows[rowIndex].count ? rows[rowIndex][colIndex] : "",
+                                    base: .system(size: 13))
                             .foregroundStyle(Theme.ink)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 6)

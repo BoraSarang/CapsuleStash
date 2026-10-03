@@ -66,10 +66,7 @@ struct DebugPanelView: View {
     }
 
     private var bundleVersion: String {
-        let info = Bundle.main.infoDictionary
-        let version = info?["CFBundleShortVersionString"] as? String ?? "-"
-        let build = info?["CFBundleVersion"] as? String ?? "-"
-        return "v\(version) (\(build)) • \(store.workspaces.count) WS"
+        "\(Bundle.main.capsuleVersionString) • \(store.workspaces.count) WS"
     }
 
     // MARK: - 통계

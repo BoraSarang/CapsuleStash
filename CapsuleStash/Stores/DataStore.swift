@@ -37,7 +37,7 @@ final class DataStore: ObservableObject {
             workspaces = loaded
             DebugLogger.cache("캐시 히트 — 저장소에서 복원")
         } else if loadSeeds {
-            workspaces = Self.seed()
+            workspaces = SeedData.workspaces()
             DebugLogger.feature("시드 데이터로 시작")
         } else {
             workspaces = []
@@ -117,102 +117,6 @@ final class DataStore: ObservableObject {
         if let ws = workspaces.first {
             expandedWorkspaces.insert(ws.id)
         }
-    }
-
-    // MARK: - 검색
-
-    var parsedQuery: SearchQuery { SearchQuery.parse(searchQuery) }
-
-    var searchHits: [SearchHit] {
-        let query = parsedQuery
-        guard !query.isEmpty else { return [] }
-
-        var hits: [SearchHit] = []
-
-        for entry in allProjects {
-            if let projectName = query.projectName,
-               entry.project.name.normalizedForSearch != projectName.normalizedForSearch {
-                continue
-            }
-            // T-16 태그 필터: 문서 태그 중 하나라도 포함해야 한다
-            if !query.tags.isEmpty,
-               !entry.project.tags.contains(where: { query.tags.contains($0.normalizedForSearch) }) {
-                continue
-            }
-
-            // 문서 자체
-            if query.types.isEmpty, matches(query.freeText, [entry.project.name, entry.project.note, entry.project.tags.joined(separator: " ")]) {
-                hits.append(SearchHit(
-                    id: "project-\(entry.project.id)",
-                    kind: .project,
-                    project: entry.project,
-                    workspaceName: entry.workspace.name,
-                    block: nil,
-                    snippet: "\(entry.project.blocks.count)개 블록"
-                ))
-            }
-
-            for block in entry.project.sortedBlocks {
-                if !query.types.isEmpty, !query.types.contains(block.type) { continue }
-                guard matches(query.freeText, [block.searchIndexText]) else { continue }
-
-                let kind: SearchHit.Kind = block.type == .credential ? .credential : .block
-                hits.append(SearchHit(
-                    id: "block-\(block.id)",
-                    kind: kind,
-                    project: entry.project,
-                    workspaceName: entry.workspace.name,
-                    block: block,
-                    snippet: snippet(for: block, term: query.freeText)
-                ))
-            }
-        }
-
-        // 문서 히트 우선, 그 다음 블록 내용 일치 순
-        return hits.sorted { lhs, rhs in
-            if lhs.kind != rhs.kind {
-                return kindRank(lhs.kind) < kindRank(rhs.kind)
-            }
-            return score(rhs) > score(lhs)
-        }
-    }
-
-    private func kindRank(_ kind: SearchHit.Kind) -> Int {
-        switch kind {
-        case .project: return 0
-        case .block: return 1
-        case .credential: return 2
-        }
-    }
-
-    private func score(_ hit: SearchHit) -> Int {
-        let term = parsedQuery.freeText.normalizedForSearch
-        guard !term.isEmpty else { return 0 }
-        if hit.title.normalizedForSearch.hasPrefix(term) { return 30 }
-        if hit.title.normalizedForSearch.contains(term) { return 20 }
-        if hit.block?.searchIndexText.normalizedForSearch.contains(term) == true { return 10 }
-        return 1
-    }
-
-    private func matches(_ term: String, _ candidates: [String]) -> Bool {
-        if term.isEmpty { return true }
-        let normalized = term.normalizedForSearch
-        return candidates.contains { $0.normalizedForSearch.contains(normalized) }
-    }
-
-    private func snippet(for block: Block, term: String) -> String {
-        if block.type.isCode {
-            let firstLine = block.content.split(separator: "\n").first.map(String.init) ?? block.content
-            return "\(block.language?.uppercased() ?? "CODE") · \(firstLine)"
-        }
-        guard !term.isEmpty else {
-            return block.displaySubtitle
-        }
-        let text = block.content.replacingOccurrences(of: "\n", with: " ")
-        guard let range = text.lowercased().range(of: term) else { return block.displaySubtitle }
-        let start = text.index(range.lowerBound, offsetBy: -20, limitedBy: text.startIndex) ?? text.startIndex
-        let end = text.index(range.upperBound, offsetBy: 40, limitedBy: text.endIndex) ?? text.endIndex
-        return (start == text.startIndex ? "" : "…") + text[start..<end] + (end == text.endIndex ? "" : "…")
     }
 
     // MARK: - 변이 (CRUD)
@@ -368,7 +272,7 @@ final class DataStore: ObservableObject {
                                                     baseDirectory: attachmentBaseDirectory)
             if !names.isEmpty {
                 insertBlock(Block(projectId: projectId, type: .image,
-                                  title: "이미지 \(names.count)개", imageNames: names))
+                                  title: L10n.format("이미지 %lld개", names.count), imageNames: names))
                 created += 1
             }
         }
@@ -418,6 +322,11 @@ final class DataStore: ObservableObject {
 
     func toggleBlockCollapsed(_ block: Block) {
         mutateBlock(block.id) { $0.isCollapsed.toggle() }
+    }
+
+    /// T-43 팔레트 이동 시 접힌 블록을 미리 펼친다 (스크롤 위치 보장).
+    func expandBlock(_ blockId: UUID) {
+        mutateBlock(blockId) { $0.isCollapsed = false }
     }
 
     /// 문서의 모든 블록을 접거나 펼친다 (T-27).
@@ -515,7 +424,7 @@ final class DataStore: ObservableObject {
 
     /// Vault 해제 요청. 생체 인증 가능하면 Touch ID·Face ID를 먼저 거친다.
     /// 미지원 기기·스위치 OFF면 기존처럼 바로 해제한다.
-    func requestVaultUnlock(reason: String = "Vault 잠금을 해제합니다", completion: @escaping (Bool) -> Void) {
+    func requestVaultUnlock(reason: String = L10n.string("Vault 잠금을 해제합니다"), completion: @escaping (Bool) -> Void) {
         guard vaultBiometricEnabled else {
             unlockVault()
             completion(true)
@@ -703,98 +612,6 @@ final class DataStore: ObservableObject {
         }
     }
 
-    // MARK: - 시드 데이터 (목업 mockup-v0.1.html 대응, 2단)
-
-    nonisolated static func seed() -> [Workspace] {
-        // MARK: 개발
-        let dev = Workspace(name: "개발")
-        var webDoc = Project(workspaceId: dev.id, name: "WKWebView로 웹 페이지 저장하기",
-                             colorHex: "#FF5C00",
-                             note: "WebArchive + PDF + 본문 텍스트 조합으로 저장",
-                             tags: ["webkit", "archive"])
-        webDoc.blocks = seedBlocks(projectId: webDoc.id)
-
-        var paletteDoc = Project(workspaceId: dev.id, name: "메뉴바 앱 구조",
-                                 colorHex: "#2D5BD7", tags: ["swiftui"])
-        paletteDoc.blocks = [Block(projectId: paletteDoc.id, type: .markdown, title: "메뉴바 상주 구조", content: """
-            1. `MenuBarExtra` 로 메뉴바 아이템 등록
-            2. `Window` 씬으로 메인 창 분리
-            3. `Carbon.RegisterEventHotKey` 로 글로벌 단축키 수신
-            4. 팔레트는 메인 창 위 오버레이로 표시
-            """.trimmingCharacters(in: .newlines))]
-
-        var shortcutDoc = Project(workspaceId: dev.id, name: "글로벌 단축키",
-                                  colorHex: "#5F6F52", tags: ["input"])
-        shortcutDoc.blocks = [Block(projectId: shortcutDoc.id, type: .code, title: "핫키 등록", content: """
-            var hotKeyID = EventHotKeyID(signature: Self.signature, id: 1)
-            RegisterEventHotKey(kVK_Space,
-                               UInt32(cmdKey | shiftKey),
-                               hotKeyID,
-                               GetApplicationEventTarget(),
-                               0,
-                               &ref)
-            """.trimmingCharacters(in: .newlines), language: "swift")]
-
-        var dockerDoc = Project(workspaceId: dev.id, name: "Docker 배포",
-                                colorHex: "#5F6F52", tags: ["infra"])
-        dockerDoc.blocks = [
-            Block(projectId: dockerDoc.id, type: .shell, title: "docker compose 실행", content: """
-                docker compose up -d
-                docker compose logs -f --tail=200
-                """.trimmingCharacters(in: .newlines), language: "bash"),
-            Block(projectId: dockerDoc.id, type: .webArchive, title: "Docker 공식 문서",
-                  content: "Compose 파일 레퍼런스",
-                  url: "https://docs.docker.com/reference/compose-file/", siteName: "docs.docker.com"),
-        ]
-
-        // MARK: 개인
-        let personal = Workspace(name: "개인")
-        let travelDoc = Project(workspaceId: personal.id, name: "여행", colorHex: "#C99A2E")
-        var accountsDoc = Project(workspaceId: personal.id, name: "계정",
-                                  colorHex: "#7A2EE0", tags: ["account"])
-        accountsDoc.blocks = [Block(
-            projectId: accountsDoc.id,
-            type: .credential,
-            title: "GitHub",
-            credential: Credential(homepage: "https://github.com", username: "example", password: "sample-only-not-a-real-secret")
-        )]
-
-        // MARK: 업무
-        let work = Workspace(name: "업무")
-        let meetingDoc = Project(workspaceId: work.id, name: "회의", colorHex: "#2D5BD7")
-
-        return [
-            Workspace(id: dev.id, name: dev.name, projects: [webDoc, paletteDoc, shortcutDoc, dockerDoc]),
-            Workspace(id: personal.id, name: personal.name, projects: [travelDoc, accountsDoc]),
-            Workspace(id: work.id, name: work.name, projects: [meetingDoc]),
-        ]
-    }
-
-    nonisolated private static func seedBlocks(projectId: UUID) -> [Block] {
-        [
-            Block(projectId: projectId, type: .text, title: "설명", content: """
-            WKWebView의 현재 페이지를 WebArchive + PDF + 본문 텍스트로 함께 저장하면 오프라인 열람과 검색이 모두 안정적이다. 기본값은 URL + 본문 + PDF 조합.
-            """.trimmingCharacters(in: .newlines), sortOrder: 0),
-            Block(projectId: projectId, type: .code, title: "아카이브 생성", content: """
-            webView.createWebArchiveData { result in
-              switch result {
-              case .success(let data):
-                try? data.write(to: archiveURL)
-              case .failure(let error):
-                logger.error("\\(error)")
-              }
-            }
-            """.trimmingCharacters(in: .newlines), language: "swift", sortOrder: 1),
-            Block(projectId: projectId, type: .webArchive, title: "참고 문서", content: "Working with web content offline in SwiftUI apps",
-                  url: "https://artemnovichkov.com/blog/swiftui-offline",
-                  siteName: "artemnovichkov.com", savedAt: Date().addingTimeInterval(-4 * 86400), sortOrder: 2),
-            Block(projectId: projectId, type: .image, title: "메뉴바 구조 스케치",
-                  imageNames: ["menubar-sketch-01.png", "palette-flow-02.png"], sortOrder: 3),
-            Block(projectId: projectId, type: .credential, title: "GitHub — 개인 계정",
-                  credential: Credential(homepage: "https://github.com", username: "example", password: "sample-only-not-a-real-secret"),
-                  sortOrder: 4),
-        ]
-    }
 }
 
 // MARK: - Block 보조
@@ -810,7 +627,7 @@ extension Block {
         case .image:
             return imageNames.joined(separator: ", ")
         case .credential:
-            return credential?.homepage ?? "홈페이지 없음"
+            return credential?.homepage ?? L10n.string("홈페이지 없음")
         default:
             return content.split(separator: "\n").first.map(String.init) ?? ""
         }
