@@ -18,47 +18,85 @@ struct ProjectDetailView: View {
     @Environment(\.locale) private var locale
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                header
-                if project.sortedBlocks.isEmpty {
-                    emptyBlocks
-                } else {
-                    VStack(spacing: Theme.blockSpacing) {
-                        ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
-                            BlockCardView(
-                                block: block,
-                                isFirst: index == 0,
-                                isLast: index == project.sortedBlocks.count - 1
-                            )
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header
+                    if project.sortedBlocks.isEmpty {
+                        emptyBlocks
+                    } else {
+                        VStack(spacing: Theme.blockSpacing) {
+                            ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                                BlockCardView(
+                                    block: block,
+                                    isFirst: index == 0,
+                                    isLast: index == project.sortedBlocks.count - 1
+                                )
+                                .id(block.id)
+                            }
+                        }
+                        .padding(.top, 4)
+                    }
+                    addBlockRow
+                }
+                .padding(.horizontal, Theme.contentPadding)
+                .padding(.vertical, 26)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .background(Theme.paper)
+            // T-38 본문 우측 플로팅 블록 바로가기 (···). 접힌 블록은 펼치고 이동.
+            .overlay(alignment: .trailing) {
+                if project.sortedBlocks.count > 1 {
+                    blockRail(proxy: proxy)
+                }
+            }
+            // T-14 외부 드롭으로 블록 추가 (파일·텍스트·웹URL). 카드가 파일을 선점하면 건너뛴다.
+            .overlay(
+                RoundedRectangle(cornerRadius: Theme.cardRadius)
+                    .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
+                    .padding(8)
+            )
+            .onDrop(of: [.fileURL, .plainText, .url], isTargeted: $isDropTargeted) { providers in
+                let cardClaimedFiles = appState.fileDropHandled
+                appState.fileDropHandled = false
+                handleExternalDrop(providers, skipFiles: cardClaimedFiles)
+                return true
+            }
+            .sheet(item: $appState.blockCreation) { request in
+                BlockEditorSheet(create: request)
+                    .environmentObject(store)
+                    .environmentObject(appState)
+            }
+        }
+    }
+
+    /// 우측 플로팅 점 레일. 타입 색으로 구분, 접힘은 흐리게.
+    private func blockRail(proxy: ScrollViewProxy) -> some View {
+        VStack(spacing: 8) {
+            ForEach(project.sortedBlocks) { block in
+                Button {
+                    if block.isCollapsed {
+                        store.toggleBlockCollapsed(block)
+                    }
+                    DispatchQueue.main.async {
+                        withAnimation(.easeOut(duration: 0.25)) {
+                            proxy.scrollTo(block.id, anchor: .top)
                         }
                     }
-                    .padding(.top, 4)
+                } label: {
+                    Circle()
+                        .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
+                        .frame(width: 7, height: 7)
                 }
-                addBlockRow
+                .buttonStyle(.plain)
+                .help(block.title)
             }
-            .padding(.horizontal, Theme.contentPadding)
-            .padding(.vertical, 26)
-            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .background(Theme.paper)
-        // T-14 외부 드롭으로 블록 추가 (파일·텍스트·웹URL). 카드가 파일을 선점하면 건너뛴다.
-        .overlay(
-            RoundedRectangle(cornerRadius: Theme.cardRadius)
-                .strokeBorder(isDropTargeted ? Theme.accent : Color.clear, lineWidth: 2)
-                .padding(8)
-        )
-        .onDrop(of: [.fileURL, .plainText, .url], isTargeted: $isDropTargeted) { providers in
-            let cardClaimedFiles = appState.fileDropHandled
-            appState.fileDropHandled = false
-            handleExternalDrop(providers, skipFiles: cardClaimedFiles)
-            return true
-        }
-        .sheet(item: $appState.blockCreation) { request in
-            BlockEditorSheet(create: request)
-                .environmentObject(store)
-                .environmentObject(appState)
-        }
+        .padding(.horizontal, 9)
+        .padding(.vertical, 12)
+        .background(Theme.card.opacity(0.9), in: Capsule())
+        .overlay(Capsule().strokeBorder(Theme.line, lineWidth: 1))
+        .padding(.trailing, 10)
     }
 
     // MARK: - 헤더
