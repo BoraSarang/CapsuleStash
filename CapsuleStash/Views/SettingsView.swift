@@ -21,7 +21,7 @@ struct SettingsView: View {
             Section("일반") {
                 Toggle("로그인 시 실행", isOn: $launchAtLogin)
                     .onChange(of: launchAtLogin) { _, enabled in setLaunchAtLogin(enabled) }
-                    .help("macOS 로그인 시 CapsuleStash를 자동으로 실행합니다")
+                    .help("macOS 로그인 시 Capsule Stash를 자동으로 실행합니다")
                 Toggle("Dock에 아이콘 표시", isOn: $showDockIcon)
                     .onChange(of: showDockIcon) { _, _ in CapsuleStashApp.applyDockVisibility() }
                     .help("끄면 메뉴바에만 상주합니다. 즉시 적용됩니다")

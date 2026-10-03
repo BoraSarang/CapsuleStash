@@ -521,12 +521,12 @@
         }
       }
     },
-    "CapsuleStash 열기" : {
+    "Capsule Stash 열기" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Open CapsuleStash"
+            "value" : "Open Capsule Stash"
           }
         }
       }
@@ -1771,12 +1771,12 @@
         }
       }
     },
-    "macOS 로그인 시 CapsuleStash를 자동으로 실행합니다" : {
+    "macOS 로그인 시 Capsule Stash를 자동으로 실행합니다" : {
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Launches CapsuleStash automatically when you log in"
+            "value" : "Launches Capsule Stash automatically when you log in"
           }
         }
       }

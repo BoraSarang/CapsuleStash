@@ -21,14 +21,14 @@ struct CapsuleStashApp: App {
     }
 
     var body: some Scene {
-        // appLanguage를 읽어 설정 변경 시 씬을 다시 그린다 (값은 effectiveLocale이 계산)
-        let _ = appLanguage
+        // 언어 변경 시 씬 내용을 통째로 갈아끼워 문자열을 새로 푼다 (Text 캐시 대응).
         // 메인 창
         Window("Capsule Stash", id: AppState.mainWindowID) {
             ContentView()
                 .environmentObject(store)
                 .environmentObject(appState)
                 .environment(\.locale, AppLanguage.effectiveLocale)
+                .id("locale-\(appLanguage)")
                 .onAppear {
                     registerGlobalHotKey()
                     observeMenuBarRequests()
@@ -51,6 +51,7 @@ struct CapsuleStashApp: App {
                 .environmentObject(store)
                 .environmentObject(appState)
                 .environment(\.locale, AppLanguage.effectiveLocale)
+                .id("locale-\(appLanguage)")
         }
         .menuBarExtraStyle(.menu)
 
@@ -60,6 +61,7 @@ struct CapsuleStashApp: App {
                 .environmentObject(store)
                 .environmentObject(appState)
                 .environment(\.locale, AppLanguage.effectiveLocale)
+                .id("locale-\(appLanguage)")
         }
         .defaultSize(width: 860, height: 560)
         .windowResizability(.contentMinSize)
@@ -68,6 +70,7 @@ struct CapsuleStashApp: App {
         Settings {
             SettingsView()
                 .environment(\.locale, AppLanguage.effectiveLocale)
+                .id("locale-\(appLanguage)")
         }
     }
 

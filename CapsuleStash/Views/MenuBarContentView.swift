@@ -12,7 +12,7 @@ struct MenuBarContentView: View {
 
             Divider()
 
-            Button("CapsuleStash 열기") { appState.showPalette() }
+            Button("Capsule Stash 열기") { appState.showPalette() }
 
             Menu("최근 사용") {
                 if store.recents.isEmpty {
