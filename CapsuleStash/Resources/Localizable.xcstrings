@@ -4848,6 +4848,54 @@
           }
         }
       }
+    },
+    "수신함에서 %lld개 저장": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved %lld from Inbox"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수신함에서 %lld개 저장"
+          }
+        }
+      }
+    },
+    "수신함에 저장됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved to Inbox"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "수신함에 저장됨"
+          }
+        }
+      }
+    },
+    "문서를 찾지 못했습니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project not found"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서를 찾지 못했습니다"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

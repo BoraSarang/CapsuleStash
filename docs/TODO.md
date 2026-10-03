@@ -88,6 +88,10 @@
 - [x] M1 안전망 → v0.2.0: T-50 일괄 내보내기(JSON/MD 왕복), T-51 자동 백업(1일 1회·7세대·복원)
       - T-50: `LibraryTransfer` (버전 봉투·스냅샷·ID 재발급·Markdown·파일명) + 사이드바(Workspace/Project별 JSON/MD)·설정(전체·가져오기), 테스트 8건. `persistableSnapshot` 비격리화, UTType.markdown→plainText(배포 타깃)
       - T-51: `BackupStore` (기동 1일 1회·7세대·토글·복원=가져오기 재사용) + 설정 자동 백업·지금 백업·복원·마지막 시각, 테스트 6건. 키 303개
+- [x] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
+      - T-48: `SharedContainer` (그룹-or-폴백)·`InboxPayload`·`DataStore+Inbox` (Inbox 문서·파일 소비·텍스트/URL 저장) + appex 타깃 빌드·내장(adhoc), 테스트 7건
+      - T-53: `capsule://search·save·open` 등록·처리 + App Intents 2종(저장·검색), `open` 실동작 검증(DB 저장 확인), 테스트 5건. 키 306개
+      - xcodegen 교훈: `info`·`entitlements`는 `path`+`properties` 필수 (Plist 규격)
 - [ ] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
 - [ ] M3 어디서든 → v0.4.0: T-52 CloudKit 동기화 (시크릿 제외 [HARD] 유지)
 - [ ] M4 꺼내기 확장 → v0.5.0: T-54 Raycast 확장 + Alfred 워크플로, T-55 스마트 그룹(검색 문법 재사용), T-56 중첩 태그
