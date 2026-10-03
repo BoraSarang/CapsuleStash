@@ -80,6 +80,16 @@ struct BlockCardView: View {
             // T-41 타이틀 칸 전체 클릭으로 접기/펼치기 (버튼 제외, 버튼은 각자 동작).
             // 드래그는 배지로 한정 유지 (T-39).
             HStack(spacing: 10) {
+                // 순서 변경 전용 핸들 (T-46). 타이틀 드래그는 버튼 클릭을 방해해서 분리.
+                Image(systemName: "arrow.up.and.down")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Theme.muted)
+                    .frame(width: 16, height: 20)
+                    .contentShape(Rectangle())
+                    .onDrag {
+                        NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+                    }
+                    .help("드래그로 순서 변경")
                 TypeBadge(text: block.badgeLabel, type: block.type)
                     .contentShape(Rectangle())
                     .onDrag {

@@ -25,6 +25,8 @@ struct CapsuleStashApp: App {
     }
 
     init() {
+        // 번들 언어(메뉴·설정창 제목)를 먼저 맞춘다. SwiftUI 본문은 .locale으로 따로 푼다.
+        AppLanguage.applyBundleLanguage()
         // 설정(⌘,)의 모양 선택을 가장 먼저 적용한다 (기본 시스템 추적).
         Theme.applyAppearance()
         // Dock 표시 여부 (기본 숨김). 설정에서 바꾸면 즉시 적용된다.

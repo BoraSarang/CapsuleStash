@@ -40,6 +40,21 @@ final class AppSettingsTests: XCTestCase {
     }
 
     // MARK: - 표시 언어 (T-25 한·영)
+
+    func testL10nPassthroughAndFallback() {
+        let ko = Locale(identifier: "ko")
+        let en = Locale(identifier: "en")
+        // 한국어 모드는 키 그대로 (소스 언어)
+        XCTAssertEqual(L10n.string("복사됨", locale: ko), "복사됨")
+        XCTAssertEqual(L10n.format("%@ 복사됨", "Vercel", locale: ko), "Vercel 복사됨")
+        // 없는 키는 그대로 (깨지지 않음)
+        XCTAssertEqual(L10n.string("T46-없는-키", locale: en), "T46-없는-키")
+        // 번들 매핑 순수 함수
+        XCTAssertEqual(AppLanguage.bundleLanguages(saved: "en"), ["en"])
+        XCTAssertEqual(AppLanguage.bundleLanguages(saved: "ko"), ["ko"])
+        XCTAssertNil(AppLanguage.bundleLanguages(saved: "system"))
+        XCTAssertNil(AppLanguage.bundleLanguages(saved: nil))
+    }
     func testAppLanguageResolve() {
         XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "ko"), "ko", "기본은 시스템 언어")
         XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "en"), "en")

@@ -20,4 +20,21 @@ enum AppLanguage {
     }
 
     static var effectiveLocale: Locale { Locale(identifier: effectiveIdentifier()) }
+
+    /// 저장값 → 번들 언어 코드. 순수 함수라 테스트가 직접 검증한다.
+    /// `nil`이면 시스템 추적 (키 삭제).
+    static func bundleLanguages(saved: String?) -> [String]? {
+        if saved == "ko" || saved == "en" { return [saved!] }
+        return nil
+    }
+
+    /// 번들 단위 UI(메뉴·설정창 제목·파일 패널)가 앱 표시 언어를 따르게 한다.
+    /// 번들은 첫 접근 시 언어를 고정하므로, 메뉴 등은 다음 실행부터 완전히 반영된다.
+    static func applyBundleLanguage() {
+        if let langs = bundleLanguages(saved: UserDefaults.standard.string(forKey: key)) {
+            UserDefaults.standard.set(langs, forKey: "AppleLanguages")
+        } else {
+            UserDefaults.standard.removeObject(forKey: "AppleLanguages")
+        }
+    }
 }

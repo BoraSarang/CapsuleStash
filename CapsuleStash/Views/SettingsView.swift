@@ -85,7 +85,8 @@ struct SettingsView: View {
                     Text("English").tag("en")
                 }
                 .pickerStyle(.radioGroup)
-                .help("앱 표시 언어를 바꾼다. 즉시 적용된다")
+                .help("앱 화면은 즉시 바뀌고, 메뉴·창 제목은 재시작 후 적용됩니다")
+                .onChange(of: appLanguage) { _, _ in AppLanguage.applyBundleLanguage() }
             }
 
             Section("보안") {
