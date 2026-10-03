@@ -98,7 +98,16 @@
       - T-56: `tagMatches` 접두 매칭(`tag:부모`→`부모/…`) + `addTag` 슬래시 접기, 힌트 문구 갱신
       - T-55: `SmartGroup` + `hits(for:)` 공용 파이프 + 사이드바 SMART 행(개수·팔레트 점프·현재 검색 저장·이름 변경·삭제) + UserDefaults 영속화, 테스트 7건
       - T-54: `alfred/` (Script Filter sqlite 읽기 전용·Enter 복사·⌘Enter 열기·계정은 홈페이지/아이디만, 실DB 검증) + `extensions/raycast/` (검색·클립보드 저장, tsc 통과·수신함 규격 Swift 테스트). 키 311개
-- [ ] M5 브라우저 → v1.0: T-49 Safari Web Extension (App Group 파일 교환)
+- [x] M5 브라우저 → v1.0: T-49 Safari Web Extension (URL scheme 채널)
+      - `extensions/safari/` (MV3 팝업·현재 탭 저장) + JS↔Swift 규격 테스트(`testParsesSafariExtensionURL`). Safari 클릭 실동작은 수동 확인 필요
+- [ ] M3 동기화 → v0.4.0: T-52 CloudKit — **차단됨 (아래 §8)**
+- [ ] M6 1.0 마무리 (M5 이후, 우선순위 순): T-57 OCR(Vision 텍스트 추출), T-58 휴지통·버전 기록, T-59 모바일(iOS), T-60 협업·공유 금고
+
+## 8. 차단됨 (T-52 CloudKit)
+
+- 사유: iCloud 컨테이너는 유료 개발자 팀 + 포털 프로비저닝이 필수 (현재 adhoc 서명). 테스트 불가한 동기화는 데이터 손실 위험이라 코드도 안 짠다.
+- 해제 순서: 유료 팀 등록 → Certificates Identifiers & Profiles에 iCloud 컨테이너 생성 → `com.apple.developer.icloud-services` entitlement → SwiftData 네이티브 vs 직접 동기 설계 (T-52 착수 시) → 2기기 실동작 검증.
+- 시크릿 정책: Keychain은 동기화 대상 아님 ([HARD] 유지, 테스트로 고정 예정).
 
 ## 1.0 이후 (연기)
 
