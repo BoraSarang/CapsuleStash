@@ -3632,6 +3632,22 @@
           }
         }
       }
+    },
+    "블록 바로가기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Block Shortcuts"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 바로가기"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

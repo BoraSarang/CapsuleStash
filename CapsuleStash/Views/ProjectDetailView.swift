@@ -15,7 +15,7 @@ struct ProjectDetailView: View {
     @State private var newTagText = ""
     @State private var isAddingBlock = false
     @State private var isDropTargeted = false
-    @State private var railExpanded = false
+    @State private var railOpen = false
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -71,49 +71,74 @@ struct ProjectDetailView: View {
         }
     }
 
-    /// 우측 플로팅 점 레일. 호버하면 타이틀로 펼쳐진다.
+    /// 우측 플로팅 블록 바로가기 (T-38).
+    /// 평소엔 ≡ 버튼만, 누르면 네모 패널에 아이콘·점·제목 목록. 행 호버하면 전체 제목 툴팁.
     /// 클릭하면 해당 블록으로 이동 (접혀 있으면 먼저 펼친다).
     private func blockRail(proxy: ScrollViewProxy) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            ForEach(project.sortedBlocks) { block in
-                Button {
-                    if block.isCollapsed {
-                        store.toggleBlockCollapsed(block)
-                    }
-                    DispatchQueue.main.async {
-                        withAnimation(.easeOut(duration: 0.25)) {
-                            proxy.scrollTo(block.id, anchor: .top)
+        VStack {
+            if railOpen {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                        Button {
+                            railOpen = false
+                            if block.isCollapsed {
+                                store.toggleBlockCollapsed(block)
+                            }
+                            DispatchQueue.main.async {
+                                withAnimation(.easeOut(duration: 0.25)) {
+                                    proxy.scrollTo(block.id, anchor: .top)
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: block.type.symbolName)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.muted)
+                                    .frame(width: 16)
+                                Circle()
+                                    .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
+                                    .frame(width: 6, height: 6)
+                                Text(block.title)
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(Theme.ink)
+                                    .lineLimit(1)
+                                    .truncationMode(.tail)
+                            }
+                            .frame(maxWidth: 190, alignment: .leading)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .help(block.title)
+                        if index < project.sortedBlocks.count - 1 {
+                            Divider().overlay(Theme.line)
                         }
                     }
-                } label: {
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
-                            .frame(width: 7, height: 7)
-                        if railExpanded {
-                            Text(block.title)
-                                .font(.system(size: 12))
-                                .foregroundStyle(Theme.ink)
-                                .lineLimit(1)
-                        }
-                    }
-                    .frame(maxWidth: railExpanded ? 170 : nil, alignment: .leading)
-                    .contentShape(Rectangle())
                 }
-                .buttonStyle(.plain)
-                .help(block.title)
+                .padding(.vertical, 4)
+                .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+                .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
             }
+            Button {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    railOpen.toggle()
+                }
+            } label: {
+                Image(systemName: "line.3.horizontal")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.ink)
+                    .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+            .shadow(color: .black.opacity(0.2), radius: 12, y: 6)
+            .help("블록 바로가기")
         }
-        .padding(.horizontal, 9)
-        .padding(.vertical, 12)
-        .background(Theme.card.opacity(0.92), in: Capsule())
-        .overlay(Capsule().strokeBorder(Theme.line, lineWidth: 1))
         .padding(.trailing, 10)
-        .onHover { hovering in
-            withAnimation(.easeOut(duration: 0.15)) {
-                railExpanded = hovering
-            }
-        }
     }
 
     // MARK: - 헤더
