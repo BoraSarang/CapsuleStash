@@ -81,7 +81,8 @@ struct BlockCardView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            // T-39 드래그는 배지로 한정 (타이틀 영역 onDrag가 헤더 버튼 클릭을 삼킬 수 있음)
+            // T-41 타이틀 칸 전체 클릭으로 접기/펼치기 (버튼 제외, 버튼은 각자 동작).
+            // 드래그는 배지로 한정 유지 (T-39).
             HStack(spacing: 10) {
                 TypeBadge(text: block.badgeLabel, type: block.type)
                     .contentShape(Rectangle())
@@ -94,13 +95,14 @@ struct BlockCardView: View {
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                     .lineLimit(1)
-                    // T-31 접힌 카드의 제목을 누르면 바로 펼친다
-                    .onTapGesture {
-                        if block.isCollapsed {
-                            store.toggleBlockCollapsed(block)
-                        }
-                    }
+
+                Spacer(minLength: 0)
             }
+            .contentShape(Rectangle())
+            .onTapGesture {
+                store.toggleBlockCollapsed(block)
+            }
+            .help("클릭으로 접기/펼치기")
 
             Spacer(minLength: 8)
 
