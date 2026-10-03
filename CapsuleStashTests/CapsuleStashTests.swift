@@ -12,7 +12,7 @@ final class CapsuleStashTests: XCTestCase {
     // MARK: - 모델
 
     func testWorkspaceProjectHierarchy() {
-        let seed = DataStore.seed()
+        let seed = SeedData.workspaces()
         XCTAssertEqual(seed.count, 3, "개발/개인/업무 3개 Workspace")
 
         let dev = seed.first { $0.name == "개발" }
@@ -31,7 +31,7 @@ final class CapsuleStashTests: XCTestCase {
     }
 
     func testSeedMatchesMockupStructure() {
-        let seed = DataStore.seed()
+        let seed = SeedData.workspaces()
         let webDoc = seed
             .flatMap(\.projects)
             .first { $0.name.contains("WKWebView") }
@@ -639,7 +639,7 @@ final class CapsuleStashTests: XCTestCase {
     func testSwiftDataRoundTrip() throws {
         let dir = try makeTempDir()
         defer { try? FileManager.default.removeItem(at: dir) }
-        let snapshot = DataStore.persistableSnapshot(from: DataStore.seed())
+        let snapshot = DataStore.persistableSnapshot(from: SeedData.workspaces())
         try SwiftDataBackend.save(snapshot, directory: dir)
         let loaded = SwiftDataBackend.loadOrMigrate(directory: dir)
         XCTAssertNotNil(loaded)
