@@ -134,6 +134,9 @@ struct BlockCardView: View {
                 Button("이 Project 즐겨찾기") { toggleProjectFavorite() }
                 Divider()
                 Button("복사", action: copyBlockContent)
+                if block.type == .image {
+                    Button("이미지 복사", action: copyImages)
+                }
                 Button("삭제", role: .destructive) { showDeleteConfirm = true }
             } label: {
                 Image(systemName: "ellipsis")
@@ -515,17 +518,28 @@ struct BlockCardView: View {
                 .foregroundStyle(Theme.muted)
         } else {
             LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
-                ForEach(block.imageNames, id: \.self) { name in
-                    cardThumbnail(for: name)
-                        .help("Finder에서 이미지·파일을 끌어다 놓으면 이 블록에 추가됩니다")
+                ForEach(Array(block.imageNames.enumerated()), id: \.element) { index, name in
+                    cardThumbnail(for: name, index: index)
+                        .help("더블클릭으로 보기 · 파일 끌어다 놓으면 이 블록에 추가됩니다")
                 }
             }
         }
     }
 
+    /// 보관 중인 실파일 URL 목록 (미리보기·복사용).
+    private var existingAttachmentURLs: [URL] {
+        let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
+        return block.imageNames.compactMap { name in
+            guard let url = AttachmentStore.fileURL(kind: kind, name: name),
+                  FileManager.default.fileExists(atPath: url.path) else { return nil }
+            return url
+        }
+    }
+
     /// 카드 썸네일. 실파일이 있으면 미리보기, 없으면 파일명 타일.
+    /// 더블클릭: 이미지 → QuickLook, 파일 → 기본 앱으로 열기 (T-32).
     @ViewBuilder
-    private func cardThumbnail(for name: String) -> some View {
+    private func cardThumbnail(for name: String, index: Int) -> some View {
         if block.type == .image,
            let url = AttachmentStore.fileURL(kind: AttachmentStore.imagesKind, name: name),
            FileManager.default.fileExists(atPath: url.path),
@@ -537,6 +551,9 @@ struct BlockCardView: View {
                 .clipped()
                 .clipShape(RoundedRectangle(cornerRadius: 10))
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+                .onTapGesture(count: 2) {
+                    QuickLookController.shared.show(urls: existingAttachmentURLs, index: index)
+                }
         } else {
             RoundedRectangle(cornerRadius: 10)
                 .fill(
@@ -560,7 +577,33 @@ struct BlockCardView: View {
                 )
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
                 .help("파일 위치: Application Support/CapsuleStash/\(block.type == .image ? "images" : "files")/\(name)")
+                .onTapGesture(count: 2) { openAttachment(named: name) }
         }
+    }
+
+    /// 파일 타일 더블클릭 → 기본 앱으로 열기 (T-32).
+    private func openAttachment(named name: String) {
+        let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
+        guard let url = AttachmentStore.fileURL(kind: kind, name: name),
+              FileManager.default.fileExists(atPath: url.path) else {
+            appState.notify("파일이 없습니다")
+            return
+        }
+        NSWorkspace.shared.open(url)
+    }
+
+    /// 이미지 원본을 클립보드에 복사 (다른 앱에 붙여넣기용, T-32).
+    private func copyImages() {
+        let images = existingAttachmentURLs.compactMap { NSImage(contentsOf: $0) }
+        guard !images.isEmpty else {
+            appState.notify("복사할 이미지가 없습니다")
+            return
+        }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.writeObjects(images)
+        // [HARD] paths are user data — log count only, never names.
+        DebugLogger.feature("이미지 복사: \(images.count)개")
+        appState.notifyCopy("이미지 \(images.count)개")
     }
 
     private var credentialBody: some View {

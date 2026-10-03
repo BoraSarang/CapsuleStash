@@ -1371,6 +1371,46 @@
         }
       }
     },
+    "이미지 복사" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copy Images"
+          }
+        }
+      }
+    },
+    "복사할 이미지가 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No images to copy"
+          }
+        }
+      }
+    },
+    "더블클릭으로 보기 · 파일 끌어다 놓으면 이 블록에 추가됩니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Double-click to view · drop files to add them here"
+          }
+        }
+      }
+    },
+    "파일이 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "File not found"
+          }
+        }
+      }
+    },
     "저장 중… (최대 30초)" : {
       "localizations" : {
         "en" : {
@@ -1437,16 +1477,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "You can also drag and drop from Finder"
-          }
-        }
-      }
-    },
-    "Finder에서 이미지·파일을 끌어다 놓으면 이 블록에 추가됩니다" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Drop images and files here to attach them to this block"
           }
         }
       }
