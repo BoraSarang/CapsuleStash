@@ -80,9 +80,14 @@ struct BlockCardView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            // T-34 드래그는 타이틀 영역으로 한정 (카드 전체 드래그가 헤더 버튼 클릭을 삼킴)
+            // T-39 드래그는 배지로 한정 (타이틀 영역 onDrag가 헤더 버튼 클릭을 삼킬 수 있음)
             HStack(spacing: 10) {
                 TypeBadge(text: block.badgeLabel, type: block.type)
+                    .contentShape(Rectangle())
+                    .onDrag {
+                        NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
+                    }
+                    .help("드래그로 순서 변경")
 
                 Text(block.title)
                     .font(.system(size: 14, weight: .semibold))
@@ -95,11 +100,6 @@ struct BlockCardView: View {
                         }
                     }
             }
-            .contentShape(Rectangle())
-            .onDrag {
-                NSItemProvider(object: "\(DataStore.blockDragPrefix)\(block.id.uuidString)" as NSString)
-            }
-            .help("드래그로 순서 변경")
 
             Spacer(minLength: 8)
 
@@ -131,6 +131,7 @@ struct BlockCardView: View {
 
             // T-37 Menu 대신 Button+팝오버 (이미지 카드에서 Menu가 안 열리는 문제 회피)
             Button {
+                DebugLogger.feature("DIAG 더보기 탭") // TEMP-DIAG
                 showMoreMenu = true
             } label: {
                 Image(systemName: "ellipsis")
@@ -319,6 +320,7 @@ struct BlockCardView: View {
 
     /// 편집 진입. 접힌 채로 누르면 펼쳐서 편집으로 간다 (무반응처럼 보여서, T-31).
     private func beginEdit() {
+        DebugLogger.feature("DIAG 연필 탭") // TEMP-DIAG
         if block.isCollapsed {
             store.toggleBlockCollapsed(block)
         }
@@ -679,6 +681,7 @@ struct BlockCardView: View {
     /// 폴더 버튼: 보관 폴더를 Finder에 보여준다 (T-37, 아이콘 기대치에 맞춤).
     /// 경로는 ··· 메뉴의 ‘경로 복사’로 복사한다.
     private func openAttachmentFolder() {
+        DebugLogger.feature("DIAG 폴더 탭") // TEMP-DIAG
         let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind
         let first = block.imageNames.compactMap { name in
             AttachmentStore.fileURL(kind: kind, name: name)

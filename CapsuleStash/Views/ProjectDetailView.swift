@@ -77,45 +77,48 @@ struct ProjectDetailView: View {
     private func blockRail(proxy: ScrollViewProxy) -> some View {
         VStack {
             if railOpen {
-                VStack(alignment: .leading, spacing: 0) {
-                    ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
-                        Button {
-                            railOpen = false
-                            if block.isCollapsed {
-                                store.toggleBlockCollapsed(block)
-                            }
-                            DispatchQueue.main.async {
-                                withAnimation(.easeOut(duration: 0.25)) {
-                                    proxy.scrollTo(block.id, anchor: .top)
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                            Button {
+                                railOpen = false
+                                if block.isCollapsed {
+                                    store.toggleBlockCollapsed(block)
                                 }
+                                DispatchQueue.main.async {
+                                    withAnimation(.easeOut(duration: 0.25)) {
+                                        proxy.scrollTo(block.id, anchor: .top)
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: block.type.symbolName)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Theme.muted)
+                                        .frame(width: 16)
+                                    Circle()
+                                        .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
+                                        .frame(width: 6, height: 6)
+                                    Text(block.title)
+                                        .font(.system(size: 13))
+                                        .foregroundStyle(Theme.ink)
+                                        .lineLimit(1)
+                                        .truncationMode(.tail)
+                                }
+                                .frame(width: 150, alignment: .leading)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .contentShape(Rectangle())
                             }
-                        } label: {
-                            HStack(spacing: 8) {
-                                Image(systemName: block.type.symbolName)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(Theme.muted)
-                                    .frame(width: 16)
-                                Circle()
-                                    .fill(block.isCollapsed ? Theme.muted : Theme.badgeColor(for: block.type))
-                                    .frame(width: 6, height: 6)
-                                Text(block.title)
-                                    .font(.system(size: 13))
-                                    .foregroundStyle(Theme.ink)
-                                    .lineLimit(1)
-                                    .truncationMode(.tail)
+                            .buttonStyle(.plain)
+                            .help(block.title)
+                            if index < project.sortedBlocks.count - 1 {
+                                Divider().overlay(Theme.line)
                             }
-                            .frame(maxWidth: 190, alignment: .leading)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 7)
-                            .contentShape(Rectangle())
-                        }
-                        .buttonStyle(.plain)
-                        .help(block.title)
-                        if index < project.sortedBlocks.count - 1 {
-                            Divider().overlay(Theme.line)
                         }
                     }
                 }
+                .frame(maxHeight: 280)
                 .padding(.vertical, 4)
                 .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
                 .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
