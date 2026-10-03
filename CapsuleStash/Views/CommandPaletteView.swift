@@ -236,8 +236,8 @@ struct CommandPaletteView: View {
         // [HARD] Credential 비밀값은 팔레트에서 복사하지 않는다. 잠금 해제 후 본문에서 복사.
         if block.type == .credential, let credential = block.credential {
             let payload = [credential.username, credential.homepage].filter { !$0.isEmpty }.joined(separator: "\n")
-            if ClipboardService.copy(payload, label: "\(block.title) (계정·비밀값 제외)") {
-                appState.notifyCopy("\(block.title) 아이디/홈페이지")
+            if ClipboardService.copy(payload, label: "\(block.title) \(L10n.string("(계정·비밀값 제외)"))") {
+                appState.notifyCopy("\(block.title) \(L10n.string("아이디/홈페이지"))")
             }
             return
         }
@@ -257,7 +257,7 @@ struct CommandPaletteView: View {
         let hit = hits[min(highlightedIndex, hits.count - 1)]
         guard hit.kind == .credential, let block = hit.block else { return false }
         if let text = block.credentialCopyText(secret: secret, vaultUnlocked: store.isVaultUnlocked) {
-            let label = secret ? "\(block.title) Secret 1" : "\(block.title) 아이디"
+            let label = secret ? "\(block.title) Secret 1" : "\(block.title) \(L10n.string("아이디"))"
             if ClipboardService.copy(text, label: label, isSecret: secret) {
                 appState.notifyCopy(label, isSecret: secret)
                 return true

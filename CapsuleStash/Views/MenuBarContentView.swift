@@ -30,8 +30,8 @@ struct MenuBarContentView: View {
                     Text("Workspace 없음")
                 } else {
                     ForEach(store.workspaces.prefix(8)) { ws in
-                        Button("\(ws.name)에 새 Project") {
-                            _ = store.createProject(title: "새 Project", in: ws.id)
+                        Button(L10n.format("%@에 새 Project", ws.name)) {
+                            _ = store.createProject(title: L10n.string("새 Project"), in: ws.id)
                             appState.notify("Project 생성됨 — 사이드바에서 이름 변경 가능")
                         }
                     }

@@ -10,6 +10,7 @@
 		057B6161878CFF541C287098 /* BlockCredentialBody.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CC9A743BF259E36E39FBC1 /* BlockCredentialBody.swift */; };
 		0C75BB8A976D1AB0A6D28C98 /* AttachmentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB79CAFB23FFD4460F811F0F /* AttachmentTests.swift */; };
 		0F502AA85FFC3C3346C826EB /* BlockTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884B7A52589017DB1AC54B6C /* BlockTextEditor.swift */; };
+		113DE531AD3064DCBBFF23DF /* L10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = B68667610BC99B452D6762DF /* L10n.swift */; };
 		16938C9858F5F09DBED29040 /* NameInputSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A4F034330E57982C863E24 /* NameInputSheet.swift */; };
 		35E1D54957D09E11943321A4 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E4E5C0FCE874021DADB73A /* SidebarView.swift */; };
 		37F40425974B258D9C9505DE /* AttachmentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DB023F2B58C6526883F119 /* AttachmentStore.swift */; };
@@ -103,6 +104,7 @@
 		B1F3A106F68228C0E61EB754 /* MarkdownBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownBody.swift; sourceTree = "<group>"; };
 		B4DCEF7D17016C685CB9C058 /* AppLanguage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLanguage.swift; sourceTree = "<group>"; };
 		B569B7A7AD2A68DE3AA07E57 /* PersistenceStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceStore.swift; sourceTree = "<group>"; };
+		B68667610BC99B452D6762DF /* L10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = L10n.swift; sourceTree = "<group>"; };
 		BADDCAE234C5633F26800EF1 /* BlockCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockCardView.swift; sourceTree = "<group>"; };
 		BEA4234E5CA6F6A0AF337DE9 /* BlockEditorSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockEditorSheet.swift; sourceTree = "<group>"; };
 		BFB8EF18E31CF961E1CF8102 /* WebArchiveStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebArchiveStore.swift; sourceTree = "<group>"; };
@@ -231,6 +233,7 @@
 				B4DCEF7D17016C685CB9C058 /* AppLanguage.swift */,
 				A189978371990F5C1811829E /* Bundle+Version.swift */,
 				EA53E0271610032C09A7E68D /* DebugLogger.swift */,
+				B68667610BC99B452D6762DF /* L10n.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 				8046BFD7FD13F7DE8566F338 /* GlobalHotKeyCenter.swift in Sources */,
 				D0E26BBA0FB51D004194D279 /* HotkeyCombo.swift in Sources */,
 				ADF422B51B40DBACEF38AA6B /* KeychainStore.swift in Sources */,
+				113DE531AD3064DCBBFF23DF /* L10n.swift in Sources */,
 				8F54E754353B3F87FA55E7B7 /* MarkdownBody.swift in Sources */,
 				6B2FD72F3F913D75FDCC2378 /* MenuBarContentView.swift in Sources */,
 				3D8A5E4E05F4012761D2243B /* Models.swift in Sources */,

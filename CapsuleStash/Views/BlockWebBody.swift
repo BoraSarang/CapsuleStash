@@ -34,7 +34,7 @@ struct BlockWebBody: View {
                         .foregroundStyle(Theme.muted)
                         .lineLimit(1)
                     if let date = block.savedAt {
-                        Text("저장 \(Self.savedDateFormatter.string(from: date))")
+                        Text(L10n.format("저장 %@", Self.savedDateFormatter.string(from: date)))
                             .font(.system(size: 11))
                             .foregroundStyle(Theme.muted)
                     }

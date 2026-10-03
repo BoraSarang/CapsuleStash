@@ -72,7 +72,7 @@ struct BlockEditorSheet: View {
             // 고정 헤더
             HStack(spacing: 10) {
                 TypeBadge(text: headerBadgeText, type: original.type)
-                Text(isCreating ? "\(creationType.displayName) 블록 추가" : "블록 편집")
+                Text(isCreating ? L10n.format("%@ 블록 추가", L10n.string(creationType.displayName)) : L10n.string("블록 편집"))
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Theme.ink)
                 Spacer(minLength: 8)
@@ -81,7 +81,7 @@ struct BlockEditorSheet: View {
             .padding(.vertical, 14)
 
             if isCreating {
-                Text(creationType.purposeHint)
+                Text(L10n.string(creationType.purposeHint))
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.muted)
                     .padding(.horizontal, 20)
@@ -192,9 +192,9 @@ struct BlockEditorSheet: View {
                     } else {
                         Group {
                             if isImage {
-                                Text("이미지 \(imageNames.count)개")
+                                Text(L10n.format("이미지 %lld개", imageNames.count))
                             } else {
-                                Text("파일 \(imageNames.count)개")
+                                Text(L10n.format("파일 %lld개", imageNames.count))
                             }
                         }
                         .font(.system(size: 12))
@@ -455,7 +455,7 @@ struct BlockEditorSheet: View {
             store.insertBlock(updated)
             // [HARD] 값 자체를 로그에 남기지 않는다. 제목만 기록.
             DebugLogger.feature("블록 추가: \(updated.title) (\(original.type.displayName))")
-            appState.notify("\(original.type.displayName) 블록 추가됨")
+            appState.notify(L10n.format("%@ 블록 추가됨", L10n.string(original.type.displayName)))
         } else {
             store.updateBlock(updated)
             DebugLogger.feature("블록 편집 저장: \(updated.title)")

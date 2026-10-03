@@ -79,7 +79,10 @@ final class AppState: ObservableObject {
         NSWorkspace.shared.open(url)
     }
 
-    func notify(_ message: String) {        toast = ToastMessage(text: message)
+    /// 토스트 표시. 리터럴은 앱 표시 언어로 푼다 (T-46, 재시작 불필요).
+    /// 키가 없으면(사용자 문구 등) 그대로 둔다.
+    func notify(_ message: String) {
+        toast = ToastMessage(text: L10n.string(message))
         toastTask?.cancel()
         toastTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 1_800_000_000)
@@ -89,7 +92,8 @@ final class AppState: ObservableObject {
     }
 
     func notifyCopy(_ label: String, isSecret: Bool = false) {
-        notify(isSecret ? "\(label) 복사됨 — \(ClipboardService.clearDelayDescription)" : "\(label) 복사됨")
+        let base = L10n.format("%@ 복사됨", label)
+        notify(isSecret ? "\(base) — \(ClipboardService.clearDelayDescription)" : base)
     }
 }
 

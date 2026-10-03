@@ -248,6 +248,6 @@ private struct ToolbarSearchField: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help("클릭하거나 \(combo.display) 로 Command Palette 열기")
+        .help(L10n.format("클릭하거나 %@ 로 Command Palette 열기", combo.display))
     }
 }

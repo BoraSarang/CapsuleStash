@@ -35,8 +35,8 @@ struct BlockCredentialBody: View {
                     tooltip: "아이디 복사",
                     primary: true
                 ) {
-                    if ClipboardService.copy(credential.username, label: "\(block.title) 아이디") {
-                        appState.notifyCopy("\(block.title) 아이디")
+                    if ClipboardService.copy(credential.username, label: "\(block.title) \(L10n.string("아이디"))") {
+                        appState.notifyCopy("\(block.title) \(L10n.string("아이디"))")
                     }
                 }
 
@@ -71,7 +71,7 @@ struct BlockCredentialBody: View {
             value: store.isVaultUnlocked ? value : "••••••••••",
             isSecret: true,
             systemImage: "doc.on.doc",
-            tooltip: "\(label) 복사",
+            tooltip: L10n.format("%@ 복사", label),
             primary: true
         ) {
             guard store.isVaultUnlocked else {

@@ -29,7 +29,7 @@ extension DataStore {
                     project: entry.project,
                     workspaceName: entry.workspace.name,
                     block: nil,
-                    snippet: "\(entry.project.blocks.count)개 블록"
+                    snippet: L10n.format("블록 %lld개", entry.project.blocks.count)
                 ))
             }
 

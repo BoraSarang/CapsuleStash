@@ -3441,22 +3441,6 @@
         }
       }
     },
-    "앱 표시 언어를 바꾼다. 즉시 적용된다": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Changes the app language. Applies immediately"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "앱 표시 언어를 바꾼다. 즉시 적용된다"
-          }
-        }
-      }
-    },
     "웹": {
       "localizations": {
         "en": {
@@ -3661,6 +3645,694 @@
           "stringUnit": {
             "state": "translated",
             "value": "클릭으로 접기/펼치기"
+          }
+        }
+      }
+    },
+    "아카이브": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Archive"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아카이브"
+          }
+        }
+      }
+    },
+    "열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "열기"
+          }
+        }
+      }
+    },
+    "닫기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "닫기"
+          }
+        }
+      }
+    },
+    "블록에 넣을 이미지를 선택하세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose images to add to the block"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록에 넣을 이미지를 선택하세요"
+          }
+        }
+      }
+    },
+    "블록에 넣을 파일을 선택하세요": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose files to add to the block"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록에 넣을 파일을 선택하세요"
+          }
+        }
+      }
+    },
+    "Project 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add Project"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project 추가"
+          }
+        }
+      }
+    },
+    "자유 메모": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Freeform notes"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자유 메모"
+          }
+        }
+      }
+    },
+    "서식 있는 메모": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Formatted notes"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "서식 있는 메모"
+          }
+        }
+      }
+    },
+    "언어 지정 코드 조각": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code snippet with language"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "언어 지정 코드 조각"
+          }
+        }
+      }
+    },
+    "터미널 명령 (실행 안 함, 복사만)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terminal commands (copy only, never runs)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "터미널 명령 (실행 안 함, 복사만)"
+          }
+        }
+      }
+    },
+    "페이지 주소 + 메모 — 열기로 브라우저에서 바로 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Page URL + note — open in browser"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "페이지 주소 + 메모 — 열기로 브라우저에서 바로 열기"
+          }
+        }
+      }
+    },
+    "웹 페이지 저장 — 주소·메모 + 브라우저 열기 + 오프라인 보관 (카드에서 저장·보기)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save web pages — URL and notes, browser open, offline archive"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "웹 페이지 저장 — 주소·메모 + 브라우저 열기 + 오프라인 보관 (카드에서 저장·보기)"
+          }
+        }
+      }
+    },
+    "이미지 첨부 (파일 선택기·드래그앤드롭)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attach images (file picker or drag & drop)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이미지 첨부 (파일 선택기·드래그앤드롭)"
+          }
+        }
+      }
+    },
+    "파일 첨부 (파일 선택기·드래그앤드롭)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attach files (file picker or drag & drop)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 첨부 (파일 선택기·드래그앤드롭)"
+          }
+        }
+      }
+    },
+    "계정·API Key 보관 (시크릿 2개까지, Keychain 보관·자동 마스킹)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Store logins and API keys (up to 2 secrets, kept in Keychain and masked)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "계정·API Key 보관 (시크릿 2개까지, Keychain 보관·자동 마스킹)"
+          }
+        }
+      }
+    },
+    "앱 화면은 즉시 바뀌고, 메뉴·창 제목은 재시작 후 적용됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App screens switch instantly; menus and window titles apply after restart"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "앱 화면은 즉시 바뀌고, 메뉴·창 제목은 재시작 후 적용됩니다"
+          }
+        }
+      }
+    },
+    "경로": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Path"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "경로"
+          }
+        }
+      }
+    },
+    "아이디/홈페이지": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID/Homepage"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "아이디/홈페이지"
+          }
+        }
+      }
+    },
+    "(계정·비밀값 제외)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(excluding secrets)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "(계정·비밀값 제외)"
+          }
+        }
+      }
+    },
+    "Vault 잠금을 해제합니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unlock the Vault"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 잠금을 해제합니다"
+          }
+        }
+      }
+    },
+    "Personal Knowledge Workspace for Mac\n텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal Knowledge Workspace for Mac\nOrganize text, code, web pages, images, and logins into Project documents,\nthen search and copy them anytime from the menu bar or with the global shortcut."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Personal Knowledge Workspace for Mac\n텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다."
+          }
+        }
+      }
+    },
+    "%@ 복사됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copied %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 복사됨"
+          }
+        }
+      }
+    },
+    "자동 삭제 안 함": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No auto-delete"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "자동 삭제 안 함"
+          }
+        }
+      }
+    },
+    "%lld초 후 자동 삭제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Auto-delete in %lld seconds"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld초 후 자동 삭제"
+          }
+        }
+      }
+    },
+    "%@ 블록 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ block added"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 블록 추가됨"
+          }
+        }
+      }
+    },
+    "블록 %lld개 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld blocks added"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "블록 %lld개 추가됨"
+          }
+        }
+      }
+    },
+    "%lld개 %@ 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld %@ added"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld개 %@ 추가됨"
+          }
+        }
+      }
+    },
+    "“%@” 생성됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” created"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” 생성됨"
+          }
+        }
+      }
+    },
+    "'%@' → '%@'으로 이동": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Moved '%@' to '%@'"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "'%@' → '%@'으로 이동"
+          }
+        }
+      }
+    },
+    "%@ 블록 추가": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add %@ Block"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ 블록 추가"
+          }
+        }
+      }
+    },
+    "파일 위치: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Location: %@"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 위치: %@"
+          }
+        }
+      }
+    },
+    "새 Workspace %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Workspace %lld"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 Workspace %lld"
+          }
+        }
+      }
+    },
+    "새 Project %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "New Project %lld"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "새 Project %lld"
+          }
+        }
+      }
+    },
+    "즐겨찾기 해제": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unfavorite"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "즐겨찾기 해제"
+          }
+        }
+      }
+    },
+    "이름 변경됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Renamed"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "이름 변경됨"
+          }
+        }
+      }
+    },
+    "Vault 잠금 해제 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to unlock Vault"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vault 잠금 해제 실패"
+          }
+        }
+      }
+    },
+    "Project 생성됨 — 사이드바에서 이름 변경 가능": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project created — rename it in the sidebar"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Project 생성됨 — 사이드바에서 이름 변경 가능"
+          }
+        }
+      }
+    },
+    "홈페이지 없음": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No homepage"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "홈페이지 없음"
+          }
+        }
+      }
+    },
+    "DebugPanel 로그": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DebugPanel log"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "DebugPanel 로그"
+          }
+        }
+      }
+    },
+    "파일 기록 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Failed to write file"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 기록 실패"
+          }
+        }
+      }
+    },
+    "캡처 시간 초과": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture timed out"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캡처 시간 초과"
+          }
+        }
+      }
+    },
+    "캡처 실패": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Capture failed"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "캡처 실패"
+          }
+        }
+      }
+    },
+    "Keychain 오류 %lld": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keychain error %lld"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keychain 오류 %lld"
           }
         }
       }

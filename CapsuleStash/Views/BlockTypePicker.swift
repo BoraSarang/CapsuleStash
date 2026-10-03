@@ -32,7 +32,7 @@ struct BlockTypePicker: View {
                         .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
-                .help(type.purposeHint)
+                .help(L10n.string(type.purposeHint))
             }
         }
         .padding(.bottom, 6)
