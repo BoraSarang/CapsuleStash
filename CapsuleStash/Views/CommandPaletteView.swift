@@ -145,10 +145,16 @@ struct CommandPaletteView: View {
                     .foregroundStyle(Theme.muted)
                     .frame(width: 16)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(project?.name ?? "최근 사용 없음")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundStyle(Theme.ink)
-                    Text(text)
+                    if let project {
+                        Text(project.name)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                    } else {
+                        Text("최근 사용 없음")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(Theme.ink)
+                    }
+                    LText(key: text)
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.muted)
                 }

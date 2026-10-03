@@ -40,7 +40,9 @@ struct MenuBarContentView: View {
 
             Divider()
 
-            Button(store.isVaultUnlocked ? "Vault 잠금" : "Vault 잠금 해제") { toggleVault() }
+            Button(store.isVaultUnlocked
+                ? LocalizedStringKey("Vault 잠금")
+                : LocalizedStringKey("Vault 잠금 해제")) { toggleVault() }
 
             Button("DebugPanel") {
                 NSApp.activate(ignoringOtherApps: true)

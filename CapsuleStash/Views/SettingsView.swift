@@ -1,3 +1,4 @@
+import AppKit
 import ServiceManagement
 import SwiftUI
 
@@ -15,6 +16,9 @@ struct SettingsView: View {
     @State private var launchAtLogin = false
     @State private var launchError: String?
     @State private var hotkeyRegistered = false
+    @AppStorage("hotkeyKeyCode") private var hotkeyCode = 47
+    @AppStorage("hotkeyModifiers") private var hotkeyMods = Int(NSEvent.ModifierFlags.command.rawValue)
+    @StateObject private var hotkeyRecorder = HotkeyRecorder()
 
     var body: some View {
         Form {
@@ -31,7 +35,7 @@ struct SettingsView: View {
                 HStack {
                     Text("글로벌 단축키")
                     Spacer()
-                    Text("⌘⇧Space")
+                    Text(currentHotkey.display)
                         .font(Theme.monoCaption)
                         .foregroundStyle(Theme.muted)
                         .padding(.horizontal, 6)
@@ -39,14 +43,27 @@ struct SettingsView: View {
                         .background(Theme.tagBackground, in: Capsule())
                 }
                 HStack {
-                    Text(hotkeyRegistered ? "등록됨 — 다른 앱에서도 호출됩니다" : "등록 실패 — 앱 안에서만 동작합니다")
+                    Text(hotkeyRegistered
+                        ? LocalizedStringKey("등록됨 — 다른 앱에서도 호출됩니다")
+                        : LocalizedStringKey("등록 실패 — 앱 안에서만 동작합니다"))
                         .font(.system(size: 12))
                         .foregroundStyle(Theme.muted)
                     Spacer()
+                    Button(hotkeyRecorder.isRecording
+                        ? LocalizedStringKey("취소")
+                        : LocalizedStringKey("단축키 변경")) {
+                        hotkeyRecorder.isRecording ? hotkeyRecorder.stop() : startHotkeyRecording()
+                    }
+                    .help("원하는 키를 직접 누르면 저장됩니다")
                     Button("다시 등록") {
                         NotificationCenter.default.post(name: .capsuleReregisterHotKey, object: nil)
                         refreshHotkeyStatus()
                     }
+                }
+                if hotkeyRecorder.isRecording {
+                    Text("바꿀 단축키를 누르세요… (esc 취소, ⌘·⌃ 중 하나 필요)")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.accent)
                 }
             }
 
@@ -127,6 +144,9 @@ struct SettingsView: View {
             refreshLaunchStatus()
             refreshHotkeyStatus()
         }
+        .onDisappear {
+            hotkeyRecorder.stop()
+        }
         .alert("로그인 시 실행 설정 실패", isPresented: Binding(
             get: { launchError != nil },
             set: { if !$0 { launchError = nil } }
@@ -138,6 +158,34 @@ struct SettingsView: View {
     }
 
     // MARK: - 동작
+
+    /// @AppStorage 값에서 조합을 읽는다 (저장 즉시 표시 갱신).
+    private var currentHotkey: HotkeyCombo {
+        HotkeyCombo(modifiers: NSEvent.ModifierFlags(rawValue: UInt(hotkeyMods)),
+                    keyCode: UInt32(hotkeyCode))
+    }
+
+    private func startHotkeyRecording() {
+        hotkeyRecorder.onCapture = { [weak hotkeyRecorder] keyCode, flags in
+            HotkeyCombo(modifiers: flags, keyCode: keyCode).save()
+            hotkeyRecorder?.stop()
+            // @AppStorage가 같은 키를 보므로 표시·메뉴 단축키가 자동 갱신된다
+            NotificationCenter.default.post(name: .capsuleReregisterHotKey, object: nil)
+            refreshHotkeyStatusSoon()
+            DebugLogger.feature("단축키 변경: \(HotkeyCombo.saved().display)")
+        }
+        hotkeyRecorder.onCancel = { [weak hotkeyRecorder] in
+            hotkeyRecorder?.stop()
+        }
+        hotkeyRecorder.start()
+    }
+
+    /// 재등록 결과 반영을 기다렸다가 상태를 읽는다 (post 직후는 구값).
+    private func refreshHotkeyStatusSoon() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            self.refreshHotkeyStatus()
+        }
+    }
 
     private func refreshLaunchStatus() {
         launchAtLogin = SMAppService.mainApp.status == .enabled
@@ -172,4 +220,48 @@ struct SettingsView: View {
 
 extension Notification.Name {
     static let capsuleReregisterHotKey = Notification.Name("CapsuleStash.reregisterHotKey")
+}
+
+// MARK: - 단축키 기록기 (T-36)
+
+/// "단축키 변경" 후 다음 키 입력을 가로채 조합으로 돌려준다.
+/// esc는 취소, ⌘·⌃ 없는 조합과 표시 불가 키는 무시하고 계속 기다린다.
+final class HotkeyRecorder: ObservableObject {
+    @Published private(set) var isRecording = false
+
+    /// 유효 조합 포착 시 (keyCode, 수정자).
+    var onCapture: ((UInt32, NSEvent.ModifierFlags) -> Void)?
+    var onCancel: (() -> Void)?
+
+    private var monitor: Any?
+
+    func start() {
+        guard monitor == nil else { return }
+        isRecording = true
+        monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+            self?.handle(event)
+            // 입력이 어딘가에 타이핑되지 않게 삼킨다
+            return nil
+        }
+    }
+
+    func stop() {
+        if let monitor {
+            NSEvent.removeMonitor(monitor)
+            self.monitor = nil
+        }
+        isRecording = false
+    }
+
+    private func handle(_ event: NSEvent) {
+        // esc(53) 취소
+        if event.keyCode == 53 {
+            onCancel?()
+            return
+        }
+        let flags = event.modifierFlags.intersection([.command, .option, .shift, .control])
+        let keyCode = UInt32(event.keyCode)
+        guard HotkeyCombo.isRecordable(keyCode: keyCode, modifiers: flags) else { return }
+        onCapture?(keyCode, flags)
+    }
 }

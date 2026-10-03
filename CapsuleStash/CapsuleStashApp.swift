@@ -10,6 +10,19 @@ struct CapsuleStashApp: App {
     @State private var cancellables = Set<AnyCancellable>()
     /// 설정(⌘,)의 표시 언어. 바뀌면 전 씬 로케일이 즉시 바뀐다.
     @AppStorage("appLanguage") private var appLanguage = "system"
+    /// 설정의 글로벌 단축키. 바뀌면 메뉴 단축키 표시도 따라간다.
+    @AppStorage("hotkeyKeyCode") private var hotkeyCode = 47
+    @AppStorage("hotkeyModifiers") private var hotkeyMods = Int(NSEvent.ModifierFlags.command.rawValue)
+
+    private var savedCombo: HotkeyCombo {
+        HotkeyCombo(modifiers: NSEvent.ModifierFlags(rawValue: UInt(hotkeyMods)),
+                    keyCode: UInt32(hotkeyCode))
+    }
+
+    private var shortcutKey: KeyEquivalent { savedCombo.keyEquivalent ?? " " }
+    private var shortcutModifiers: SwiftUI.EventModifiers {
+        savedCombo.keyEquivalent == nil ? [.command, .shift] : savedCombo.eventModifiers
+    }
 
     init() {
         // 설정(⌘,)의 모양 선택을 가장 먼저 적용한다 (기본 시스템 추적).
@@ -85,7 +98,8 @@ struct CapsuleStashApp: App {
     // MARK: - 글로벌 단축키
 
     private func registerGlobalHotKey() {
-        let ok = GlobalHotKeyCenter.shared.register { [weak appState] in
+        let combo = HotkeyCombo.saved()
+        let ok = GlobalHotKeyCenter.shared.register(modifiers: combo.modifiers, keyCode: combo.keyCode) { [weak appState] in
             MainActor.assumeIsolated {
                 guard let appState else { return }
                 if appState.isPalettePresented {
@@ -96,7 +110,7 @@ struct CapsuleStashApp: App {
             }
         }
         if ok {
-            DebugLogger.feature("T-05 글로벌 단축키 ⌘⇧Space 활성화")
+            DebugLogger.feature("글로벌 단축키 \(combo.display) 활성화")
         } else {
             DebugLogger.error(code: ErrorCode.hotkeyRegister, "핫키 등록 실패 — 앱 내부 단축키만 사용 가능")
         }
@@ -125,7 +139,7 @@ struct CapsuleStashApp: App {
         alert.informativeText = """
         Personal Knowledge Workspace for Mac
         텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,
-        메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다.
+        메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다.
         """
         alert.addButton(withTitle: "확인")
         alert.runModal()
@@ -151,7 +165,7 @@ struct CapsuleStashApp: App {
 
         CommandGroup(after: .newItem) {
             Button("빠른 검색…") { appState.showPalette() }
-                .keyboardShortcut(" ", modifiers: [.command, .shift])
+                .keyboardShortcut(shortcutKey, modifiers: shortcutModifiers)
         }
 
         CommandGroup(after: .toolbar) {

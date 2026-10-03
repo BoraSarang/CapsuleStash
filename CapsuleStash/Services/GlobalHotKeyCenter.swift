@@ -7,9 +7,9 @@ import Foundation
 final class GlobalHotKeyCenter {
     static let shared = GlobalHotKeyCenter()
 
-    /// 기본 조합: ⌘ ⇧ Space (PLAN_v0.1_macos §8.1)
-    static let defaultModifiers: NSEvent.ModifierFlags = [.command, .shift]
-    static let defaultKeyCode: UInt32 = 49 // kVK_Space
+    /// 기본 조합: ⌘. (T-36, HotkeyCombo.default와 동일 유지)
+    static let defaultModifiers: NSEvent.ModifierFlags = [.command]
+    static let defaultKeyCode: UInt32 = 47 // kVK_ANSI_Period
 
     private static let signature: OSType = 0x4353_5441 // 'CSTA'
 

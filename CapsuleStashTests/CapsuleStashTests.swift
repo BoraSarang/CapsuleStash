@@ -1058,8 +1058,43 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertFalse(show, "Dock 아이콘 기본값은 숨김(아니오)")
     }
 
-    // MARK: - 표시 언어 (T-25 한·영)
+    // MARK: - 글로벌 단축키 조합 (T-36)
 
+    func testHotkeyComboDefaults() {
+        // 실제 저장값을 건드리지 않게 저장·복원
+        let savedCode = UserDefaults.standard.object(forKey: "hotkeyKeyCode")
+        let savedMods = UserDefaults.standard.object(forKey: "hotkeyModifiers")
+        defer {
+            if let savedCode { UserDefaults.standard.set(savedCode, forKey: "hotkeyKeyCode") }
+            else { UserDefaults.standard.removeObject(forKey: "hotkeyKeyCode") }
+            if let savedMods { UserDefaults.standard.set(savedMods, forKey: "hotkeyModifiers") }
+            else { UserDefaults.standard.removeObject(forKey: "hotkeyModifiers") }
+        }
+        UserDefaults.standard.removeObject(forKey: "hotkeyKeyCode")
+        UserDefaults.standard.removeObject(forKey: "hotkeyModifiers")
+        XCTAssertEqual(HotkeyCombo.saved(), .default, "미설정 시 기본 ⌘.")
+        XCTAssertEqual(HotkeyCombo.default.keyCode, 47, "기본 ⌘. (kVK_ANSI_Period)")
+        XCTAssertEqual(HotkeyCombo.default.modifiers, [.command])
+        XCTAssertEqual(HotkeyCombo.default.display, "⌘.")
+        // 기록 불가 값은 기본값으로 떨어진다
+        XCTAssertEqual(HotkeyCombo.saved(keyCode: 9999, modifiers: 1048576), .default)
+        XCTAssertEqual(HotkeyCombo.saved(keyCode: 47, modifiers: 0), .default, "수정자 없는 단독 키 금지")
+    }
+
+    func testHotkeyKeyNames() {
+        XCTAssertEqual(HotkeyCombo.keyName(47), ".")
+        XCTAssertEqual(HotkeyCombo.keyName(49), "Space")
+        XCTAssertEqual(HotkeyCombo.keyName(0), "A")
+        XCTAssertEqual(HotkeyCombo.keyChar(47), ".")
+        XCTAssertNil(HotkeyCombo.keyChar(9999))
+        XCTAssertTrue(HotkeyCombo.isRecordable(keyCode: 47, modifiers: [.command]))
+        XCTAssertTrue(HotkeyCombo.isRecordable(keyCode: 8, modifiers: [.control, .shift]))
+        XCTAssertFalse(HotkeyCombo.isRecordable(keyCode: 47, modifiers: [.shift]), "⌘·⌃ 중 하나 필요")
+        XCTAssertFalse(HotkeyCombo.isRecordable(keyCode: 9999, modifiers: [.command]))
+        XCTAssertEqual(HotkeyCombo(modifiers: [.command, .shift], keyCode: 8).display, "⇧⌘C")
+    }
+
+    // MARK: - 표시 언어 (T-25 한·영)
     func testAppLanguageResolve() {
         XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "ko"), "ko", "기본은 시스템 언어")
         XCTAssertEqual(AppLanguage.resolve(saved: nil, systemCode: "en"), "en")

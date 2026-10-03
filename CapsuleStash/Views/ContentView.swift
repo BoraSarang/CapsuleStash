@@ -221,6 +221,13 @@ private struct ResizeHandle: View {
 // 내용은 투명으로 두고 시스템 필만 살린다. 클릭하면 Command Palette를 연다.
 private struct ToolbarSearchField: View {
     @EnvironmentObject private var appState: AppState
+    @AppStorage("hotkeyKeyCode") private var hotkeyCode = 47
+    @AppStorage("hotkeyModifiers") private var hotkeyMods = Int(NSEvent.ModifierFlags.command.rawValue)
+
+    private var combo: HotkeyCombo {
+        HotkeyCombo(modifiers: NSEvent.ModifierFlags(rawValue: UInt(hotkeyMods)),
+                    keyCode: UInt32(hotkeyCode))
+    }
 
     var body: some View {
         Button {
@@ -231,7 +238,7 @@ private struct ToolbarSearchField: View {
                     .font(.system(size: 12))
                 Text("검색")
                     .font(.system(size: 13))
-                Text("⌘⇧Space")
+                Text(combo.display)
                     .font(.system(size: 11, design: .monospaced))
             }
             .foregroundStyle(Theme.muted)
@@ -241,6 +248,6 @@ private struct ToolbarSearchField: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .help("클릭하거나 ⌘⇧Space 로 Command Palette 열기")
+        .help("클릭하거나 \(combo.display) 로 Command Palette 열기")
     }
 }

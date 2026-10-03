@@ -865,22 +865,6 @@
         }
       }
     },
-    "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Groups text, code, web pages, images, and account info into Project documents.\nSearch and copy them anytime from the menu bar and ⌘⇧Space."
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 ⌘⇧Space 로 언제든 검색하고 복사합니다."
-          }
-        }
-      }
-    },
     "새로 만들기": {
       "localizations": {
         "en": {
@@ -3073,22 +3057,6 @@
         }
       }
     },
-    "클릭하거나 ⌘⇧Space 로 Command Palette 열기": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Click or press ⌘⇧Space to open Command Palette"
-          }
-        },
-        "ko": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "클릭하거나 ⌘⇧Space 로 Command Palette 열기"
-          }
-        }
-      }
-    },
     "사이드바 숨기기/보이기 (⌥⌘S)": {
       "localizations": {
         "en": {
@@ -3533,6 +3501,118 @@
           "stringUnit": {
             "state": "translated",
             "value": "블록 추가"
+          }
+        }
+      }
+    },
+    "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Groups text, code, web pages, images, and account info into Project documents.\nSearch and copy anytime from the menu bar with the global shortcut."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "텍스트·코드·웹 페이지·이미지·계정 정보를 Project 문서로 묶고,\n메뉴바와 글로벌 단축키로 언제든 검색하고 복사합니다."
+          }
+        }
+      }
+    },
+    "클릭하거나 %@ 로 Command Palette 열기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Click or press %@ to open Command Palette"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "클릭하거나 %@ 로 Command Palette 열기"
+          }
+        }
+      }
+    },
+    "단축키 변경": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change Shortcut"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "단축키 변경"
+          }
+        }
+      }
+    },
+    "원하는 키를 직접 누르면 저장됩니다": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press the keys to save them"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "원하는 키를 직접 누르면 저장됩니다"
+          }
+        }
+      }
+    },
+    "바꿀 단축키를 누르세요… (esc 취소, ⌘·⌃ 중 하나 필요)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Press the new shortcut… (esc cancels, needs ⌘ or ⌃)"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "바꿀 단축키를 누르세요… (esc 취소, ⌘·⌃ 중 하나 필요)"
+          }
+        }
+      }
+    },
+    "첨부된 이미지가 없습니다. 편집에서 추가하세요.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No images attached. Add them in Edit."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "첨부된 이미지가 없습니다. 편집에서 추가하세요."
+          }
+        }
+      }
+    },
+    "첨부된 파일이 없습니다. 편집에서 추가하세요.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No files attached. Add them in Edit."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "첨부된 파일이 없습니다. 편집에서 추가하세요."
           }
         }
       }

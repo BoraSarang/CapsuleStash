@@ -129,7 +129,7 @@ struct BlockCardView: View {
             }
 
             Menu {
-                Button(canInlineEdit ? "편집" : "편집…", action: beginEdit)
+                Button(canInlineEdit ? LocalizedStringKey("편집") : LocalizedStringKey("편집…"), action: beginEdit)
                 if canInlineEdit {
                     Button("전체 편집…") { isEditing = true }
                 }
@@ -303,7 +303,7 @@ struct BlockCardView: View {
                     }
                     // 웹은 단일 타입으로 통합됨 (T-28, 레거시 webLink는 로드 시 변환)
                     let saved = WebArchiveStore.hasOfflineFiles(for: block)
-                    Text(saved ? "오프라인 저장됨" : "미저장 — 주소·메모만 보관 중")
+                    Text(saved ? LocalizedStringKey("오프라인 저장됨") : LocalizedStringKey("미저장 — 주소·메모만 보관 중"))
                         .font(.system(size: 11, weight: .medium))
                         .foregroundStyle(saved ? Theme.webBlue : Theme.muted)
                         .padding(.horizontal, 8)
@@ -518,7 +518,9 @@ struct BlockCardView: View {
     @ViewBuilder
     private var imageBody: some View {
         if block.imageNames.isEmpty {
-            Text(block.type == .image ? "첨부된 이미지가 없습니다. 편집에서 추가하세요." : "첨부된 파일이 없습니다. 편집에서 추가하세요.")
+            Text(block.type == .image
+                ? LocalizedStringKey("첨부된 이미지가 없습니다. 편집에서 추가하세요.")
+                : LocalizedStringKey("첨부된 파일이 없습니다. 편집에서 추가하세요."))
                 .font(.system(size: 13))
                 .foregroundStyle(Theme.muted)
         } else {

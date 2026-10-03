@@ -154,7 +154,9 @@ struct BlockEditorSheet: View {
             }
         case .webLink, .webArchive:
             let isArchive = original.type == .webArchive
-            Text(isArchive ? "페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다." : "자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다.")
+            Text(isArchive
+                ? LocalizedStringKey("페이지 본문을 오프라인으로 보관합니다. 실파일 저장은 카드의 ‘아카이브 저장’으로, 보기는 ‘오프라인 보기’로 합니다.")
+                : LocalizedStringKey("자주 보는 페이지의 주소와 메모입니다. 열기로 브라우저에서 바로 엽니다."))
                 .font(.system(size: 12))
                 .foregroundStyle(Theme.muted)
             if isArchive, WebArchiveStore.hasOfflineFiles(for: original) {
@@ -180,13 +182,21 @@ struct BlockEditorSheet: View {
             field(isImage ? "이미지" : "파일") {
                 VStack(alignment: .leading, spacing: 10) {
                     if imageNames.isEmpty {
-                        Text(isImage ? "아직 첨부된 이미지가 없습니다." : "아직 첨부된 파일이 없습니다.")
+                        Text(isImage
+                            ? LocalizedStringKey("아직 첨부된 이미지가 없습니다.")
+                            : LocalizedStringKey("아직 첨부된 파일이 없습니다."))
                             .font(.system(size: 13))
                             .foregroundStyle(Theme.muted)
                     } else {
-                        Text(isImage ? "이미지 \(imageNames.count)개" : "파일 \(imageNames.count)개")
-                            .font(.system(size: 12))
-                            .foregroundStyle(Theme.muted)
+                        Group {
+                            if isImage {
+                                Text("이미지 \(imageNames.count)개")
+                            } else {
+                                Text("파일 \(imageNames.count)개")
+                            }
+                        }
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.muted)
                         LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)], spacing: 10) {
                             ForEach(imageNames, id: \.self) { name in
                                 ZStack(alignment: .topTrailing) {
@@ -259,7 +269,7 @@ struct BlockEditorSheet: View {
                             .foregroundStyle(Theme.muted)
                     }
                     .buttonStyle(.plain)
-                    .help(revealPassword ? "가리기" : "보기")
+                    .help(Text(revealPassword ? LocalizedStringKey("가리기") : LocalizedStringKey("보기")))
                 }
             }
             field("Secret 2 (선택, 예: Client Secret)") {
@@ -280,7 +290,7 @@ struct BlockEditorSheet: View {
                             .foregroundStyle(Theme.muted)
                     }
                     .buttonStyle(.plain)
-                    .help(revealSecondSecret ? "가리기" : "보기")
+                    .help(Text(revealSecondSecret ? LocalizedStringKey("가리기") : LocalizedStringKey("보기")))
                 }
             }
         }
