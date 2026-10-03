@@ -17,7 +17,7 @@ struct BlockTypePicker: View {
                 .padding(.horizontal, 10)
                 .padding(.top, 8)
                 .padding(.bottom, 4)
-            ForEach(BlockType.allCases) { type in
+            ForEach(BlockType.pickable) { type in
                 Button {
                     onDismiss()
                     // 생성 우선: 입력 시트를 먼저 보여주고 저장될 때만 만든다

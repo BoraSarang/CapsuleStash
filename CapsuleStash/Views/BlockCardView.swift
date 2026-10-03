@@ -15,10 +15,12 @@ struct BlockCardView: View {
     @State private var isBlockDropTargeted = false
     @State private var isSavingArchive = false
     @State private var showingOffline = false
+    @State private var viewingPDF = false
     /// 인라인 편집 상태 (T-13, 텍스트·코드 계열만)
     @State private var isInlineEditing = false
     @State private var draftTitle = ""
     @State private var draftContent = ""
+    @State private var showDeleteConfirm = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -29,6 +31,15 @@ struct BlockCardView: View {
                 bodyView
                     .padding(.horizontal, Theme.blockPadding)
                     .padding(.vertical, 14)
+                // T-31 길게 읽은 뒤 하단에서도 접기
+                HStack {
+                    Spacer(minLength: 0)
+                    CapsuleIconButton(systemImage: "chevron.up", tooltip: "접기") {
+                        store.toggleBlockCollapsed(block)
+                    }
+                    Spacer(minLength: 0)
+                }
+                .padding(.bottom, 10)
             }
         }
         .background(Theme.card, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
@@ -77,14 +88,18 @@ struct BlockCardView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Theme.ink)
                 .lineLimit(1)
+                // T-31 접힌 카드의 제목을 누르면 바로 펼친다
+                .onTapGesture {
+                    if block.isCollapsed {
+                        store.toggleBlockCollapsed(block)
+                    }
+                }
 
             Spacer(minLength: 8)
 
-            CapsuleIconButton(systemImage: "pencil", tooltip: "편집") {
-                if canInlineEdit { startInlineEdit() } else { isEditing = true }
-            }
+            CapsuleIconButton(systemImage: "pencil", tooltip: "편집", action: beginEdit)
 
-            if block.type == .webLink || block.type == .webArchive {
+            if block.type == .webArchive {
                 if let url = URL(string: block.url ?? "") {
                     CapsuleIconButton(systemImage: "arrow.up.forward.app", tooltip: "브라우저로 열기") {
                         open(url)
@@ -109,9 +124,7 @@ struct BlockCardView: View {
             }
 
             Menu {
-                Button(canInlineEdit ? "편집" : "편집…") {
-                    if canInlineEdit { startInlineEdit() } else { isEditing = true }
-                }
+                Button(canInlineEdit ? "편집" : "편집…", action: beginEdit)
                 if canInlineEdit {
                     Button("전체 편집…") { isEditing = true }
                 }
@@ -121,10 +134,7 @@ struct BlockCardView: View {
                 Button("이 Project 즐겨찾기") { toggleProjectFavorite() }
                 Divider()
                 Button("복사", action: copyBlockContent)
-                Button("삭제", role: .destructive) {
-                    store.deleteBlock(block)
-                    appState.notify("블록 삭제됨")
-                }
+                Button("삭제", role: .destructive) { showDeleteConfirm = true }
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 12, weight: .semibold))
@@ -139,6 +149,16 @@ struct BlockCardView: View {
         }
         .padding(.horizontal, Theme.blockPadding)
         .padding(.vertical, 12)
+        // T-29 삭제 확인 (실수 방지 — Workspace·Project와 동일)
+        .alert(Text(LocalizedStringKey("'\(block.title)' 삭제")), isPresented: $showDeleteConfirm) {
+            Button("삭제", role: .destructive) {
+                store.deleteBlock(block)
+                appState.notify("블록 삭제됨")
+            }
+            Button("취소", role: .cancel) {}
+        } message: {
+            Text("첨부·아카이브 파일도 함께 사라집니다.")
+        }
     }
 
     // MARK: - 본문
@@ -212,6 +232,14 @@ struct BlockCardView: View {
         .background(mono ? Theme.codeBackground : .clear, in: RoundedRectangle(cornerRadius: 10))
     }
 
+    /// 편집 진입. 접힌 채로 누르면 펼쳐서 편집으로 간다 (무반응처럼 보여서, T-31).
+    private func beginEdit() {
+        if block.isCollapsed {
+            store.toggleBlockCollapsed(block)
+        }
+        if canInlineEdit { startInlineEdit() } else { isEditing = true }
+    }
+
     /// 텍스트·코드 계열만 인라인 편집 (구조형 블록은 시트 유지).
     private var canInlineEdit: Bool {
         [.text, .markdown, .code, .shell].contains(block.type)
@@ -265,15 +293,14 @@ struct BlockCardView: View {
                             .font(.system(size: 11))
                             .foregroundStyle(Theme.muted)
                     }
-                    if block.type == .webArchive {
-                        let saved = WebArchiveStore.hasOfflineFiles(for: block)
-                        Text(saved ? "오프라인 저장됨" : "미저장 — 주소·메모만 보관 중")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundStyle(saved ? Theme.webBlue : Theme.muted)
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 2)
-                            .background((saved ? Theme.webBlueSoft : Theme.tagBackground), in: Capsule())
-                    }
+                    // 웹은 단일 타입으로 통합됨 (T-28, 레거시 webLink는 로드 시 변환)
+                    let saved = WebArchiveStore.hasOfflineFiles(for: block)
+                    Text(saved ? "오프라인 저장됨" : "미저장 — 주소·메모만 보관 중")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(saved ? Theme.webBlue : Theme.muted)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 2)
+                        .background((saved ? Theme.webBlueSoft : Theme.tagBackground), in: Capsule())
                 }
                 Spacer(minLength: 0)
             }
@@ -293,20 +320,18 @@ struct BlockCardView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.muted)
             }
-            // T-09 오프라인 저장·보기 (웹 아카이브만)
-            if block.type == .webArchive {
-                archiveActions
-            }
+            // T-09 오프라인 저장·보기
+            archiveActions
         }
         .sheet(isPresented: $showingOffline) {
-            if let url = offlineFileURL {
+            if let url = offlineFileURL(pdf: viewingPDF) {
                 OfflineWebView(fileURL: url)
                     .frame(minWidth: 800, minHeight: 600)
             }
         }
     }
 
-    /// 웹 아카이브 저장·보기 행.
+    /// 웹 아카이브 저장·보기 행. 아카이브와 PDF가 둘 다 있으면 각각 본다.
     private var archiveActions: some View {
         HStack(spacing: 8) {
             if isSavingArchive {
@@ -316,8 +341,24 @@ struct BlockCardView: View {
                     .font(.system(size: 12))
                     .foregroundStyle(Theme.muted)
             } else {
-                if WebArchiveStore.hasOfflineFiles(for: block) {
-                    CapsuleButton(title: "오프라인 보기", action: { showingOffline = true })
+                let hasArchive = block.archiveFile != nil
+                    && WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: block.archiveFile!) != nil
+                let hasPDF = block.pdfFile != nil
+                    && WebArchiveStore.fileURL(kind: WebArchiveStore.pdfKind, name: block.pdfFile!) != nil
+                if hasArchive || hasPDF {
+                    if hasArchive {
+                        CapsuleButton(title: "아카이브 보기") {
+                            viewingPDF = false
+                            showingOffline = true
+                        }
+                    }
+                    if hasPDF {
+                        CapsuleButton(title: "PDF 보기") {
+                            viewingPDF = true
+                            showingOffline = true
+                        }
+                        CapsuleButton(title: "PDF 내보내기", action: exportPDF)
+                    }
                     CapsuleButton(title: "다시 저장", action: saveOfflineArchive)
                 } else {
                     CapsuleButton(title: "아카이브 저장", style: .primary, action: saveOfflineArchive)
@@ -328,9 +369,10 @@ struct BlockCardView: View {
         .padding(.top, 4)
     }
 
-    /// 실파일 URL (아카이브 우선, 없으면 PDF).
-    private var offlineFileURL: URL? {
-        if let name = block.archiveFile,
+    /// 실파일 URL. 아카이브 우선이던 것을 보기 버튼에 따라 고른다.
+    private func offlineFileURL(pdf: Bool) -> URL? {
+        if !pdf,
+           let name = block.archiveFile,
            let url = WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: name) {
             return url
         }
@@ -338,7 +380,38 @@ struct BlockCardView: View {
            let url = WebArchiveStore.fileURL(kind: WebArchiveStore.pdfKind, name: name) {
             return url
         }
+        // PDF가 없으면 아카이브로 폴백
+        if let name = block.archiveFile,
+           let url = WebArchiveStore.fileURL(kind: WebArchiveStore.archiveKind, name: name) {
+            return url
+        }
         return nil
+    }
+
+    /// 저장된 PDF를 Finder 위치에 복사한다 (다운로드).
+    private func exportPDF() {
+        guard let name = block.pdfFile,
+              let src = WebArchiveStore.fileURL(kind: WebArchiveStore.pdfKind, name: name) else {
+            appState.notify("내보낼 PDF가 없습니다")
+            return
+        }
+        let panel = NSSavePanel()
+        panel.nameFieldStringValue = "\(block.title.isEmpty ? "archive" : block.title).pdf"
+        panel.allowedContentTypes = [.pdf]
+        panel.canCreateDirectories = true
+        guard panel.runModal() == .OK, let dest = panel.url else { return }
+        do {
+            if FileManager.default.fileExists(atPath: dest.path) {
+                try FileManager.default.removeItem(at: dest)
+            }
+            try FileManager.default.copyItem(at: src, to: dest)
+            // [HARD] paths are user data — log file name only, never contents.
+            DebugLogger.feature("PDF 내보내기: \(dest.lastPathComponent)")
+            appState.notify("PDF 내보냄")
+        } catch {
+            DebugLogger.error(code: ErrorCode.storeSave, "PDF 내보내기 실패")
+            appState.notify("PDF 내보내기 실패")
+        }
     }
 
     /// WKWebView로 읽어 .webarchive + PDF를 저장한다. 기존 파일은 새 저장 성공 후 정리.
@@ -356,11 +429,16 @@ struct BlockCardView: View {
                 var updated = block
                 let oldArchive = block.archiveFile
                 let oldPDF = block.pdfFile
+                let oldThumbnail = block.thumbnailFile
                 if let name = WebArchiveStore.save(captured.webarchive, ext: "webarchive") {
                     updated.archiveFile = name
                 }
                 if let name = WebArchiveStore.save(captured.pdf, ext: "pdf") {
                     updated.pdfFile = name
+                }
+                if let data = captured.thumbnail,
+                   let name = WebArchiveStore.save(data, ext: "png", kind: WebArchiveStore.thumbnailKind) {
+                    updated.thumbnailFile = name
                 }
                 guard updated.archiveFile != nil || updated.pdfFile != nil else {
                     throw CapsuleError.store(code: ErrorCode.webArchive, message: "파일 기록 실패")
@@ -370,6 +448,9 @@ struct BlockCardView: View {
                 }
                 if let old = oldPDF, old != updated.pdfFile {
                     WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: old)
+                }
+                if let old = oldThumbnail, old != updated.thumbnailFile {
+                    WebArchiveStore.remove(kind: WebArchiveStore.thumbnailKind, name: old)
                 }
                 updated.savedAt = Date()
                 updated.updatedAt = Date()
@@ -384,22 +465,34 @@ struct BlockCardView: View {
         }
     }
 
+    /// 웹 썸네일. 저장 시점 스크린샷이 있으면 실화면, 없으면 기본 타일 (T-28).
     private var webThumbnail: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(
-                LinearGradient(
-                    colors: [Theme.tileTop, Theme.tileBottom],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .frame(width: 120, height: 80)
-            .overlay(
-                Image(systemName: "globe")
-                    .font(.system(size: 20, weight: .light))
-                    .foregroundStyle(Theme.tileText)
-            )
-            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+        Group {
+            if let name = block.thumbnailFile,
+               let url = WebArchiveStore.fileURL(kind: WebArchiveStore.thumbnailKind, name: name),
+               let nsImage = NSImage(contentsOf: url) {
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+            } else {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(
+                        LinearGradient(
+                            colors: [Theme.tileTop, Theme.tileBottom],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .overlay(
+                        Image(systemName: "globe")
+                            .font(.system(size: 20, weight: .light))
+                            .foregroundStyle(Theme.tileText)
+                    )
+            }
+        }
+        .frame(width: 120, height: 80)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
     }
 
     private var subtitleText: String {
@@ -410,7 +503,7 @@ struct BlockCardView: View {
             // 사이트명이 비면 URL 호스트를 대신 표시
             parts.append(host)
         }
-        parts.append(block.type == .webArchive ? "아카이브" : "링크 저장")
+        parts.append("아카이브")
         return parts.joined(separator: " • ")
     }
 

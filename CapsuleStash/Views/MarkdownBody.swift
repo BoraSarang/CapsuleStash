@@ -8,6 +8,7 @@ enum MarkdownSegment: Equatable {
     case quote(lines: [String])
     case bullet(items: [String])
     case code(language: String, lines: [String])
+    case table(header: [String], rows: [[String]])
     case paragraph(lines: [String])
     case blank
 
@@ -37,8 +38,43 @@ enum MarkdownSegment: Equatable {
             }
         }
 
-        for rawLine in text.components(separatedBy: "\n") {
+        /// `|---|---|` 구분행 판별
+        func isDelimiter(_ line: String) -> Bool {
+            let cells = line.split(separator: "|", omittingEmptySubsequences: true)
+            guard cells.count >= 1 else { return false }
+            return cells.allSatisfy { cell in
+                let t = cell.trimmingCharacters(in: .whitespaces)
+                return !t.isEmpty && t.allSatisfy { $0 == "-" || $0 == ":" }
+            }
+        }
+
+        /// `| a | b |` → ["a", "b"]
+        func splitRow(_ line: String) -> [String] {
+            line.split(separator: "|", omittingEmptySubsequences: true)
+                .map { $0.trimmingCharacters(in: .whitespaces) }
+        }
+
+        let lines = text.components(separatedBy: "\n")
+        var index = 0
+        while index < lines.count {
+            let rawLine = lines[index]
             let trimmed = rawLine.trimmingCharacters(in: .whitespaces)
+            // 표: 헤더행 + 구분행이 오면 본문 행까지 묶는다
+            if trimmed.hasPrefix("|"), index + 1 < lines.count,
+               isDelimiter(lines[index + 1].trimmingCharacters(in: .whitespaces)) {
+                flush()
+                let header = splitRow(trimmed)
+                var rows: [[String]] = []
+                index += 2
+                while index < lines.count {
+                    let rowTrimmed = lines[index].trimmingCharacters(in: .whitespaces)
+                    guard rowTrimmed.hasPrefix("|") else { break }
+                    rows.append(splitRow(rowTrimmed))
+                    index += 1
+                }
+                segments.append(.table(header: header, rows: rows))
+                continue
+            }
             if trimmed.hasPrefix("```") {
                 if inFence {
                     segments.append(.code(language: fenceLanguage, lines: fenceLines))
@@ -49,20 +85,24 @@ enum MarkdownSegment: Equatable {
                     fenceLanguage = String(trimmed.dropFirst(3)).trimmingCharacters(in: .whitespaces)
                     inFence = true
                 }
+                index += 1
                 continue
             }
             if inFence {
                 fenceLines.append(rawLine)
+                index += 1
                 continue
             }
             if trimmed.hasPrefix(">") {
                 if !bulletItems.isEmpty || !paragraphLines.isEmpty { flush() }
                 quoteLines.append(String(trimmed.dropFirst()).trimmingCharacters(in: .whitespaces))
+                index += 1
                 continue
             }
             if trimmed.hasPrefix("- ") || trimmed.hasPrefix("* ") {
                 if !paragraphLines.isEmpty { flush() }
                 bulletItems.append(String(trimmed.dropFirst(2)))
+                index += 1
                 continue
             }
             var level = 0
@@ -75,15 +115,18 @@ enum MarkdownSegment: Equatable {
                 flush()
                 let heading = String(trimmed.dropFirst(level)).trimmingCharacters(in: .whitespaces)
                 segments.append(.heading(level: min(level, 3), text: heading))
+                index += 1
                 continue
             }
             if trimmed.isEmpty {
                 flush()
                 segments.append(.blank)
+                index += 1
                 continue
             }
             if !quoteLines.isEmpty { flush() }
             paragraphLines.append(rawLine)
+            index += 1
         }
         if inFence {
             // 닫히지 않은 펜스는 코드로 간주
@@ -156,8 +199,46 @@ struct MarkdownBody: View {
                 .foregroundStyle(Theme.ink)
                 .lineSpacing(3)
                 .textSelection(.enabled)
+        case .table(let header, let rows):
+            tableView(header: header, rows: rows)
         case .blank:
             Spacer(minLength: 2)
         }
+    }
+
+    /// 표 렌더링. 헤더 굵게 + 행 줄무늬 없이 선으로만 구분.
+    private func tableView(header: [String], rows: [[String]]) -> some View {
+        let columnCount = max(header.count, rows.map(\.count).max() ?? 0)
+        return Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
+            GridRow {
+                ForEach(0..<columnCount, id: \.self) { index in
+                    Text(index < header.count ? header[index] : "")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            .background(Theme.tagBackground)
+            Divider().overlay(Theme.line)
+            ForEach(rows.indices, id: \.self) { rowIndex in
+                GridRow {
+                    ForEach(0..<columnCount, id: \.self) { colIndex in
+                        Text(colIndex < rows[rowIndex].count ? rows[rowIndex][colIndex] : "")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.ink)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                if rowIndex < rows.count - 1 {
+                    Divider().overlay(Theme.line)
+                }
+            }
+        }
+        .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.line, lineWidth: 1))
+        .textSelection(.enabled)
     }
 }

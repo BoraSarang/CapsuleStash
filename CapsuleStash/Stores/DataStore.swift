@@ -43,6 +43,7 @@ final class DataStore: ObservableObject {
             workspaces = []
             DebugLogger.info("빈 저장소로 시작")
         }
+        normalizeWebBlocks()
         restoreSecretsFromKeychain()
         expandDefaults()
         selectFirstProject()
@@ -50,6 +51,25 @@ final class DataStore: ObservableObject {
     }
 
     // MARK: - 탐색 헬퍼
+
+    /// 레거시 `webLink` 블록을 `webArchive` 로 통일한다 (T-28, 필드 그대로 승계).
+    /// 다음 commit 때 DB에도 반영된다.
+    func normalizeWebBlocks() {
+        var converted = 0
+        for wsIndex in workspaces.indices {
+            for index in workspaces[wsIndex].projects.indices {
+                for blockIndex in workspaces[wsIndex].projects[index].blocks.indices {
+                    if workspaces[wsIndex].projects[index].blocks[blockIndex].type == .webLink {
+                        workspaces[wsIndex].projects[index].blocks[blockIndex].type = .webArchive
+                        converted += 1
+                    }
+                }
+            }
+        }
+        if converted > 0 {
+            DebugLogger.feature("웹 블록 통합: \(converted)개")
+        }
+    }
 
     var allProjects: [(workspace: Workspace, project: Project)] {
         workspaces.flatMap { ws in ws.projects.map { (ws, $0) } }
@@ -344,7 +364,7 @@ final class DataStore: ObservableObject {
             }
         }
         for url in urls where !url.isFileURL {
-            insertBlock(Block(projectId: projectId, type: .webLink,
+            insertBlock(Block(projectId: projectId, type: .webArchive,
                               title: url.host ?? url.absoluteString,
                               url: url.absoluteString, siteName: url.host))
             created += 1
@@ -397,7 +417,7 @@ final class DataStore: ObservableObject {
         DebugLogger.feature("블록 삭제")
     }
 
-    /// 블록 삭제 시 동반 정리: Keychain 시크릿 + 아카이브 실파일 + 이미지·파일 첨부.
+    /// 블록 삭제 시 동반 정리: Keychain 시크릿 + 아카이브 실파일 + 썸네일 + 이미지·파일 첨부.
     /// [HARD] 값 자체를 로그에 남기지 않는다.
     private func removeBlockFiles(_ block: Block) {
         if block.credential != nil {
@@ -409,6 +429,10 @@ final class DataStore: ObservableObject {
         }
         if let name = block.pdfFile {
             WebArchiveStore.remove(kind: WebArchiveStore.pdfKind, name: name,
+                                   baseDirectory: attachmentBaseDirectory)
+        }
+        if let name = block.thumbnailFile {
+            WebArchiveStore.remove(kind: WebArchiveStore.thumbnailKind, name: name,
                                    baseDirectory: attachmentBaseDirectory)
         }
         let kind = block.type == .image ? AttachmentStore.imagesKind : AttachmentStore.filesKind

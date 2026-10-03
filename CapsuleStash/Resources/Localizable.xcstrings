@@ -1311,6 +1311,66 @@
         }
       }
     },
+    "아카이브 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View Archive"
+          }
+        }
+      }
+    },
+    "PDF 보기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "View PDF"
+          }
+        }
+      }
+    },
+    "PDF 내보내기" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Export PDF"
+          }
+        }
+      }
+    },
+    "내보낼 PDF가 없습니다" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No PDF to export"
+          }
+        }
+      }
+    },
+    "PDF 내보냄" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF exported"
+          }
+        }
+      }
+    },
+    "PDF 내보내기 실패" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "PDF export failed"
+          }
+        }
+      }
+    },
     "저장 중… (최대 30초)" : {
       "localizations" : {
         "en" : {
@@ -2087,6 +2147,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DebugPanel (⌘⇧D)"
+          }
+        }
+      }
+    },
+    "첨부·아카이브 파일도 함께 사라집니다." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Attached and archived files go with it."
           }
         }
       }

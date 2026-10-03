@@ -836,7 +836,7 @@ final class CapsuleStashTests: XCTestCase {
         let types = store.selectedProject?.blocks.map(\.type) ?? []
         XCTAssertTrue(types.contains(.image))
         XCTAssertTrue(types.contains(.file))
-        let web = store.selectedProject?.blocks.first(where: { $0.type == .webLink })
+        let web = store.selectedProject?.blocks.first(where: { $0.type == .webArchive })
         XCTAssertEqual(web?.siteName, "example.com")
         XCTAssertTrue(FileManager.default.fileExists(
             atPath: dir.appendingPathComponent("images", isDirectory: true).path),
@@ -864,8 +864,34 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertFalse(store.importTextDrop("   \n  ", to: project.id), "빈 텍스트 무시")
     }
 
-    // MARK: - 마크다운 파서 (T-26)
+    // MARK: - 제목 자동완성 (T-30)
 
+    func testSuggestedTitle() {
+        var web = Block(projectId: UUID(), type: .webArchive, title: "",
+                        url: "https://m.clien.net/service/board/cm_mac", siteName: "")
+        XCTAssertEqual(web.suggestedTitle(), "m.clien.net")
+        web.siteName = "클리앙"
+        XCTAssertEqual(web.suggestedTitle(), "클리앙", "사이트명 우선")
+
+        var md = Block(projectId: UUID(), type: .markdown, title: "",
+                       content: "\n#  최종 제품 정의\n본문")
+        XCTAssertEqual(md.suggestedTitle(), "최종 제품 정의", "마크다운 # 제거")
+
+        let text = Block(projectId: UUID(), type: .text, title: "",
+                         content: "  \n첫 줄입니다\n둘째 줄")
+        XCTAssertEqual(text.suggestedTitle(), "첫 줄입니다", "빈 줄 건너뜀")
+
+        let cred = Block(projectId: UUID(), type: .credential, title: "",
+                         credential: Credential(homepage: "https://x.test", username: "토리"))
+        XCTAssertEqual(cred.suggestedTitle(), "토리")
+
+        let empty = Block(projectId: UUID(), type: .code, title: "", content: "   \n  ")
+        XCTAssertEqual(empty.suggestedTitle(), "코드", "없으면 타입 표시명")
+        let image = Block(projectId: UUID(), type: .image, title: "")
+        XCTAssertEqual(image.suggestedTitle(), "이미지")
+    }
+
+    // MARK: - 마크다운 파서 (T-26)
     func testMarkdownParse() {
         let segments = MarkdownSegment.parse("# 제목\n## 부제\n### 소제\n본문\n> 인용\n- 하나\n- 둘\n```swift\nlet a = 1\n```\n")
         XCTAssertEqual(segments[0], .heading(level: 1, text: "제목"))
@@ -879,6 +905,40 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertEqual(MarkdownSegment.parse("#태그"), [.paragraph(lines: ["#태그"])])
         XCTAssertEqual(MarkdownSegment.parse("```\nabc"), [.code(language: "", lines: ["abc"])])
         XCTAssertEqual(MarkdownSegment.parse(""), [])
+    }
+
+    func testMarkdownTableParse() {
+        let text = "| 이름 | 값 |\n|---|---|\n| A | 1 |\n| B | 2 | extra |\n본문"
+        let segments = MarkdownSegment.parse(text)
+        XCTAssertEqual(segments[0], .table(header: ["이름", "값"],
+                                           rows: [["A", "1"], ["B", "2", "extra"]]))
+        XCTAssertEqual(segments[1], .paragraph(lines: ["본문"]))
+        // 구분행 없으면 표 아님
+        XCTAssertEqual(MarkdownSegment.parse("| a | b |"),
+                       [.paragraph(lines: ["| a | b |"])])
+    }
+
+    // MARK: - 웹 단일 타입 (T-28)
+
+    func testWebPickableHidesLegacyLink() {
+        XCTAssertFalse(BlockType.pickable.contains(.webLink))
+        XCTAssertEqual(BlockType.pickable.count, BlockType.allCases.count - 1)
+        XCTAssertTrue(BlockType.pickable.contains(.webArchive))
+        XCTAssertEqual(SearchQuery.parse("type:weblink").types, [.webArchive], "구 필터 별칭")
+    }
+
+    @MainActor
+    func testNormalizeWebBlocks() throws {
+        let dir = try makeTempDir()
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let (store, project) = try makeStoreWithProject(dir: dir)
+        let legacy = Block(projectId: project.id, type: .webLink, title: "옛 링크",
+                           url: "https://example.com/a")
+        store.insertBlock(legacy)
+        store.normalizeWebBlocks()
+        let back = store.selectedProject?.blocks.first(where: { $0.id == legacy.id })
+        XCTAssertEqual(back?.type, .webArchive)
+        XCTAssertEqual(back?.url, "https://example.com/a", "필드 승계")
     }
 
     // MARK: - 모두 접기·순서 이동 (T-27)

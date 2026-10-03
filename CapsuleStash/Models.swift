@@ -58,6 +58,12 @@ struct Project: Identifiable, Hashable, Codable {
 enum BlockType: String, Codable, CaseIterable, Identifiable {
     case text, markdown, code, shell, webLink, webArchive, image, file, credential
 
+    /// 레거시 별칭. `webLink` 는 디코딩 호환용으로만 남기고 신규 생성은 `webArchive` 하나로 통일한다 (T-28).
+    /// 로드 시 `DataStore.normalizeWebBlocks` 가 전부 `webArchive` 로 바꾼다.
+    static var pickable: [BlockType] {
+        allCases.filter { $0 != .webLink }
+    }
+
     var id: String { rawValue }
 
     var isCode: Bool { self == .code || self == .shell }
@@ -84,7 +90,7 @@ enum BlockType: String, Codable, CaseIterable, Identifiable {
         case .code: return "코드"
         case .shell: return "셸 명령"
         case .webLink: return "웹 링크"
-        case .webArchive: return "웹 아카이브"
+        case .webArchive: return "웹"
         case .image: return "이미지"
         case .file: return "파일"
         case .credential: return "계정 정보"
@@ -115,10 +121,10 @@ enum BlockType: String, Codable, CaseIterable, Identifiable {
         case .code: return "언어 지정 코드 조각"
         case .shell: return "터미널 명령 (실행 안 함, 복사만)"
         case .webLink: return "페이지 주소 + 메모 — 열기로 브라우저에서 바로 열기"
-        case .webArchive: return "페이지 본문 오프라인 보관 (카드에서 저장·보기)"
+        case .webArchive: return "웹 페이지 저장 — 주소·메모 + 브라우저 열기 + 오프라인 보관 (카드에서 저장·보기)"
         case .image: return "이미지 첨부 (파일 선택기·드래그앤드롭)"
         case .file: return "파일 첨부 (파일 선택기·드래그앤드롭)"
-        case .credential: return "계정·API Key 보관 (시크릿 2개까지, 메모리 보관·자동 마스킹)"
+        case .credential: return "계정·API Key 보관 (시크릿 2개까지, Keychain 보관·자동 마스킹)"
         }
     }
 }
@@ -141,6 +147,8 @@ struct Block: Identifiable, Hashable, Codable {
     var archiveFile: String?
     /// 웹 아카이브 PDF 실파일명 (T-09, `pdf/` 아래). 없으면 미저장.
     var pdfFile: String?
+    /// 웹 아카이브 썸네일 (T-28, 저장 시점 스크린샷, `thumbnails/` 아래).
+    var thumbnailFile: String?
     /// Credential 본문. [HARD] 시크릿은 파일 저장에서 제외되고 Keychain에 보관된다.
     var credential: Credential?
     var isCollapsed: Bool
@@ -151,7 +159,7 @@ struct Block: Identifiable, Hashable, Codable {
     init(id: UUID = UUID(), projectId: UUID, type: BlockType, title: String,
          content: String = "", language: String? = nil, url: String? = nil,
          siteName: String? = nil, savedAt: Date? = nil, imageNames: [String] = [],
-         archiveFile: String? = nil, pdfFile: String? = nil,
+         archiveFile: String? = nil, pdfFile: String? = nil, thumbnailFile: String? = nil,
          credential: Credential? = nil, isCollapsed: Bool = false, sortOrder: Int = 0,
          createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
@@ -166,6 +174,7 @@ struct Block: Identifiable, Hashable, Codable {
         self.imageNames = imageNames
         self.archiveFile = archiveFile
         self.pdfFile = pdfFile
+        self.thumbnailFile = thumbnailFile
         self.credential = credential
         self.isCollapsed = isCollapsed
         self.sortOrder = sortOrder
@@ -186,6 +195,34 @@ struct Block: Identifiable, Hashable, Codable {
             parts.append(credential.username)
         }
         return parts.joined(separator: " ")
+    }
+
+    /// 제목이 비었을 때 내용에서 끌어오는 기본 제목 (T-30).
+    /// 마크다운 `#`·본문 첫 줄·URL 호스트·아이디 순으로 고르고, 없으면 타입 표시명.
+    /// 제목은 사용자 데이터라 번역하지 않는다 (있는 그대로 저장).
+    func suggestedTitle() -> String {
+        switch type {
+        case .webLink, .webArchive:
+            if let site = siteName, !site.isEmpty { return site }
+            if let url, let host = URL(string: url)?.host, !host.isEmpty { return host }
+        case .text, .markdown, .code, .shell:
+            let lines = content.split(separator: "\n", omittingEmptySubsequences: false)
+            for rawLine in lines {
+                var line = rawLine.trimmingCharacters(in: .whitespaces)
+                if type == .markdown {
+                    line = String(line.drop(while: { $0 == "#" })).trimmingCharacters(in: .whitespaces)
+                }
+                if !line.isEmpty { return String(line.prefix(40)) }
+            }
+        case .credential:
+            if let credential {
+                if !credential.username.isEmpty { return credential.username }
+                if let host = URL(string: credential.homepage)?.host, !host.isEmpty { return host }
+            }
+        case .image, .file:
+            break
+        }
+        return type.displayName
     }
 
     /// 복사 대상 문자열.
@@ -267,7 +304,10 @@ struct SearchQuery: Equatable {
         for token in Self.tokenize(raw) {
             if token.hasPrefix("type:") {
                 let value = String(token.dropFirst(5)).lowercased()
-                if let type = BlockType(rawValue: value) { query.types.insert(type) }
+                // 레거시 별칭: 구 type:weblink 는 type:webarchive 와 같다 (T-28)
+                if value == "weblink" {
+                    query.types.insert(.webArchive)
+                } else if let type = BlockType(rawValue: value) { query.types.insert(type) }
             } else if token.hasPrefix("project:") {
                 let value = String(token.dropFirst(8)).trimmingCharacters(in: .whitespaces)
                 if !value.isEmpty { query.projectName = value }

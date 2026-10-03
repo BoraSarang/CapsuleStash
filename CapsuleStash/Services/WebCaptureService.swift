@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import WebKit
 
@@ -11,9 +12,9 @@ final class WebCaptureService: NSObject {
     private var webView: WKWebView?
     private var navigationContinuation: CheckedContinuation<Void, Error>?
 
-    /// URL을 읽어 웹아카이브 + PDF를 반환한다.
-    static func capture(url: URL) async throws -> (webarchive: Data, pdf: Data) {
-        try await withThrowingTaskGroup(of: (Data, Data).self) { group in
+    /// URL을 읽어 웹아카이브 + PDF + 썸네일을 반환한다. 썸네일이 없으면 nil (본 저장은 진행).
+    static func capture(url: URL) async throws -> (webarchive: Data, pdf: Data, thumbnail: Data?) {
+        try await withThrowingTaskGroup(of: (Data, Data, Data?).self) { group in
             group.addTask { @MainActor in
                 let service = WebCaptureService()
                 return try await service.run(url: url)
@@ -30,8 +31,8 @@ final class WebCaptureService: NSObject {
         }
     }
 
-    private func run(url: URL) async throws -> (Data, Data) {
-        let webView = WKWebView()
+    private func run(url: URL) async throws -> (Data, Data, Data?) {
+        let webView = WKWebView(frame: CGRect(x: 0, y: 0, width: 1280, height: 800))
         self.webView = webView
         webView.navigationDelegate = self
         webView.load(URLRequest(url: url))
@@ -56,7 +57,22 @@ final class WebCaptureService: NSObject {
                 }
             }
         }
-        return try await (archive, pdf)
+        // T-28 저장 시점 스크린샷 (카드 썸네일용, 480px). 실패해도 본 저장은 진행.
+        let thumbnail: Data? = await withCheckedContinuation { continuation in
+            let config = WKSnapshotConfiguration()
+            config.snapshotWidth = 480
+            webView.takeSnapshot(with: config) { image, _ in
+                guard let image,
+                      let cgImage = image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+                    continuation.resume(returning: nil)
+                    return
+                }
+                let png = NSBitmapImageRep(cgImage: cgImage)
+                    .representation(using: .png, properties: [:])
+                continuation.resume(returning: png)
+            }
+        }
+        return try await (archive, pdf, thumbnail)
     }
 }
 

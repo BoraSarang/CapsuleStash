@@ -6,13 +6,19 @@ import Foundation
 enum WebArchiveStore {
     static let archiveKind = "web-archives"
     static let pdfKind = "pdf"
+    /// 저장 시점 스크린샷 보관 폴더 (T-28).
+    static let thumbnailKind = "thumbnails"
 
     /// Data를 보관 폴더에 쓰고 파일명을 반환한다. 실패 시 nil + 에러 로그.
-    /// - Parameter baseDirectory: 테스트 격리용. 기본값은 실제 Application Support.
+    /// - Parameters:
+    ///   - ext: 확장자 (`pdf` 면 pdf 폴더, 그 외 아카이브 폴더).
+    ///   - kind: 지정하면 폴더를 직접 선택 (썸네일용).
+    ///   - baseDirectory: 테스트 격리용. 기본값은 실제 Application Support.
     @discardableResult
-    static func save(_ data: Data, ext: String, baseDirectory: URL? = nil) -> String? {
-        let dir = (baseDirectory ?? PersistenceStore.directoryURL).appendingPathComponent(
-            ext == "pdf" ? pdfKind : archiveKind, isDirectory: true)
+    static func save(_ data: Data, ext: String, kind: String? = nil,
+                     baseDirectory: URL? = nil) -> String? {
+        let folder = kind ?? (ext == "pdf" ? pdfKind : archiveKind)
+        let dir = (baseDirectory ?? PersistenceStore.directoryURL).appendingPathComponent(folder, isDirectory: true)
         do {
             try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         } catch {

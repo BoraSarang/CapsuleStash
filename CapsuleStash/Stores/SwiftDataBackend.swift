@@ -86,6 +86,8 @@ final class SDBlock {
     var archiveFile: String?
     /// 웹 아카이브 PDF 실파일명 (T-09). 없으면 미저장.
     var pdfFile: String?
+    /// 웹 아카이브 썸네일 (T-28). 없으면 기본 타일.
+    var thumbnailFile: String?
     var isCollapsed: Bool
     var sortOrder: Int
     var createdAt: Date
@@ -96,7 +98,7 @@ final class SDBlock {
          content: String = "", language: String? = nil, url: String? = nil,
          siteName: String? = nil, savedAt: Date? = nil, imageNames: [String] = [],
          credHomepage: String = "", credUsername: String = "", hasCredential: Bool = false,
-         archiveFile: String? = nil, pdfFile: String? = nil,
+         archiveFile: String? = nil, pdfFile: String? = nil, thumbnailFile: String? = nil,
          isCollapsed: Bool = false, sortOrder: Int = 0,
          createdAt: Date = Date(), updatedAt: Date = Date()) {
         self.id = id
@@ -114,6 +116,7 @@ final class SDBlock {
         self.hasCredential = hasCredential
         self.archiveFile = archiveFile
         self.pdfFile = pdfFile
+        self.thumbnailFile = thumbnailFile
         self.isCollapsed = isCollapsed
         self.sortOrder = sortOrder
         self.createdAt = createdAt
@@ -252,6 +255,7 @@ private extension Block {
                   url: entity.url, siteName: entity.siteName, savedAt: entity.savedAt,
                   imageNames: entity.imageNames,
                   archiveFile: entity.archiveFile, pdfFile: entity.pdfFile,
+                  thumbnailFile: entity.thumbnailFile,
                   credential: credential,
                   isCollapsed: entity.isCollapsed, sortOrder: entity.sortOrder,
                   createdAt: entity.createdAt, updatedAt: entity.updatedAt)
@@ -270,6 +274,7 @@ private extension SDBlock {
                   credUsername: block.credential?.username ?? "",
                   hasCredential: block.credential != nil,
                   archiveFile: block.archiveFile, pdfFile: block.pdfFile,
+                  thumbnailFile: block.thumbnailFile,
                   isCollapsed: block.isCollapsed, sortOrder: sortOrder,
                   createdAt: block.createdAt, updatedAt: block.updatedAt)
     }

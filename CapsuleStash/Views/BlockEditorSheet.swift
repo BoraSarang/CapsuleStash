@@ -360,6 +360,7 @@ struct BlockEditorSheet: View {
     }
 
     private func save() {
+        // 생성 시 제목이 비면 내용에서 끌어온다 (빈 블록 방지)
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
         if !isCreating {
             guard !trimmedTitle.isEmpty else {
@@ -367,11 +368,8 @@ struct BlockEditorSheet: View {
                 return
             }
         }
-        // 생성 시 제목이 비면 타입명을 기본값으로 (빈 블록 방지)
-        let finalTitle = trimmedTitle.isEmpty ? original.type.displayName : trimmedTitle
 
         var updated = original
-        updated.title = finalTitle
         updated.updatedAt = Date()
 
         switch original.type {
@@ -405,14 +403,21 @@ struct BlockEditorSheet: View {
             )
         }
 
+        // 생성 시 제목이 비면 필드를 채운 뒤 내용에서 끌어온다 (빈 블록 방지)
+        if trimmedTitle.isEmpty {
+            updated.title = updated.suggestedTitle()
+        } else {
+            updated.title = trimmedTitle
+        }
+
         if isCreating {
             store.insertBlock(updated)
             // [HARD] 값 자체를 로그에 남기지 않는다. 제목만 기록.
-            DebugLogger.feature("블록 추가: \(finalTitle) (\(original.type.displayName))")
+            DebugLogger.feature("블록 추가: \(updated.title) (\(original.type.displayName))")
             appState.notify("\(original.type.displayName) 블록 추가됨")
         } else {
             store.updateBlock(updated)
-            DebugLogger.feature("블록 편집 저장: \(finalTitle)")
+            DebugLogger.feature("블록 편집 저장: \(updated.title)")
             appState.notify("저장됨")
         }
         dismiss()
