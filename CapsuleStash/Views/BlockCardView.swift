@@ -630,22 +630,30 @@ struct BlockCardView: View {
 
     /// 카드 썸네일. 실파일이 있으면 미리보기, 없으면 파일명 타일.
     /// 더블클릭: 이미지 → QuickLook, 파일 → 기본 앱으로 열기 (T-32).
+    /// T-42 썸네일 크기를 행에 고정. fill 원본의 이상 크기가 히트 영역까지
+    /// 커지면 펼친 이미지 카드의 헤더 버튼을 덮는다 (위로 오버플로).
+    private static let thumbnailHeight: CGFloat = 120
+
     @ViewBuilder
     private func cardThumbnail(for name: String, index: Int) -> some View {
         if block.type == .image,
            let url = AttachmentStore.fileURL(kind: AttachmentStore.imagesKind, name: name),
            FileManager.default.fileExists(atPath: url.path),
            let nsImage = NSImage(contentsOf: url) {
-            Image(nsImage: nsImage)
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(height: 120)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-                .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
-                .onTapGesture(count: 2) {
-                    QuickLookController.shared.show(urls: existingAttachmentURLs, index: index)
-                }
+            GeometryReader { geo in
+                Image(nsImage: nsImage)
+                    .resizable()
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: geo.size.width, height: Self.thumbnailHeight)
+                    .clipped()
+            }
+            .frame(height: Self.thumbnailHeight)
+            .contentShape(Rectangle())
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+            .onTapGesture(count: 2) {
+                QuickLookController.shared.show(urls: existingAttachmentURLs, index: index)
+            }
         } else {
             RoundedRectangle(cornerRadius: 10)
                 .fill(
