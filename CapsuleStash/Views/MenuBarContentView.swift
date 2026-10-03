@@ -42,7 +42,7 @@ struct MenuBarContentView: View {
 
             Button(store.isVaultUnlocked
                 ? LocalizedStringKey("Vault 잠금")
-                : LocalizedStringKey("Vault 잠금 해제")) { toggleVault() }
+                : LocalizedStringKey("Vault 잠금 해제")) { appState.toggleVault(store) }
 
             Button("DebugPanel") {
                 NSApp.activate(ignoringOtherApps: true)
@@ -69,16 +69,6 @@ struct MenuBarContentView: View {
         DebugLogger.feature("메뉴바 최근 항목 이동: \(entry.title)")
     }
 
-    private func toggleVault() {
-        if store.isVaultUnlocked {
-            store.lockVault()
-            appState.notify("Vault 잠금")
-        } else {
-            store.requestVaultUnlock { _ in
-                appState.notify(store.isVaultUnlocked ? "Vault 잠금 해제" : "Vault 잠금 해제 실패")
-            }
-        }
-    }
 }
 
 extension Notification.Name {

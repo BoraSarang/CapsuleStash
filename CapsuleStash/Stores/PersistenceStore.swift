@@ -71,6 +71,13 @@ enum PersistenceStore {
     static func attachmentsURL(kind: String) -> URL {
         directoryURL.appendingPathComponent(kind, isDirectory: true)
     }
+
+    /// 경로 탈출(`..`, `/`) 방지 후 보관 파일 URL 반환 (AttachmentStore·WebArchiveStore 공유).
+    static func safeFileURL(kind: String, name: String, baseDirectory: URL? = nil) -> URL? {
+        guard !name.isEmpty, !name.contains("/"), !name.contains("..") else { return nil }
+        let base = baseDirectory ?? directoryURL
+        return base.appendingPathComponent(kind, isDirectory: true).appendingPathComponent(name)
+    }
 }
 
 // MARK: - v1 (3단: Workspace→Project→Collection) 레거시

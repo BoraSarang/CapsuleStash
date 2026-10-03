@@ -72,9 +72,7 @@ enum AttachmentStore {
 
     /// 경로 탈출(`..`, `/`) 방지 후 보관 파일 URL 반환.
     static func fileURL(kind: String, name: String, baseDirectory: URL? = nil) -> URL? {
-        guard !name.isEmpty, !name.contains("/"), !name.contains("..") else { return nil }
-        let base = baseDirectory ?? PersistenceStore.directoryURL
-        return base.appendingPathComponent(kind, isDirectory: true).appendingPathComponent(name)
+        PersistenceStore.safeFileURL(kind: kind, name: name, baseDirectory: baseDirectory)
     }
 
     static func remove(kind: String, name: String, baseDirectory: URL? = nil) {

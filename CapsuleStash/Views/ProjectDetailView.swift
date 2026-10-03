@@ -80,6 +80,11 @@ struct ProjectDetailView: View {
         guard let id = appState.pendingBlockScroll,
               project.sortedBlocks.contains(where: { $0.id == id }) else { return }
         appState.pendingBlockScroll = nil
+        scrollToBlock(id, proxy: proxy)
+    }
+
+    /// 블록으로 스크롤 (접혔으면 펼치고 이동). 레일·팔레트 이동 공유.
+    private func scrollToBlock(_ id: UUID, proxy: ScrollViewProxy) {
         store.expandBlock(id)
         DispatchQueue.main.async {
             withAnimation(.easeOut(duration: 0.25)) {
@@ -99,14 +104,7 @@ struct ProjectDetailView: View {
                         ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
                             Button {
                                 railOpen = false
-                                if block.isCollapsed {
-                                    store.toggleBlockCollapsed(block)
-                                }
-                                DispatchQueue.main.async {
-                                    withAnimation(.easeOut(duration: 0.25)) {
-                                        proxy.scrollTo(block.id, anchor: .top)
-                                    }
-                                }
+                                scrollToBlock(block.id, proxy: proxy)
                             } label: {
                                 HStack(spacing: 8) {
                                     Image(systemName: block.type.symbolName)
@@ -346,9 +344,7 @@ struct ProjectDetailView: View {
 
     private func copyAll() {
         let includeSecrets = store.isVaultUnlocked
-        let text = project.sortedBlocks
-            .map { "## \($0.title)\n\($0.copyPayload(includeSecrets: includeSecrets))" }
-            .joined(separator: "\n\n")
+        let text = project.plainText(includeSecrets: includeSecrets)
         guard !text.isEmpty else {
             appState.notify("복사할 블록이 없습니다")
             return

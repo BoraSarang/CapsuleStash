@@ -226,9 +226,7 @@ struct CommandPaletteView: View {
     /// 결과 행의 복사 버튼 동작. Credential 은 비밀값을 직접 복사하지 않는다.
     private func copy(_ hit: SearchHit) {
         guard let block = hit.block else {
-            let text = hit.project.sortedBlocks
-                .map { "## \($0.title)\n\($0.copyPayload())" }
-                .joined(separator: "\n\n")
+            let text = hit.project.plainText()
             if ClipboardService.copy(text, label: hit.project.name) {
                 appState.notifyCopy(hit.project.name)
             }

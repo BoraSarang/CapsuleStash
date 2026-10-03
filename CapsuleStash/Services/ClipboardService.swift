@@ -47,10 +47,6 @@ enum ClipboardService {
         return "\(Int(delay))초 후 자동 삭제"
     }
 
-    static func read() -> String? {
-        NSPasteboard.general.string(forType: .string)
-    }
-
     /// T-17 종료 시 정리: 클립보드에 마지막 비밀값이 그대로 있으면 비운다.
     /// [HARD] 값 자체를 로그에 남기지 않는다.
     static func clearSecretsOnQuit() {
