@@ -973,6 +973,35 @@ final class CapsuleStashTests: XCTestCase {
         XCTAssertFalse(store.moveBlockTo(ids[0], before: ids[1], in: UUID()), "없는 문서 무시")
     }
 
+    // MARK: - 문서 순서 이동 (T-35)
+
+    @MainActor
+    func testMoveProjectTo() {
+        let store = makeStore()
+        guard store.workspaces.count >= 1,
+              store.workspaces[0].projects.count >= 3 else {
+            XCTFail("시드에 Workspace·Project 3개 필요")
+            return
+        }
+        let wsId = store.workspaces[0].id
+        let ids = store.workspaces[0].projects.map(\.id)
+        let names = store.workspaces[0].projects.map(\.name)
+        XCTAssertGreaterThanOrEqual(ids.count, 3)
+        XCTAssertTrue(store.moveProjectTo(ids[2], before: ids[0], in: wsId))
+        let expectedIDs = [ids[2], ids[0], ids[1]] + Array(ids.dropFirst(3))
+        XCTAssertEqual(store.workspaces[0].projects.map(\.id), expectedIDs, "맨 앞으로 이동")
+        let expectedNames = [names[2], names[0], names[1]] + Array(names.dropFirst(3))
+        XCTAssertEqual(store.workspaces[0].projects.map(\.name), expectedNames)
+        XCTAssertFalse(store.moveProjectTo(ids[0], before: ids[0], in: wsId), "자기 자신은 무시")
+        XCTAssertFalse(store.moveProjectTo(UUID(), before: ids[0], in: wsId), "없는 문서 무시")
+        XCTAssertFalse(store.moveProjectTo(ids[0], before: ids[1], in: UUID()), "없는 공간 무시")
+        if store.workspaces.count >= 2 {
+            let other = store.workspaces[1].id
+            XCTAssertFalse(store.moveProjectTo(ids[0], before: ids[1], in: other),
+                           "다른 공간으로는 Workspace 드롭 사용")
+        }
+    }
+
     @MainActor
     func testDeleteBlockClearsAttachments() throws {
         KeychainStore.inMemory = [:]

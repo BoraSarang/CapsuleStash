@@ -299,6 +299,27 @@ final class DataStore: ObservableObject {
         return true
     }
 
+    /// T-35 Project 드래그 페이로드 접두사 (`capsule-project:<uuid>`).
+    static let projectDragPrefix = "capsule-project:"
+
+    /// 같은 Workspace 안에서 Project 순서를 바꾼다 (사이드바 드래그).
+    /// dragged·target이 같은 문서에 없으면 무시한다 (다른 문서로는 Workspace 드롭 사용).
+    /// - Returns: 실제 이동 여부.
+    @discardableResult
+    func moveProjectTo(_ draggedId: UUID, before targetId: UUID, in workspaceId: UUID) -> Bool {
+        guard draggedId != targetId,
+              let wsIndex = workspaces.firstIndex(where: { $0.id == workspaceId }) else { return false }
+        var order = workspaces[wsIndex].projects
+        guard let from = order.firstIndex(where: { $0.id == draggedId }),
+              let to = order.firstIndex(where: { $0.id == targetId }) else { return false }
+        let dragged = order.remove(at: from)
+        order.insert(dragged, at: from < to ? to - 1 : to)
+        workspaces[wsIndex].projects = order
+        commit()
+        DebugLogger.feature("Project 순서 이동")
+        return true
+    }
+
     func toggleFavorite(_ project: Project) {
         mutateProject(project.id) { $0.isFavorite.toggle() }
     }

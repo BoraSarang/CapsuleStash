@@ -12,6 +12,19 @@ struct SidebarView: View {
     @State private var deleteTarget: DeleteTarget?
     /// 드래그 중인 Project를 받을 Workspace 하이라이트
     @State private var dropWorkspaceId: UUID?
+    /// 드래그 중인 Project를 받을 Project 행 하이라이트 (T-35 같은 문서 순서 변경)
+    @State private var dropProjectId: UUID?
+
+    /// 행 하이라이트용 isTargeted 바인딩
+    private func dropBinding(for id: UUID) -> Binding<Bool> {
+        Binding(
+            get: { dropProjectId == id },
+            set: { hovering in
+                if hovering { dropProjectId = id }
+                else if dropProjectId == id { dropProjectId = nil }
+            }
+        )
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
@@ -133,7 +146,7 @@ struct SidebarView: View {
                 // 문서는 워크스페이스명보다 1단(16pt) 들여쓰기
                 VStack(alignment: .leading, spacing: 2) {
                     ForEach(ws.projects) { project in
-                        projectRow(project)
+                        projectRow(project, in: ws.id)
                     }
                 }
                 .padding(.leading, 16)
@@ -154,7 +167,7 @@ struct SidebarView: View {
         }
     }
 
-    private func projectRow(_ project: Project) -> some View {
+    private func projectRow(_ project: Project, in workspaceId: UUID) -> some View {
         let isActive = store.selectedProjectId == project.id
         return Button {
             store.select(project)
@@ -177,11 +190,27 @@ struct SidebarView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.horizontal, 8)
             .padding(.vertical, 7)
-            .background(isActive ? Theme.paper : .clear, in: RoundedRectangle(cornerRadius: Theme.controlRadius))
+            .background(
+                dropProjectId == project.id ? Theme.sidebarHover
+                    : isActive ? Theme.paper : .clear,
+                in: RoundedRectangle(cornerRadius: Theme.controlRadius)
+            )
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .onDrag { NSItemProvider(object: project.id.uuidString as NSString) }
+        .onDrag { NSItemProvider(object: "\(DataStore.projectDragPrefix)\(project.id.uuidString)" as NSString) }
+        .onDrop(of: [.plainText], isTargeted: dropBinding(for: project.id)) { providers in
+            providers.first?.loadObject(ofClass: NSString.self) { object, _ in
+                guard let raw = object as? String else { return }
+                let idString = raw.hasPrefix(DataStore.projectDragPrefix)
+                    ? String(raw.dropFirst(DataStore.projectDragPrefix.count)) : raw
+                guard let draggedId = UUID(uuidString: idString) else { return }
+                Task { @MainActor in
+                    _ = self.store.moveProjectTo(draggedId, before: project.id, in: workspaceId)
+                }
+            }
+            return true
+        }
         .contextMenu {
             Button(project.isFavorite ? "즐겨찾기 해제" : "즐겨찾기") { store.toggleFavorite(project) }
             Button("이름 바꾸기…") { rename(project: project) }
@@ -260,10 +289,14 @@ struct SidebarView: View {
     }
 
     /// 사이드바 드롭: Project 행을 다른 Workspace에 떨어뜨리면 이동한다.
+    /// 같은 Workspace 행에 떨어뜨리면 행 드롭(moveProjectTo)이 순서 변경을 담당한다.
     private func dropProject(_ providers: [NSItemProvider], to ws: Workspace) {
         guard let provider = providers.first(where: { $0.hasItemConformingToTypeIdentifier(UTType.plainText.identifier) }) else { return }
         provider.loadObject(ofClass: NSString.self) { object, _ in
-            guard let idString = object as? String, let projectId = UUID(uuidString: idString) else { return }
+            guard let raw = object as? String else { return }
+            let idString = raw.hasPrefix(DataStore.projectDragPrefix)
+                ? String(raw.dropFirst(DataStore.projectDragPrefix.count)) : raw
+            guard let projectId = UUID(uuidString: idString) else { return }
             Task { @MainActor in
                 guard let project = store.allProjects.first(where: { $0.project.id == projectId })?.project else { return }
                 if store.moveProject(projectId, to: ws.id) {

@@ -277,8 +277,9 @@ struct ProjectDetailView: View {
             if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier), !isFile {
                 provider.loadObject(ofClass: NSString.self) { object, _ in
                     guard let text = object as? String,
-                          // 블록 순서 드롭은 카드가 처리 (T-27)
-                          !text.hasPrefix(DataStore.blockDragPrefix) else { return }
+                          // 블록·문서 순서 드롭은 각자 카드·행이 처리 (T-27/T-35)
+                          !text.hasPrefix(DataStore.blockDragPrefix),
+                          !text.hasPrefix(DataStore.projectDragPrefix) else { return }
                     Task { @MainActor in
                         if self.store.importTextDrop(text, to: self.project.id) {
                             self.appState.notify("텍스트 블록 추가됨")
