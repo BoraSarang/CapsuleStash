@@ -14,7 +14,12 @@
 2. 개발자용 → "서명되지 않은 확장 허용".
 3. Xcode로 열기: 새로운 Safari Extension App 타깃을 만들고 이 폴더 파일을 넣거나,
    `safari-web-extension-converter`로 변환 후 실행.
+   - 컨버터 주의: `--bundle-identifier` 뒤에 앱 이름이 덧붙어 부모 앱 ID가 바뀌면
+     "Embedded binary's bundle identifier is not prefixed..." 에러가 난다.
+     이때는 앱 타깃(확장 말고)의 Bundle Identifier를 확장 ID의 접두가 되게 고친다
+     (예: 앱 `com.borasarang.CapsuleStash.Saver` ← 확장 `...Saver.Extension`). ⇧⌘K 후 재빌드.
 4. 팝업에서 "현재 탭 저장" → 앱 Inbox 문서에 저장됨.
+   - 2026-10-04 수동 확인됨 (GitHub 탭 → Inbox 웹 아카이브 블록 + 오프라인 뱃지).
 
 ## 검증 (Safari 없이도 됨)
 

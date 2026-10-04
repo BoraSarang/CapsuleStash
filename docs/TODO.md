@@ -97,7 +97,7 @@
       - T-55: `SmartGroup` + `hits(for:)` 공용 파이프 + 사이드바 SMART 행(개수·팔레트 점프·현재 검색 저장·이름 변경·삭제) + UserDefaults 영속화, 테스트 7건
       - T-54: `alfred/` (Script Filter sqlite 읽기 전용·Enter 복사·⌘Enter 열기·계정은 홈페이지/아이디만, 실DB 검증) + `extensions/raycast/` (검색·클립보드 저장, tsc 통과·수신함 규격 Swift 테스트). 키 311개
 - [x] M5 브라우저 → v1.0: T-49 Safari Web Extension (URL scheme 채널)
-      - `extensions/safari/` (MV3 팝업·현재 탭 저장) + JS↔Swift 규격 테스트(`testParsesSafariExtensionURL`). Safari 클릭 실동작은 수동 확인 필요
+      - `extensions/safari/` (MV3 팝업·현재 탭 저장) + JS↔Swift 규격 테스트(`testParsesSafariExtensionURL`). 2026-10-04 Safari 실클릭 수동 확인됨 (팝업 저장→Inbox 웹 아카이브)
 
 ## 1.0 이후 (연기)
 
