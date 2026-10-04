@@ -55,8 +55,15 @@ final class FolderImportTests: XCTestCase {
     }
 
     @MainActor
-    func testImportFolderRejects() throws {
-        let dir = try TestHelpers.makeTempDir()
+    func testScanFolder() throws {
+        let scanned = DataStore.scanFolder(try makeTree(), maxFileBytes: 100)
+        XCTAssertEqual(scanned.projects, 2)
+        XCTAssertEqual(scanned.files, 5)
+        XCTAssertEqual(DataStore.scanFolder(URL(fileURLWithPath: "/없음")).files, 0)
+    }
+
+    @MainActor
+    func testImportFolderRejects() throws {        let dir = try TestHelpers.makeTempDir()
         let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
         let empty = store.importFolder(dir.appendingPathComponent("없음"))
         XCTAssertEqual(empty.blocks, 0)
