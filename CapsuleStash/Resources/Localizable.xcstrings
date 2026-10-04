@@ -5328,6 +5328,54 @@
           }
         }
       }
+    },
+    "변경 %lld줄 보기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show %lld changed lines"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "변경 %lld줄 보기"
+          }
+        }
+      }
+    },
+    "변경 닫기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide changes"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "변경 닫기"
+          }
+        }
+      }
+    },
+    "외 %lld줄": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "+%lld more lines"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "외 %lld줄"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

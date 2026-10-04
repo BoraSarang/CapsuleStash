@@ -194,6 +194,29 @@ final class TrashTests: XCTestCase {
         XCTAssertFalse(store.restoreVersion(blockId: block.id, versionId: UUID()), "없는 버전 거부")
     }
 
+    // MARK: - 버전 diff (순수 함수)
+
+    func testDiffDetectsChanges() {
+        let result = TextDiff.diff(old: "a\nb\nc", new: "a\nB\nc")
+        XCTAssertEqual(result.changed, 2)
+        let signs = result.lines.map(\.sign)
+        XCTAssertTrue(signs.contains("-") && signs.contains("+"))
+        XCTAssertTrue(TextDiff.diff(old: "same", new: "same").lines.isEmpty, "변경 없으면 빈 diff")
+        XCTAssertEqual(TextDiff.diff(old: "", new: "").changed, 0)
+    }
+
+    func testDiffContextAndCap() {
+        let old = (0..<10).map { "line\($0)" }.joined(separator: "\n")
+        let new = (0..<10).map { $0 == 5 ? "CHANGED" : "line\($0)" }.joined(separator: "\n")
+        let result = TextDiff.diff(old: old, new: new, context: 1, maxLines: 100)
+        XCTAssertEqual(result.changed, 2)
+        // 문맥 1줄: line4, -line5, +CHANGED, line6
+        XCTAssertEqual(result.lines.count, 4)
+        let capped = TextDiff.diff(old: old, new: new, context: 9, maxLines: 5)
+        XCTAssertGreaterThan(capped.omitted, 0, "초과분 생략 표시")
+        XCTAssertEqual(capped.lines.count, 5)
+    }
+
     // MARK: - 영속화
 
     @MainActor
