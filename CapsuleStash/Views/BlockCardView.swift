@@ -138,9 +138,10 @@ struct BlockCardView: View {
                 store.toggleBlockCollapsed(block)
             }
 
-            // T-37 Menu 대신 Button+팝오버 (이미지 카드에서 Menu가 안 열리는 문제 회피)
-            Button {
-                showMoreMenu = true
+            // 팝오버 대신 네이티브 Menu (베타 popover 크래시 회피).
+            // T-37에서 이미지 카드 Menu가 안 열리던 전적 있음 — 재발 시 별도 대응.
+            Menu {
+                cardMoreMenu
             } label: {
                 Image(systemName: "ellipsis")
                     .font(.system(size: 12, weight: .semibold))
@@ -150,10 +151,6 @@ struct BlockCardView: View {
             }
             .buttonStyle(.plain)
             .help("더 보기")
-            .popover(isPresented: $showMoreMenu) {
-                cardMoreMenu
-                    .environment(\.locale, AppLanguage.effectiveLocale)
-            }
         }
         .padding(.horizontal, Theme.blockPadding)
         .padding(.vertical, 12)
@@ -169,9 +166,9 @@ struct BlockCardView: View {
         }
     }
 
-    // MARK: - 더보기 팝오버 (T-37)
+    // MARK: - 더보기 메뉴 (T-37: 팝오버→Menu, 베타 popover 크래시 회피)
 
-    /// 카드 ··· 메뉴. Menu 대신 팝오버로 띄운다.
+    /// 카드 ··· 메뉴. Menu가 열리면 자동 닫히므로 showMoreMenu 세터는 유지용.
     private var cardMoreMenu: some View {
         VStack(alignment: .leading, spacing: 2) {
             Button(canInlineEdit ? LocalizedStringKey("편집") : LocalizedStringKey("편집…")) {

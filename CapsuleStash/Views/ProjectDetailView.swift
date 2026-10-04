@@ -13,7 +13,6 @@ struct ProjectDetailView: View {
     @State private var titleDraft = ""
     @State private var isEditingTags = false
     @State private var newTagText = ""
-    @State private var isAddingBlock = false
     @State private var isDropTargeted = false
     @State private var railOpen = false
     @Environment(\.locale) private var locale
@@ -310,9 +309,17 @@ struct ProjectDetailView: View {
         .padding(.vertical, 48)
     }
 
+    /// 팝오버 대신 네이티브 Menu (베타 popover 크래시 회피 — ContentView.addMenu 참조).
     private var addBlockRow: some View {
-        Button {
-            isAddingBlock = true
+        Menu {
+            ForEach(BlockType.pickable) { type in
+                Button {
+                    appState.requestBlockCreation(type: type, in: project.id)
+                } label: {
+                    LText(key: type.displayName)
+                }
+                .help(L10n.string(type.purposeHint))
+            }
         } label: {
             Image(systemName: "plus.circle.fill")
                 .font(.system(size: 20))
@@ -324,9 +331,6 @@ struct ProjectDetailView: View {
         }
         .buttonStyle(.plain)
         .help("블록 추가")
-        .popover(isPresented: $isAddingBlock) {
-            BlockTypePicker(projectId: project.id) { isAddingBlock = false }
-        }
         .padding(.top, 16)
         .padding(.bottom, 40)
     }
