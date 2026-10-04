@@ -2,12 +2,18 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <!--
   Capsule Stash Alfred 워크플로 (T-54). `cs <검색어>` → Enter 복사 · ⌘Enter 앱에서 열기.
-  더블클릭으로 가져오기가 안 되면 README의 수동 연결을 따라 하세요 (2분).
+  스키마 주의: Run Script config `type`은 언어 열거형 (0=bash) — 없는 값을 넣으면
+  Alfred가 "incompatible workflow"로 찍는다 (2026-10-04 실측, type:2 → 불가).
+  Script Filter는 argv 모드(`$1`)라 따옴표 이스케이프 걱정이 없다.
 -->
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
 	<string>com.borasarang.capsulestash</string>
+	<key>category</key>
+	<string>Tools</string>
+	<key>createdby</key>
+	<string>BoraSarang</string>
 	<key>name</key>
 	<string>Capsule Stash</string>
 	<key>description</key>
@@ -18,6 +24,10 @@
 	<string>0.5.0</string>
 	<key>webaddress</key>
 	<string>https://github.com/BoraSarang/CapsuleStash</string>
+	<key>readme</key>
+	<string>cs &lt;검색어&gt; → Enter 복사 · ⌘Enter 앱에서 열기. 계정 블록은 홈페이지·아이디만 복사된다.</string>
+	<key>variablesdontexport</key>
+	<array/>
 	<key>objects</key>
 	<array>
 		<dict>
@@ -29,6 +39,8 @@
 			<integer>1</integer>
 			<key>config</key>
 			<dict>
+				<key>argumenttype</key>
+				<integer>0</integer>
 				<key>keyword</key>
 				<string>cs</string>
 				<key>subtext</key>
@@ -48,14 +60,42 @@
 			<integer>3</integer>
 			<key>config</key>
 			<dict>
-				<key>script</key>
-				<string>./search.py "{query}"</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>withspace</key>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
 				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
 				<key>runningsubtext</key>
 				<string>검색 중…</string>
+				<key>script</key>
+				<string>./search.py "$1"</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string></string>
+				<key>title</key>
+				<string>Capsule Stash 검색</string>
+				<key>type</key>
+				<integer>0</integer>
+				<key>withspace</key>
+				<true/>
 			</dict>
 		</dict>
 		<dict>
@@ -67,10 +107,18 @@
 			<integer>2</integer>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
 				<key>script</key>
 				<string>./copy-or-open.sh</string>
+				<key>scriptargtype</key>
+				<integer>0</integer>
+				<key>scriptfile</key>
+				<string></string>
 				<key>type</key>
-				<integer>2</integer>
+				<integer>0</integer>
 			</dict>
 		</dict>
 	</array>
@@ -87,6 +135,8 @@
 				<string></string>
 				<key>viable</key>
 				<true/>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 		<key>CS-FILTER-001</key>
@@ -100,6 +150,8 @@
 				<string></string>
 				<key>viable</key>
 				<true/>
+				<key>vitoclose</key>
+				<false/>
 			</dict>
 		</array>
 	</dict>
@@ -108,23 +160,23 @@
 		<key>CS-KEYWORD-001</key>
 		<dict>
 			<key>xpos</key>
-			<real>100</real>
+			<integer>100</integer>
 			<key>ypos</key>
-			<real>100</real>
+			<integer>100</integer>
 		</dict>
 		<key>CS-FILTER-001</key>
 		<dict>
 			<key>xpos</key>
-			<real>300</real>
+			<integer>300</integer>
 			<key>ypos</key>
-			<real>100</real>
+			<integer>100</integer>
 		</dict>
 		<key>CS-ACTION-001</key>
 		<dict>
 			<key>xpos</key>
-			<real>500</real>
+			<integer>500</integer>
 			<key>ypos</key>
-			<real>100</real>
+			<integer>100</integer>
 		</dict>
 	</dict>
 </dict>

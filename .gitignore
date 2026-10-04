@@ -5,3 +5,6 @@ DerivedData/
 
 # Raycast 확장 의존성 (타입체크용 로컬 설치)
 extensions/raycast/node_modules/
+
+# Alfred 빌드 산출물 (README 명령으로 재생성)
+*.alfredworkflow
