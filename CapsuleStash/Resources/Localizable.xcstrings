@@ -5376,6 +5376,54 @@
           }
         }
       }
+    },
+    "폴더 가져오기": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import folder"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "폴더 가져오기"
+          }
+        }
+      }
+    },
+    "가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a folder to import. Subfolders become projects."
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다."
+          }
+        }
+      }
+    },
+    "파일 %lld개 건너뜀": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Skipped %lld files"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "파일 %lld개 건너뜀"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

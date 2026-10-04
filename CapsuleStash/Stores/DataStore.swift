@@ -445,12 +445,109 @@ final class DataStore: ObservableObject {
         }
     }
 
+    /// 폴더 통째로 가져오기 결과.
+    struct FolderImportReport {
+        var projects: Int = 0
+        var blocks: Int = 0
+        var skipped: [String] = []
+    }
+
+    /// 폴더 구조를 Workspace(Project 묶음)로 편입한다.
+    /// 최상위 폴더→Workspace, 하위 폴더→Project, 루트 파일→"기타" 문서.
+    /// md/txt는 내용 블록, 이미지는 이미지 블록, 나머지는 파일 블록 (1파일 1블록).
+    /// 100MB 초과·번들·심볼릭링크·숨김은 건너뛴다. 동기 실행 (호출자가 백그라운드로).
+    @discardableResult
+    func importFolder(_ root: URL, maxFileBytes: Int = 100 * 1024 * 1024) -> FolderImportReport {
+        var report = FolderImportReport()
+        var isDir = ObjCBool(false)
+        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir),
+              isDir.boolValue else { return report }
+        let skipDirNames: Set<String> = [".git", "node_modules", "__pycache__", ".svn"]
+        let bundleExts: Set<String> = ["app", "appex", "framework", "bundle", "xcodeproj",
+                                       "playground", "xcworkspace", "lproj"]
+        // topDir → [(fileURL)] 수집 후 이름순으로 확정
+        var groups: [String: [URL]] = [:]
+        let rootParts = root.resolvingSymlinksInPath().pathComponents
+        let enumerator = FileManager.default.enumerator(
+            at: root, includingPropertiesForKeys: [.isDirectoryKey, .isHiddenKey, .isSymbolicLinkKey],
+            options: [.skipsHiddenFiles, .skipsPackageDescendants])
+        while let url = enumerator?.nextObject() as? URL {
+            guard let values = try? url.resourceValues(forKeys: [.isDirectoryKey, .isSymbolicLinkKey]),
+                  values.isSymbolicLink != true else { continue }
+            if values.isDirectory == true {
+                if skipDirNames.contains(url.lastPathComponent) { enumerator?.skipDescendants() }
+                continue
+            }
+            if bundleExts.contains(url.pathExtension.lowercased()) {
+                report.skipped.append(url.lastPathComponent)
+                continue
+            }
+            let parts = url.resolvingSymlinksInPath().pathComponents
+            guard parts.starts(with: rootParts) else { continue }
+            let rel = Array(parts.dropFirst(rootParts.count))
+            let group: String
+            if rel.count > 1 {
+                group = rel[0]
+            } else {
+                group = "기타"
+            }
+            groups[group, default: []].append(url)
+        }
+        guard !groups.isEmpty else { return report }
+        createWorkspace(name: root.lastPathComponent)
+        guard let ws = workspaces.last else { return report }
+        for group in groups.keys.sorted() {
+            var projectId: UUID?
+            for file in groups[group]!.sorted(by: { $0.path < $1.path }) {
+                guard let size = try? file.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+                      size <= maxFileBytes else {
+                    report.skipped.append(file.lastPathComponent)
+                    continue
+                }
+                if projectId == nil {
+                    guard let created = createProject(title: group, in: ws.id) else { continue }
+                    projectId = created.id
+                    report.projects += 1
+                }
+                if importFolderFile(file, to: projectId!) { report.blocks += 1 }
+                else { report.skipped.append(file.lastPathComponent) }
+            }
+        }
+        if let first = workspaces.last?.projects.first { select(first) }
+        DebugLogger.feature("폴더 가져오기: 문서 \(report.projects)개·블록 \(report.blocks)개·건너뜀 \(report.skipped.count)개")
+        return report
+    }
+
+    /// 폴더 가져오기용 1파일 처리. 성공하면 true.
+    private func importFolderFile(_ file: URL, to projectId: UUID) -> Bool {
+        let stem = file.deletingPathExtension().lastPathComponent
+        let title = stem.isEmpty ? "파일" : String(stem.prefix(40))
+        if AttachmentStore.isImageFile(file) {
+            let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.imagesKind,
+                                                    baseDirectory: attachmentBaseDirectory)
+            guard !names.isEmpty else { return false }
+            insertBlock(Block(projectId: projectId, type: .image, title: title, imageNames: names))
+            return true
+        }
+        if let type = Self.textBlockType(for: file),
+           let content = Self.readableText(from: file),
+           !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            insertBlock(Block(projectId: projectId, type: type, title: title, content: content))
+            return true
+        }
+        // 읽히지 않는 텍스트 파일 포함 나머지는 파일 블록으로 폴백
+        let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.filesKind,
+                                                baseDirectory: attachmentBaseDirectory)
+        guard !names.isEmpty else { return false }
+        insertBlock(Block(projectId: projectId, type: .file, title: title, imageNames: names))
+        return true
+    }
+
     /// T-14 텍스트 드롭 → 텍스트 블록. 빈 문자열은 무시한다.
     @discardableResult
     func importTextDrop(_ text: String, to projectId: UUID) -> Bool {
         importDroppedText(text, type: .text, to: projectId)
     }
-
     /// 내용물로만 온 md 드롭 → markdown 블록 (파일 URL 없이 UTI만 오는 경우).
     /// 제목은 파일명이 없어 첫 줄을 쓴다 (텍스트 드롭과 동일 규칙).
     @discardableResult
