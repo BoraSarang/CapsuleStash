@@ -129,6 +129,7 @@ struct SettingsView: View {
                 HStack {
                     Button("전체 내보내기 (JSON)") { exportAll() }
                     Button("가져오기 (JSON)") { importJSON() }
+                    Button("폴더 가져오기") { importFolderPanel() }
                     Spacer()
                 }
                 .padding(.top, 2)
@@ -301,6 +302,27 @@ struct SettingsView: View {
         } catch {
             DebugLogger.error(code: ErrorCode.storeSave, "가져오기 실패")
             appState.notify("가져오기 실패")
+        }
+    }
+
+    /// 폴더 통째로 가져오기 (하위 폴더→문서, md/txt→내용 블록).
+    /// 파일 IO가 무거울 수 있어 백그라운드에서 돌리고 토스트로 알린다.
+    private func importFolderPanel() {
+        let panel = NSOpenPanel()
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.message = L10n.string("가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다.")
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+        Task.detached(priority: .userInitiated) {
+            let report = await MainActor.run { store.importFolder(url) }
+            await MainActor.run {
+                var message = L10n.format("블록 %lld개 추가됨", report.blocks)
+                if !report.skipped.isEmpty {
+                    message += " · " + L10n.format("파일 %lld개 건너뜀", report.skipped.count)
+                }
+                appState.notify(message)
+            }
         }
     }
 
