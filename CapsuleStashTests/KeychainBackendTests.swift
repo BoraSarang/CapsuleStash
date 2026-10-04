@@ -54,7 +54,7 @@ final class KeychainBackendTests: XCTestCase {
     }
 
     @MainActor
-    func testDeleteBlockClearsKeychain() throws {
+    func testDeleteBlockKeepsKeychainUntilForever() throws {
         KeychainStore.inMemory = [:]
         defer { KeychainStore.inMemory = nil }
         let store = TestHelpers.makeStore()
@@ -63,7 +63,9 @@ final class KeychainBackendTests: XCTestCase {
         }
         try KeychainStore.save(blockId: block.id, secrets: .init(password: "pw", secondSecret: ""))
         store.deleteBlock(block)
-        XCTAssertNil(KeychainStore.load(blockId: block.id), "삭제된 블록의 시크릿은 Keychain에서도 지워야 함")
+        XCTAssertNotNil(KeychainStore.load(blockId: block.id), "휴지통 보관 중에는 복원을 위해 유지")
+        XCTAssertTrue(store.deleteForever(block.id))
+        XCTAssertNil(KeychainStore.load(blockId: block.id), "완전 삭제 때 Keychain 정리")
     }
 
     // MARK: - SwiftData 백엔드 (T-11, 임시 폴더 격리)

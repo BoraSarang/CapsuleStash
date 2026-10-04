@@ -92,6 +92,8 @@ final class SDBlock {
     var sortOrder: Int
     var createdAt: Date
     var updatedAt: Date
+    /// 버전 기록 JSON (BlockVersion 배열 직렬화). Transformable 대신 문자열로 둔다.
+    var versionsJSON: String = ""
     var project: SDProject?
 
     init(id: UUID = UUID(), projectId: UUID, typeRaw: String, title: String,
@@ -100,7 +102,8 @@ final class SDBlock {
          credHomepage: String = "", credUsername: String = "", hasCredential: Bool = false,
          archiveFile: String? = nil, pdfFile: String? = nil, thumbnailFile: String? = nil,
          isCollapsed: Bool = false, sortOrder: Int = 0,
-         createdAt: Date = Date(), updatedAt: Date = Date()) {
+         createdAt: Date = Date(), updatedAt: Date = Date(),
+         versionsJSON: String = "") {
         self.id = id
         self.projectId = projectId
         self.typeRaw = typeRaw
@@ -121,6 +124,7 @@ final class SDBlock {
         self.sortOrder = sortOrder
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.versionsJSON = versionsJSON
     }
 }
 
@@ -249,6 +253,11 @@ private extension Block {
         let credential = entity.hasCredential
             ? Credential(homepage: entity.credHomepage, username: entity.credUsername)
             : nil
+        var versions: [BlockVersion] = []
+        if !entity.versionsJSON.isEmpty,
+           let data = entity.versionsJSON.data(using: .utf8) {
+            versions = (try? JSONDecoder().decode([BlockVersion].self, from: data)) ?? []
+        }
         self.init(id: entity.id, projectId: projectId,
                   type: BlockType(rawValue: entity.typeRaw) ?? .text,
                   title: entity.title, content: entity.content, language: entity.language,
@@ -258,7 +267,8 @@ private extension Block {
                   thumbnailFile: entity.thumbnailFile,
                   credential: credential,
                   isCollapsed: entity.isCollapsed, sortOrder: entity.sortOrder,
-                  createdAt: entity.createdAt, updatedAt: entity.updatedAt)
+                  createdAt: entity.createdAt, updatedAt: entity.updatedAt,
+                  versions: versions)
     }
 }
 
@@ -266,6 +276,11 @@ private extension SDBlock {
     /// 구조체 → 엔티티. [HARD] 시크릿은 절대 담지 않는다 (호출 전 persistableSnapshot).
     /// 순서는 저장 시점 배열 인덱스로 정규화한다 (동점 sortOrder의 SQLite 비결정 순서 방지).
     convenience init(entityOf block: Block, projectId: UUID, sortOrder: Int) {
+        var versionsJSON = ""
+        if !block.versions.isEmpty,
+           let data = try? JSONEncoder().encode(block.versions) {
+            versionsJSON = String(data: data, encoding: .utf8) ?? ""
+        }
         self.init(id: block.id, projectId: projectId,
                   typeRaw: block.type.rawValue, title: block.title, content: block.content,
                   language: block.language, url: block.url, siteName: block.siteName,
@@ -276,6 +291,7 @@ private extension SDBlock {
                   archiveFile: block.archiveFile, pdfFile: block.pdfFile,
                   thumbnailFile: block.thumbnailFile,
                   isCollapsed: block.isCollapsed, sortOrder: sortOrder,
-                  createdAt: block.createdAt, updatedAt: block.updatedAt)
+                  createdAt: block.createdAt, updatedAt: block.updatedAt,
+                  versionsJSON: versionsJSON)
     }
 }

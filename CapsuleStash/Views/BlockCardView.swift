@@ -19,6 +19,8 @@ struct BlockCardView: View {
     @State private var draftContent = ""
     @State private var showDeleteConfirm = false
     @State private var showMoreMenu = false
+    /// T-58 버전 기록 시트 대상 (nil이면 닫힘)
+    @State private var versionTarget: Block?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -162,7 +164,10 @@ struct BlockCardView: View {
             }
             Button("취소", role: .cancel) {}
         } message: {
-            Text("첨부·아카이브 파일도 함께 사라집니다.")
+            Text(L10n.string("휴지통으로 이동합니다. 30일 보관됩니다."))
+        }
+        .sheet(item: $versionTarget) { target in
+            BlockVersionSheet(blockId: target.id)
         }
     }
 
@@ -187,6 +192,22 @@ struct BlockCardView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
             }
+            Button {
+                showMoreMenu = false
+                versionTarget = block
+            } label: {
+                HStack(spacing: 4) {
+                    LText(key: "버전 기록")
+                    if !block.versions.isEmpty {
+                        Text("\(block.versions.count)")
+                            .font(.system(size: 11, design: .monospaced))
+                            .foregroundStyle(Theme.muted)
+                    }
+                }
+            }
+            .buttonStyle(.plain)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
             Divider()
             Button("위로") {
                 showMoreMenu = false

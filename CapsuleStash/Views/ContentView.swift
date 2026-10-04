@@ -136,7 +136,9 @@ struct ContentView: View {
 
     @ViewBuilder
     private var detail: some View {
-        if let project = store.selectedProject, let located = store.locate(project) {
+        if store.isTrashSelected {
+            TrashView()
+        } else if let project = store.selectedProject, let located = store.locate(project) {
             ProjectDetailView(
                 project: project,
                 workspaceName: located.workspace.name
