@@ -110,6 +110,40 @@ final class ContentCollectTests: XCTestCase {
         XCTAssertTrue(DataStore.filterBlocks(blocks, by: .image).isEmpty)
     }
 
+    // MARK: - 끼워넣기 (`![[제목]]`)
+
+    func testEmbedParsesOwnLineOnly() {
+        let segs = MarkdownSegment.parse("앞줄\n![[이미지]]\n뒷줄")
+        XCTAssertEqual(segs.count, 3)
+        guard case .embed(let title) = segs[1] else { return XCTFail("embed 아님: \(segs)") }
+        XCTAssertEqual(title, "이미지")
+        // 문장 중간은 리터럴
+        let inline = MarkdownSegment.parse("그림 ![[이미지]] 참고")
+        XCTAssertFalse(inline.contains { if case .embed = $0 { return true }; return false })
+        // 빈 제목·닫힘 없음은 리터럴
+        XCTAssertFalse(MarkdownSegment.parse("![[]]").contains { if case .embed = $0 { return true }; return false })
+        XCTAssertFalse(MarkdownSegment.parse("![[열림").contains { if case .embed = $0 { return true }; return false })
+        // 앞뒤 공백 허용
+        guard case .embed(let trimmed) = MarkdownSegment.parse("  ![[ 띄움 ]]  ")[0] else {
+            return XCTFail("공백 허용 안 됨")
+        }
+        XCTAssertEqual(trimmed, "띄움")
+    }
+
+    func testResolveEmbed() {
+        let pid = UUID()
+        let blocks = [
+            Block(projectId: pid, type: .image, title: "도식", content: ""),
+            Block(projectId: pid, type: .text, title: "도식", content: "둘째"),
+            Block(projectId: pid, type: .text, title: "메모", content: "a"),
+        ]
+        // 첫 일치 (정렬 순서대로, 입력 순서 유지)
+        XCTAssertEqual(DataStore.resolveEmbed(title: "도식", in: blocks)?.content, "")
+        XCTAssertNil(DataStore.resolveEmbed(title: "없음", in: blocks))
+        XCTAssertNil(DataStore.resolveEmbed(title: "  ", in: blocks))
+        XCTAssertNil(DataStore.resolveEmbed(title: "도", in: blocks), "부분 일치는 안 함")
+    }
+
     // MARK: - 이어보기 (합친 마크다운 재사용)
 
     @MainActor

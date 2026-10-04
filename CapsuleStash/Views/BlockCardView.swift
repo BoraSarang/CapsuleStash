@@ -274,7 +274,9 @@ struct BlockCardView: View {
             if isInlineEditing {
                 inlineEditor(mono: false)
             } else {
-                MarkdownBody(text: block.content)
+                MarkdownBody(text: block.content, resolve: { [projectId = block.projectId] title in
+                    store.resolveEmbed(title: title, in: projectId)
+                })
                     .onTapGesture(count: 2) { startInlineEdit() }
             }
         default:

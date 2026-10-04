@@ -30,7 +30,9 @@ struct ProjectDetailView: View {
                         emptyBlocks
                     } else if isContinuous {
                         // 이어보기: 내보내기와 같은 마크다운을 카드 없이 이어서 보여준다.
-                        MarkdownBody(text: LibraryTransfer.markdown(for: project))
+                        MarkdownBody(text: LibraryTransfer.markdown(for: project), resolve: { title in
+                            store.resolveEmbed(title: title, in: project.id)
+                        })
                             .padding(.top, 4)
                     } else if visibleBlocks.isEmpty {
                         Text(L10n.string("해당 타입의 블록이 없습니다"))
