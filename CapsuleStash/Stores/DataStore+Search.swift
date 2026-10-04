@@ -86,6 +86,19 @@ extension DataStore {
         return candidates.contains { $0.normalizedForSearch.contains(normalized) }
     }
 
+    /// 끼워넣기 해석. 같은 문서에서 제목이(정규화 후) 일치하는 첫 블록. 순수 함수.
+    nonisolated static func resolveEmbed(title: String, in blocks: [Block]) -> Block? {
+        let want = title.normalizedForSearch
+        guard !want.isEmpty else { return nil }
+        return blocks.first { $0.title.normalizedForSearch == want }
+    }
+
+    /// 문서 ID로 끼워넣기 해석.
+    func resolveEmbed(title: String, in projectId: UUID) -> Block? {
+        guard let entry = allProjects.first(where: { $0.project.id == projectId }) else { return nil }
+        return Self.resolveEmbed(title: title, in: entry.project.sortedBlocks)
+    }
+
     /// 문서 내 타입 필터 (nil이면 전체). 타입 선택 드롭다운용. 순수 함수.
     nonisolated static func filterBlocks(_ blocks: [Block], by type: BlockType?) -> [Block] {
         guard let type else { return blocks }

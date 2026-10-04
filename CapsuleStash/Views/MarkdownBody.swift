@@ -11,6 +11,8 @@ enum MarkdownSegment: Equatable {
     case table(header: [String], rows: [[String]])
     case paragraph(lines: [String])
     case blank
+    /// 끼워넣기. 단독 행 `![[블록 제목]]`만 해당 (문장 중간은 리터럴). 1단계만 펼친다.
+    case embed(title: String)
 
     /// 행 단위 파싱. 순수 함수라 테스트가 직접 검증한다.
     static func parse(_ text: String) -> [MarkdownSegment] {
@@ -105,6 +107,17 @@ enum MarkdownSegment: Equatable {
                 bulletItems.append(String(trimmed.dropFirst(2)).trimmingCharacters(in: .whitespaces))
                 index += 1
                 continue
+            }
+            // 끼워넣기: 행 전체가 `![[제목]]`일 때만. 앞뒤 공백 허용, 빈 제목은 리터럴.
+            if trimmed.hasPrefix("![["), trimmed.hasSuffix("]]") {
+                let inner = String(trimmed.dropFirst(3).dropLast(2))
+                    .trimmingCharacters(in: .whitespaces)
+                if !inner.isEmpty {
+                    flush()
+                    segments.append(.embed(title: inner))
+                    index += 1
+                    continue
+                }
             }
             var level = 0
             for character in trimmed {
@@ -210,6 +223,8 @@ enum MarkdownInline: Equatable {
 /// 파싱 결과를 카드에 그린다. 색상은 토큰이라 라이트·다크 모두 보인다.
 struct MarkdownBody: View {
     let text: String
+    /// 끼워넣기 해석기. nil이면(중첩 렌더) `![[]]`는 리터럴로 보인다. 순환 방지용 1단계.
+    var resolve: ((String) -> Block?)? = nil
 
     /// 인라인 서식 적용. 기본 글꼴은 호출 쪽이 정하고 굵게·기울임·코드는 토큰마다 입힌다.
     static func styled(_ raw: String, base: Font) -> Text {
@@ -293,7 +308,81 @@ struct MarkdownBody: View {
             tableView(header: header, rows: rows)
         case .blank:
             Spacer(minLength: 2)
+        case .embed(let title):
+            if let block = resolve?(title) {
+                embedView(block)
+            } else {
+                Text("![[\(title)]]")
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.muted)
+            }
         }
+    }
+
+    /// 끼워넣은 블록 렌더. 중첩은 해석기 없이 그려서 순환을 끊는다.
+    /// [HARD] 계정은 홈페이지·아이디만 (내보내기와 동일).
+    private func embedView(_ block: Block) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: block.type.symbolName)
+                    .font(.system(size: 11))
+                Text(block.title)
+                    .font(.system(size: 12, weight: .semibold))
+                    .lineLimit(1)
+            }
+            .foregroundStyle(Theme.muted)
+            switch block.type {
+            case .text:
+                Text(block.content)
+                    .font(.system(size: 14))
+                    .foregroundStyle(Theme.ink)
+            case .markdown:
+                // AnyView로 opaque 타입 순환(segmentView↔embedView)을 끊는다.
+                AnyView(MarkdownBody(text: block.content))
+            case .code, .shell:
+                AnyView(segmentView(.code(language: block.language ?? "",
+                                          lines: block.content.components(separatedBy: "\n"))))
+            case .webLink, .webArchive:
+                if let url = block.url, !url.isEmpty {
+                    Text(url)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.accent)
+                }
+                if !block.content.isEmpty {
+                    Text(block.content)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Theme.ink)
+                }
+            case .image, .file:
+                ForEach(block.imageNames, id: \.self) { name in
+                    HStack(spacing: 6) {
+                        Image(systemName: block.type == .image ? "photo" : "doc")
+                            .font(.system(size: 12))
+                        Text(name)
+                            .font(.system(size: 13))
+                            .lineLimit(1)
+                    }
+                    .foregroundStyle(Theme.muted)
+                }
+            case .credential:
+                if let credential = block.credential {
+                    if !credential.homepage.isEmpty {
+                        Text("\(L10n.string("홈페이지")): \(credential.homepage)")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.muted)
+                    }
+                    if !credential.username.isEmpty {
+                        Text("\(L10n.string("아이디")): \(credential.username)")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.muted)
+                    }
+                }
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.tagBackground, in: RoundedRectangle(cornerRadius: 10))
+        .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
     }
 
     /// 표 렌더링. 헤더 굵게 + 행 줄무늬 없이 선으로만 구분.
