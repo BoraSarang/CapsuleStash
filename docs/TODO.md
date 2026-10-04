@@ -83,32 +83,25 @@
 
 - [x] Dock 아이콘 표시 여부 → 설정(⌘,) 일반에 토글 추가, 기본 숨김(아니오, `LSUIElement` YES). 켜면 즉시 `.regular` 전환
 
-## 1.0 (계획, PLAN: docs/plans/PLAN_v1.0_macos.md)
+## 1.0 (완료, PLAN: docs/plans/PLAN_v1.0_macos.md)
 
 - [x] M1 안전망 → v0.2.0: T-50 일괄 내보내기(JSON/MD 왕복), T-51 자동 백업(1일 1회·7세대·복원)
       - T-50: `LibraryTransfer` (버전 봉투·스냅샷·ID 재발급·Markdown·파일명) + 사이드바(Workspace/Project별 JSON/MD)·설정(전체·가져오기), 테스트 8건. `persistableSnapshot` 비격리화, UTType.markdown→plainText(배포 타깃)
       - T-51: `BackupStore` (기동 1일 1회·7세대·토글·복원=가져오기 재사용) + 설정 자동 백업·지금 백업·복원·마지막 시각, 테스트 6건. 키 303개
-- [x] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
+- [x] M2 모으기 → v0.3.0: T-48 Share 확장(수신함 채널), T-53 URL scheme + Shortcuts
       - T-48: `SharedContainer` (그룹-or-폴백)·`InboxPayload`·`DataStore+Inbox` (Inbox 문서·파일 소비·텍스트/URL 저장) + appex 타깃 빌드·내장(adhoc), 테스트 7건
       - T-53: `capsule://search·save·open` 등록·처리 + App Intents 2종(저장·검색), `open` 실동작 검증(DB 저장 확인), 테스트 5건. 키 306개
       - xcodegen 교훈: `info`·`entitlements`는 `path`+`properties` 필수 (Plist 규격)
-- [ ] M2 모으기 → v0.3.0: T-48 Share 확장(수신함·App Group 전제), T-53 URL scheme + Shortcuts
-- [ ] M3 어디서든 → v0.4.0: T-52 CloudKit 동기화 (시크릿 제외 [HARD] 유지)
 - [x] M4 꺼내기 확장 → v0.5.0: T-54 Raycast 확장 + Alfred 워크플로, T-55 스마트 그룹(검색 문법 재사용), T-56 중첩 태그
       - T-56: `tagMatches` 접두 매칭(`tag:부모`→`부모/…`) + `addTag` 슬래시 접기, 힌트 문구 갱신
       - T-55: `SmartGroup` + `hits(for:)` 공용 파이프 + 사이드바 SMART 행(개수·팔레트 점프·현재 검색 저장·이름 변경·삭제) + UserDefaults 영속화, 테스트 7건
       - T-54: `alfred/` (Script Filter sqlite 읽기 전용·Enter 복사·⌘Enter 열기·계정은 홈페이지/아이디만, 실DB 검증) + `extensions/raycast/` (검색·클립보드 저장, tsc 통과·수신함 규격 Swift 테스트). 키 311개
 - [x] M5 브라우저 → v1.0: T-49 Safari Web Extension (URL scheme 채널)
       - `extensions/safari/` (MV3 팝업·현재 탭 저장) + JS↔Swift 규격 테스트(`testParsesSafariExtensionURL`). Safari 클릭 실동작은 수동 확인 필요
-- [ ] M3 동기화 → v0.4.0: T-52 CloudKit — **차단됨 (아래 §8)**
-- [ ] M6 1.0 마무리 (M5 이후, 우선순위 순): T-57 OCR(Vision 텍스트 추출), T-58 휴지통·버전 기록, T-59 모바일(iOS), T-60 협업·공유 금고
-
-## 8. 차단됨 (T-52 CloudKit)
-
-- 사유: iCloud 컨테이너는 유료 개발자 팀 + 포털 프로비저닝이 필수 (현재 adhoc 서명). 테스트 불가한 동기화는 데이터 손실 위험이라 코드도 안 짠다.
-- 해제 순서: 유료 팀 등록 → Certificates Identifiers & Profiles에 iCloud 컨테이너 생성 → `com.apple.developer.icloud-services` entitlement → SwiftData 네이티브 vs 직접 동기 설계 (T-52 착수 시) → 2기기 실동작 검증.
-- 시크릿 정책: Keychain은 동기화 대상 아님 ([HARD] 유지, 테스트로 고정 예정).
 
 ## 1.0 이후 (연기)
 
-- [ ] OCR, 휴지통·버전 기록, 모바일(iOS), 협업·공유 금고
+- [ ] T-52 CloudKit 동기화 — 유료 개발자 팀 + iCloud 컨테이너 프로비저닝 필요 (현재 adhoc).
+      해제 순서: 팀 등록 → 컨테이너 생성 → entitlement → 설계 결정 → 2기기 검증. 시크릿은 동기화 제외 ([HARD] 유지)
+- [ ] T-57 OCR, T-58 휴지통·버전 기록, T-59 모바일(iOS), T-60 협업·공유 금고
+- [ ] App Group 실동작 (프로비저닝 후 Share 확장이 그룹 컨테이너 사용, 코드는 준비됨)
