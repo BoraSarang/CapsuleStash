@@ -12,12 +12,18 @@
 
 1. Safari → 설정 → 고급 → "메뉴 막대에서 개발자용 메뉴 보기" 켜기.
 2. 개발자용 → "서명되지 않은 확장 허용".
-3. Xcode로 열기: 새로운 Safari Extension App 타깃을 만들고 이 폴더 파일을 넣거나,
-   `safari-web-extension-converter`로 변환 후 실행.
-   - 컨버터 주의: `--bundle-identifier` 뒤에 앱 이름이 덧붙어 부모 앱 ID가 바뀌면
-     "Embedded binary's bundle identifier is not prefixed..." 에러가 난다.
-     이때는 앱 타깃(확장 말고)의 Bundle Identifier를 확장 ID의 접두가 되게 고친다
-     (예: 앱 `com.borasarang.CapsuleStash.Saver` ← 확장 `...Saver.Extension`). ⇧⌘K 후 재빌드.
+3. 변환 + 번들 ID 패치 (한 번에, 저장소 루트에서):
+
+   ```sh
+   xcrun safari-web-extension-converter extensions/safari --macos-only --app-name "Capsule Stash Saver" --bundle-identifier com.borasarang.CapsuleStash.Saver --project-location /tmp/CapsuleSaver --copy-resources --no-prompt --force
+   sed -i '' 's/com.borasarang.CapsuleStash.Capsule-Stash-Saver/com.borasarang.CapsuleStash.Saver/g' "/tmp/CapsuleSaver/Capsule Stash Saver/Capsule Stash Saver.xcodeproj/project.pbxproj"
+   open "/tmp/CapsuleSaver/Capsule Stash Saver/Capsule Stash Saver.xcodeproj"
+   ```
+
+   패치가 필요한 이유: 컨버터가 부모 앱 ID 뒤에 앱 이름을 덧붙여서
+   (`...Saver` → `...Capsule-Stash-Saver`), 확장과 접두가 어긋나
+   "Embedded binary's bundle identifier is not prefixed..."로 빌드가 깨진다.
+   `sed`가 앱 타깃 ID를 확장 접두(`...Saver`)로 되돌린다. 변환할 때마다 실행.
 4. 팝업에서 "현재 탭 저장" → 앱 Inbox 문서에 저장됨.
    - 2026-10-04 수동 확인됨 (GitHub 탭 → Inbox 웹 아카이브 블록 + 오프라인 뱃지).
 
