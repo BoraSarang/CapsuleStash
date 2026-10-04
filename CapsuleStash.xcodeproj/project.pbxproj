@@ -17,6 +17,7 @@
 		16938C9858F5F09DBED29040 /* NameInputSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59A4F034330E57982C863E24 /* NameInputSheet.swift */; };
 		19712657EEF3A4A85B00CE00 /* SmartOrganizeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F98C64F42E645CEC6B848589 /* SmartOrganizeTests.swift */; };
 		1B4EB29328C20E13FBAECA1C /* TrashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 603F7FB366C297C5F336C4DA /* TrashView.swift */; };
+		1E9B24D143BE17652BD97BA0 /* TextDiff.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3683AC31E74922CEFF806542 /* TextDiff.swift */; };
 		24B6F2704CE4C753C67B1587 /* CapsuleLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E98279E8437685D4B9521EAD /* CapsuleLink.swift */; };
 		35E1D54957D09E11943321A4 /* SidebarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5E4E5C0FCE874021DADB73A /* SidebarView.swift */; };
 		37F40425974B258D9C9505DE /* AttachmentStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DB023F2B58C6526883F119 /* AttachmentStore.swift */; };
@@ -127,6 +128,7 @@
 		1D40FB9D15AA2F27473A4AF4 /* TransferTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferTests.swift; sourceTree = "<group>"; };
 		25528E0D0AE0B6544AB160EA /* CapsuleStash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CapsuleStash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3477784DD55376AB3F25A2F1 /* BlockWebBody.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockWebBody.swift; sourceTree = "<group>"; };
+		3683AC31E74922CEFF806542 /* TextDiff.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDiff.swift; sourceTree = "<group>"; };
 		36E7BA836EF3F5DF137C87AC /* CapsuleStashApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapsuleStashApp.swift; sourceTree = "<group>"; };
 		36F6E6FB6B9D6DA758C98D67 /* Components.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Components.swift; sourceTree = "<group>"; };
 		3AB19271EB0D20101096BBC8 /* GlobalHotKeyCenter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalHotKeyCenter.swift; sourceTree = "<group>"; };
@@ -329,6 +331,7 @@
 				A189978371990F5C1811829E /* Bundle+Version.swift */,
 				EA53E0271610032C09A7E68D /* DebugLogger.swift */,
 				B68667610BC99B452D6762DF /* L10n.swift */,
+				3683AC31E74922CEFF806542 /* TextDiff.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -525,6 +528,7 @@
 				9910CE4BF8266578ACC137E9 /* SharedContainer.swift in Sources */,
 				35E1D54957D09E11943321A4 /* SidebarView.swift in Sources */,
 				89881E99F5ED788BE7B6E1F6 /* SwiftDataBackend.swift in Sources */,
+				1E9B24D143BE17652BD97BA0 /* TextDiff.swift in Sources */,
 				E286AD7EE0B4F339DF467415 /* Theme.swift in Sources */,
 				1B4EB29328C20E13FBAECA1C /* TrashView.swift in Sources */,
 				0AFBA06B9EF986CAAA6F7491 /* UpdateAvailableSheet.swift in Sources */,

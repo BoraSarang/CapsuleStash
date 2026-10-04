@@ -7,6 +7,7 @@ struct BlockVersionSheet: View {
     @EnvironmentObject private var appState: AppState
     @Environment(\.locale) private var locale
     @Environment(\.dismiss) private var dismiss
+    @State private var expandedVersionId: UUID?
 
     let blockId: UUID
 
@@ -69,29 +70,75 @@ struct BlockVersionSheet: View {
     }
 
     private func versionRow(block: Block, version: BlockVersion) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(version.title)
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Theme.ink)
-                    .lineLimit(1)
-                Text(version.content)
-                    .font(.system(size: 13))
-                    .foregroundStyle(Theme.muted)
-                    .lineLimit(3)
-                Text(relative(version.savedAt))
-                    .font(.system(size: 12))
-                    .foregroundStyle(Theme.muted)
-            }
-            Spacer(minLength: 8)
-            CapsuleButton(title: "복원") {
-                if store.restoreVersion(blockId: block.id, versionId: version.id) {
-                    appState.notify(L10n.string("복원됨"))
+        let diff = TextDiff.diff(old: version.content, new: block.content)
+        return VStack(alignment: .leading, spacing: 6) {
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(version.title)
+                        .font(.system(size: 14, weight: .semibold))
+                        .foregroundStyle(Theme.ink)
+                        .lineLimit(1)
+                    Text(version.content)
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.muted)
+                        .lineLimit(3)
+                    Text(relative(version.savedAt))
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.muted)
                 }
+                Spacer(minLength: 8)
+                VStack(spacing: 6) {
+                    CapsuleButton(title: "복원") {
+                        if store.restoreVersion(blockId: block.id, versionId: version.id) {
+                            appState.notify(L10n.string("복원됨"))
+                        }
+                    }
+                    if diff.changed > 0 {
+                        Button {
+                            withAnimation(.easeOut(duration: 0.15)) {
+                                expandedVersionId = (expandedVersionId == version.id) ? nil : version.id
+                            }
+                        } label: {
+                            Text(expandedVersionId == version.id
+                                ? L10n.string("변경 닫기")
+                                : L10n.format("변경 %lld줄 보기", diff.changed))
+                        }
+                        .buttonStyle(.plain)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.accent)
+                    }
+                }
+            }
+            if expandedVersionId == version.id {
+                diffView(diff)
             }
         }
         .padding(10)
         .background(Theme.card, in: RoundedRectangle(cornerRadius: 10))
         .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(Theme.line, lineWidth: 1))
+    }
+
+    /// 변경 줄만 모노로. `-` 빨강, `+` 초록, 문맥은 회색.
+    private func diffView(_ diff: TextDiff.Result) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            ForEach(Array(diff.lines.enumerated()), id: \.offset) { _, line in
+                HStack(alignment: .top, spacing: 6) {
+                    Text(String(line.sign))
+                        .frame(width: 10)
+                    Text(line.text.isEmpty ? " " : line.text)
+                        .lineLimit(2)
+                }
+                .font(.system(size: 12, design: .monospaced))
+                .foregroundStyle(line.sign == "-" ? .red : line.sign == "+" ? .green : Theme.muted)
+            }
+            if diff.omitted > 0 {
+                Text(L10n.format("외 %lld줄", diff.omitted))
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.muted)
+            }
+        }
+        .padding(8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Theme.codeBackground, in: RoundedRectangle(cornerRadius: 8))
     }
 }
