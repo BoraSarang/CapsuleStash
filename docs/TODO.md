@@ -99,6 +99,13 @@
 - [x] M5 브라우저 → v1.0: T-49 Safari Web Extension (URL scheme 채널)
       - `extensions/safari/` (MV3 팝업·현재 탭 저장) + JS↔Swift 규격 테스트(`testParsesSafariExtensionURL`). 2026-10-04 Safari 실클릭 수동 확인됨 (팝업 저장→Inbox 웹 아카이브)
 
+## 일상 개선 (진행 중)
+
+- [x] md/txt 드롭 내용 인식: `.md`→markdown·`.txt`→text 블록으로 본문 읽기 (UTF-8·1MB 이하, 실패 시 파일 블록 폴백). 테스트 6건
+- [x] 타입별 보기: 문서 헤더 드롭다운(전체·타입별, 네이티브 Menu). 카드 목록·레일 적용. 테스트 1건
+- [x] 이어보기: 내보내기와 같은 합친 마크다운을 카드 없이 연속 렌더 (이미지·파일은 파일명 행, 계정은 홈페이지·아이디만). 토글 버튼. 테스트 1건
+- [ ] 끼워넣기 (`![[제목]]` transclusion): 설계만, 미착수
+
 ## 1.0 이후 (연기)
 
 - [ ] T-52 CloudKit 동기화 — 유료 개발자 팀 + iCloud 컨테이너 프로비저닝 필요 (현재 adhoc).

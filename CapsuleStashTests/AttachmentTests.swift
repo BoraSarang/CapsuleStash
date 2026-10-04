@@ -85,10 +85,10 @@ final class AttachmentTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: txt) }
 
         let created = store.importFileDrops([png, txt, URL(string: "https://example.com/a")!], to: project.id)
-        XCTAssertEqual(created, 3, "이미지+파일+웹링크 각 1블록")
+        XCTAssertEqual(created, 3, "이미지+텍스트+웹링크 각 1블록")
         let types = store.selectedProject?.blocks.map(\.type) ?? []
         XCTAssertTrue(types.contains(.image))
-        XCTAssertTrue(types.contains(.file))
+        XCTAssertTrue(types.contains(.text), ".txt는 내용 블록으로 읽힌다")
         let web = store.selectedProject?.blocks.first(where: { $0.type == .webArchive })
         XCTAssertEqual(web?.siteName, "example.com")
         XCTAssertTrue(FileManager.default.fileExists(
