@@ -363,7 +363,7 @@ struct ProjectDetailView: View {
         .padding(.vertical, 48)
     }
 
-    /// 팝오버 대신 네이티브 Menu (베타 popover 크래시 회피 — ContentView.addMenu 참조).
+    /// 팝오버 대신 네이티브 Menu (베타 popover 크래시 회피 — 유지 결정, ContentView.addMenu 참조).
     private var addBlockRow: some View {
         Menu {
             ForEach(BlockType.pickable) { type in

@@ -1,8 +1,7 @@
 import SwiftUI
 
 /// 블록 타입 선택 목록 (생성 우선: 시트 → 저장 시 생성).
-/// 베타 popover 크래시 회피로 + 자리는 네이티브 Menu로 대체되어 현재 미사용.
-/// 베타 종료 후 팝오버 복귀 시 재사용한다.
+/// + 자리는 네이티브 Menu로 대체되어(유지 결정) 현재 미사용.
 struct BlockTypePicker: View {
     @EnvironmentObject private var appState: AppState
 

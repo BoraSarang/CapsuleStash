@@ -107,7 +107,7 @@ struct ContentView: View {
 
     /// 팝오버 대신 네이티브 Menu — macOS 27 베타에서 SwiftUI popover present 시
     /// RenderBox GPU 스레드가 죽으며 앱이 함께 종료된다 (2026-10-04 실측 4건).
-    /// Toolbar Menu의 숨긴 인디케이터 비대칭(T-20)은 베타 기간 감수한다.
+    /// Menu로도 UX 문제없음 확인됨 → 유지. Toolbar 인디케이터 비대칭(T-20)은 감수.
     private var addMenu: some View {
         Menu {
             if let project = store.selectedProject {
