@@ -24,6 +24,7 @@ struct SettingsView: View {
     @AppStorage("hotkeyKeyCode") private var hotkeyCode = 47
     @AppStorage("hotkeyModifiers") private var hotkeyMods = Int(NSEvent.ModifierFlags.command.rawValue)
     @StateObject private var hotkeyRecorder = HotkeyRecorder()
+    @State private var folderConfirm: FolderImportChoice?
 
     var body: some View {
         Form {
@@ -207,9 +208,25 @@ struct SettingsView: View {
         } message: {
             Text((launchError ?? "") + "\n(\(ErrorCode.launchAtLogin))")
         }
+        .alert(item: $folderConfirm) { choice in
+            Alert(
+                title: Text(choice.url.lastPathComponent),
+                message: Text(L10n.format("문서 %lld개 · 파일 %lld개 가져옵니다", choice.projects, choice.files)),
+                primaryButton: .default(Text("가져오기")) { runFolderImport(choice.url) },
+                secondaryButton: .cancel(Text("취소"))
+            )
+        }
     }
 
     // MARK: - 동작
+
+    /// 폴더 가져오기 확인 모델 (얼럿 item용).
+    struct FolderImportChoice: Identifiable {
+        let id = UUID()
+        let url: URL
+        let projects: Int
+        let files: Int
+    }
 
     /// @AppStorage 값에서 조합을 읽는다 (저장 즉시 표시 갱신).
     private var currentHotkey: HotkeyCombo {
@@ -312,8 +329,21 @@ struct SettingsView: View {
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = true
         panel.canChooseFiles = false
+        panel.canCreateDirectories = false
+        panel.prompt = L10n.string("가져오기")
         panel.message = L10n.string("가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다.")
+        panel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
         guard panel.runModal() == .OK, let url = panel.url else { return }
+        // 폴더를 잘못 고르는 실수 방지: 개수 세서 확인받고 시작한다.
+        let scanned = DataStore.scanFolder(url)
+        guard scanned.files > 0 else {
+            appState.notify(L10n.string("가져올 파일이 없습니다"))
+            return
+        }
+        folderConfirm = FolderImportChoice(url: url, projects: scanned.projects, files: scanned.files)
+    }
+
+    private func runFolderImport(_ url: URL) {
         Task.detached(priority: .userInitiated) {
             let report = await MainActor.run { store.importFolder(url) }
             await MainActor.run {
