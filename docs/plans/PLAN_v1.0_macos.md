@@ -53,3 +53,5 @@
 - 2026-10-04 M4 완료 → v0.5.0: T-56·T-55(테스트 7건)·T-54(Alfred 실DB 검증·tsc 통과), 147개 통과, debug 배포·실행 중. 키 311개.
 - 2026-10-04 M5 완료: T-49 Safari 스캐폴드(JS↔Swift 규격 테스트), Safari 클릭은 수동 확인.
 - 2026-10-04 1.0 마무리: T-52·T-57~T-60·App Group 실동작을 1.0 이후로 제외. 1.0 = T-48·T-49·T-50·T-51·T-53·T-54·T-55·T-56.
+- 2026-10-04 v1.0.0 릴리스 발행: MARKETING_VERSION 1.0.0 (PR #15) → 태그 v1.0.0 → Actions Release 성공 (테스트+Release 빌드+ZIP). 릴리스 노트 `release-notes/v1.0.0.md`.
+  - 교훈: xcodegen 생성 Info.plist는 버전을 `1.0`으로 하드코딩한다 — `info.properties`에 `CFBundleShortVersionString`·`CFBundleVersion` 명시 필수.
