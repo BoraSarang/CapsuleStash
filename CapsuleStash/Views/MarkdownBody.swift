@@ -353,10 +353,13 @@ struct MarkdownBody: View {
                         .font(.system(size: 14))
                         .foregroundStyle(Theme.ink)
                 }
-            case .image, .file:
+            case .image:
+                // 카드와 같은 썸네일 그리드 재사용 (더블클릭 QuickLook 포함).
+                BlockThumbnailGrid(block: block)
+            case .file:
                 ForEach(block.imageNames, id: \.self) { name in
                     HStack(spacing: 6) {
-                        Image(systemName: block.type == .image ? "photo" : "doc")
+                        Image(systemName: "doc")
                             .font(.system(size: 12))
                         Text(name)
                             .font(.system(size: 13))
