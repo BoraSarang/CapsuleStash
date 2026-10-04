@@ -15,6 +15,10 @@ struct ProjectDetailView: View {
     @State private var newTagText = ""
     @State private var isDropTargeted = false
     @State private var railOpen = false
+    /// 문서 내 타입 필터 (nil=전체). 카드 목록·레일에 함께 적용.
+    @State private var typeFilter: BlockType? = nil
+    /// 이어보기(연속 마크다운) 모드. 카드 목록 대신 합친 글을 보여준다.
+    @State private var isContinuous = false
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -24,13 +28,23 @@ struct ProjectDetailView: View {
                     header
                     if project.sortedBlocks.isEmpty {
                         emptyBlocks
+                    } else if isContinuous {
+                        // 이어보기: 내보내기와 같은 마크다운을 카드 없이 이어서 보여준다.
+                        MarkdownBody(text: LibraryTransfer.markdown(for: project))
+                            .padding(.top, 4)
+                    } else if visibleBlocks.isEmpty {
+                        Text(L10n.string("해당 타입의 블록이 없습니다"))
+                            .font(.system(size: 14))
+                            .foregroundStyle(Theme.muted)
+                            .padding(.vertical, 48)
+                            .frame(maxWidth: .infinity)
                     } else {
                         VStack(spacing: Theme.blockSpacing) {
-                            ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                            ForEach(Array(visibleBlocks.enumerated()), id: \.element.id) { index, block in
                                 BlockCardView(
                                     block: block,
                                     isFirst: index == 0,
-                                    isLast: index == project.sortedBlocks.count - 1
+                                    isLast: index == visibleBlocks.count - 1
                                 )
                                 .id(block.id)
                             }
@@ -49,7 +63,7 @@ struct ProjectDetailView: View {
             .onChange(of: appState.pendingBlockScroll) { _, _ in consumePendingScroll(proxy) }
             // T-38 본문 우측 플로팅 블록 바로가기 (···). 접힌 블록은 펼치고 이동.
             .overlay(alignment: .trailing) {
-                if project.sortedBlocks.count > 1 {
+                if !isContinuous, visibleBlocks.count > 1 {
                     blockRail(proxy: proxy)
                 }
             }
@@ -71,6 +85,11 @@ struct ProjectDetailView: View {
                     .environmentObject(appState)
             }
         }
+    }
+
+    /// 타입 필터가 걸린 목록. 레일·카드 목록이 공유한다.
+    private var visibleBlocks: [Block] {
+        DataStore.filterBlocks(project.sortedBlocks, by: typeFilter)
     }
 
     /// T-43 팔레트에서 온 블록 이동 요청 처리. 펼치고 해당 위치로 스크롤한다.
@@ -101,7 +120,7 @@ struct ProjectDetailView: View {
             if railOpen {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
-                        ForEach(Array(project.sortedBlocks.enumerated()), id: \.element.id) { index, block in
+                        ForEach(Array(visibleBlocks.enumerated()), id: \.element.id) { index, block in
                             Button {
                                 railOpen = false
                                 scrollToBlock(block.id, proxy: proxy)
@@ -127,7 +146,7 @@ struct ProjectDetailView: View {
                             }
                             .buttonStyle(.plain)
                             .help(block.title)
-                            if index < project.sortedBlocks.count - 1 {
+                            if index < visibleBlocks.count - 1 {
                                 Divider().overlay(Theme.line)
                             }
                         }
@@ -207,6 +226,39 @@ struct ProjectDetailView: View {
                 ) {
                     let collapsed = !project.blocks.allSatisfy(\.isCollapsed)
                     store.setAllBlocksCollapsed(collapsed, in: project.id)
+                }
+                // 타입 필터 (카드 목록·레일에 적용). 네이티브 Menu라 베타에서도 안전.
+                Menu {
+                    Button {
+                        typeFilter = nil
+                    } label: {
+                        if typeFilter == nil { Image(systemName: "checkmark") }
+                        LText(key: "전체")
+                    }
+                    Divider()
+                    ForEach(BlockType.pickable) { type in
+                        Button {
+                            typeFilter = (typeFilter == type) ? nil : type
+                        } label: {
+                            if typeFilter == type { Image(systemName: "checkmark") }
+                            LText(key: type.displayName)
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Image(systemName: "line.3.horizontal.decrease.circle")
+                        if let type = typeFilter {
+                            LText(key: type.displayName)
+                        } else {
+                            LText(key: "전체")
+                        }
+                    }
+                }
+                .buttonStyle(.plain)
+                .help("타입별 보기")
+                // 이어보기: 카드 구분 없이 합친 마크다운으로 읽기
+                CapsuleButton(title: isContinuous ? "카드 보기" : "이어보기") {
+                    isContinuous.toggle()
                 }
                 CapsuleIconButton(
                     systemImage: project.isFavorite ? "star.fill" : "star",

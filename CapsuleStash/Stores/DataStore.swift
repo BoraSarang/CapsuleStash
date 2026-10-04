@@ -334,7 +334,8 @@ final class DataStore: ObservableObject {
         DebugLogger.feature("블록 추가: \(block.type.displayName)")
     }
 
-    /// T-14 외부 드롭 가져오기. 파일은 이미지/파일 블록으로, http(s) URL은 웹 링크로 만든다.
+    /// T-14 외부 드롭 가져오기. 파일은 이미지/텍스트내용/파일 블록으로, http(s) URL은 웹 링크로 만든다.
+    /// `.md`→markdown·`.txt`→text 블록으로 내용을 읽는다 (1MB 초과·디코딩 실패는 파일 블록 폴백).
     /// - Returns: 생성된 블록 수 (없는 Project면 0).
     @discardableResult
     func importFileDrops(_ urls: [URL], to projectId: UUID) -> Int {
@@ -352,11 +353,28 @@ final class DataStore: ObservableObject {
             }
         }
         let others = files.filter { !AttachmentStore.isImageFile($0) }
-        if !others.isEmpty {
-            let names = AttachmentStore.importFiles(from: others, kind: AttachmentStore.filesKind,
+        // 텍스트로 읽히는 파일은 내용 블록으로 (md→markdown, txt→text). 나머지만 파일 블록.
+        var textItems: [(type: BlockType, title: String, content: String)] = []
+        var binaries: [URL] = []
+        for url in others {
+            if let type = Self.textBlockType(for: url),
+               let content = Self.readableText(from: url),
+               !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                let stem = url.deletingPathExtension().lastPathComponent
+                textItems.append((type, stem.isEmpty ? type.displayName : String(stem.prefix(40)), content))
+            } else {
+                binaries.append(url)
+            }
+        }
+        for item in textItems {
+            insertBlock(Block(projectId: projectId, type: item.type, title: item.title, content: item.content))
+            created += 1
+        }
+        if !binaries.isEmpty {
+            let names = AttachmentStore.importFiles(from: binaries, kind: AttachmentStore.filesKind,
                                                     baseDirectory: attachmentBaseDirectory)
             if !names.isEmpty {
-                let base = others[0].deletingPathExtension().lastPathComponent
+                let base = binaries[0].deletingPathExtension().lastPathComponent
                 insertBlock(Block(projectId: projectId, type: .file,
                                   title: base.isEmpty ? "파일" : String(base.prefix(40)),
                                   imageNames: names))
@@ -374,6 +392,25 @@ final class DataStore: ObservableObject {
             DebugLogger.feature("드롭 가져오기: 블록 \(created)개")
         }
         return created
+    }
+
+    /// 드롭 파일이 내용으로 읽히는 텍스트인지 (.md→markdown, .txt→text). 순수 판별.
+    nonisolated static func textBlockType(for url: URL) -> BlockType? {
+        switch url.pathExtension.lowercased() {
+        case "md", "markdown", "mdown": return .markdown
+        case "txt", "text": return .text
+        default: return nil
+        }
+    }
+
+    /// 드롭 파일 본문 읽기. UTF-8만 인정한다 (자동 감지는 이진까지 텍스트로
+    /// 둔갑시켜서 제외). 1MB 초과·디코딩 실패 → nil (파일 블록 폴백). 순수 함수.
+    nonisolated static func readableText(from url: URL, maxBytes: Int = 1_048_576) -> String? {
+        guard let size = try? url.resourceValues(forKeys: [.fileSizeKey]).fileSize,
+              size <= maxBytes,
+              var text = try? String(contentsOf: url, encoding: .utf8) else { return nil }
+        if text.hasPrefix("\u{FEFF}") { text.removeFirst() }
+        return text
     }
 
     /// T-14 텍스트 드롭 → 텍스트 블록. 빈 문자열은 무시한다.

@@ -86,6 +86,12 @@ extension DataStore {
         return candidates.contains { $0.normalizedForSearch.contains(normalized) }
     }
 
+    /// 문서 내 타입 필터 (nil이면 전체). 타입 선택 드롭다운용. 순수 함수.
+    nonisolated static func filterBlocks(_ blocks: [Block], by type: BlockType?) -> [Block] {
+        guard let type else { return blocks }
+        return blocks.filter { $0.type == type }
+    }
+
     /// T-56 중첩 태그 접두 매칭. `tag:업무`는 `업무`·`업무/진행중`에 닿고 `업무용`에는 안 닿는다.
     /// 쿼리·태그 모두 정규화(전각·소문자) 후 비교한다. 순수 함수.
     nonisolated static func tagMatches(queryTag: String, tag: String) -> Bool {
