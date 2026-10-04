@@ -166,7 +166,7 @@ struct BlockCardView: View {
         }
     }
 
-    // MARK: - 더보기 메뉴 (T-37: 팝오버→Menu, 베타 popover 크래시 회피)
+    // MARK: - 더보기 메뉴 (T-37: 팝오버→Menu 전환, 유지 결정)
 
     /// 카드 ··· 메뉴. Menu가 열리면 자동 닫히므로 showMoreMenu 세터는 유지용.
     private var cardMoreMenu: some View {
