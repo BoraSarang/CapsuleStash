@@ -425,6 +425,11 @@ struct ProjectDetailView: View {
     /// Finder·브라우저·텍스트 드롭으로 블록을 만든다.
     /// 카드가 파일을 선점했으면(`skipFiles`) 파일은 건너뛰고 텍스트·URL만 처리한다.
     private func handleExternalDrop(_ providers: [NSItemProvider], skipFiles: Bool) {
+        // 드롭 진단: 타입 ID만 기록 (파일명·내용 없음, [HARD]).
+        DebugLogger.feature("드롭 수신: providers \(providers.count)개 skipFiles=\(skipFiles)")
+        for provider in providers {
+            DebugLogger.feature("드롭 타입: \(provider.registeredTypeIdentifiers.joined(separator: ","))")
+        }
         if !skipFiles {
             AttachmentStore.urls(from: providers) { urls in
                 guard !urls.isEmpty else { return }
@@ -437,13 +442,17 @@ struct ProjectDetailView: View {
         for provider in providers {
             let isFile = provider.hasItemConformingToTypeIdentifier(UTType.fileURL.identifier)
             if provider.hasItemConformingToTypeIdentifier(UTType.plainText.identifier), !isFile {
+                // 내용물로만 온 md는 markdown 블록으로 (파일 URL이 없어 파일 분기를 못 탐).
+                let asMarkdown = DataStore.isMarkdownDropTypeIdentifiers(provider.registeredTypeIdentifiers)
                 provider.loadObject(ofClass: NSString.self) { object, _ in
                     guard let text = object as? String,
                           // 블록·문서 순서 드롭은 각자 카드·행이 처리 (T-27/T-35)
                           !text.hasPrefix(DataStore.blockDragPrefix),
                           !text.hasPrefix(DataStore.projectDragPrefix) else { return }
                     Task { @MainActor in
-                        if self.store.importTextDrop(text, to: self.project.id) {
+                        if asMarkdown, self.store.importMarkdownDrop(text, to: self.project.id) {
+                            self.appState.notify("마크다운 블록 추가됨")
+                        } else if self.store.importTextDrop(text, to: self.project.id) {
                             self.appState.notify("텍스트 블록 추가됨")
                         }
                     }

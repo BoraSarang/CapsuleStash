@@ -72,7 +72,28 @@ final class ContentCollectTests: XCTestCase {
         XCTAssertEqual(store.locate(project)?.project.blocks.first?.type, .file)
     }
 
-    // MARK: - 타입 필터 (순수 함수)
+    // MARK: - 내용물 md 드롭 (파일 URL 없이 UTI만 오는 경우)
+
+    func testIsMarkdownDropTypeIdentifiers() {
+        XCTAssertTrue(DataStore.isMarkdownDropTypeIdentifiers(["net.daringfireball.markdown"]),
+                      "Finder 실측 UTI")
+        XCTAssertTrue(DataStore.isMarkdownDropTypeIdentifiers(["public.file-url", "net.daringfireball.markdown"]))
+        XCTAssertFalse(DataStore.isMarkdownDropTypeIdentifiers(["public.plain-text"]))
+        XCTAssertFalse(DataStore.isMarkdownDropTypeIdentifiers(["public.png"]))
+        XCTAssertFalse(DataStore.isMarkdownDropTypeIdentifiers([]))
+        XCTAssertFalse(DataStore.isMarkdownDropTypeIdentifiers(["not-a-type"]))
+    }
+
+    @MainActor
+    func testMarkdownContentDropBecomesMarkdownBlock() throws {
+        let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        XCTAssertTrue(store.importMarkdownDrop("# 제목\n본문", to: project.id))
+        let block = store.locate(project)?.project.blocks.first
+        XCTAssertEqual(block?.type, .markdown)
+        XCTAssertEqual(block?.title, "# 제목")
+        XCTAssertFalse(store.importMarkdownDrop("   ", to: project.id), "빈 내용은 무시")
+    }
 
     @MainActor
     func testFilterBlocks() {

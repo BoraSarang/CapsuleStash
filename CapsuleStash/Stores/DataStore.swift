@@ -1,5 +1,6 @@
 import Foundation
 import LocalAuthentication
+import UniformTypeIdentifiers
 
 /// T-02/T-06 인메모리 저장소 + 선택 상태 + 검색 (2단: Workspace → Project 문서).
 /// 영구 저장은 `SwiftDataBackend` 가 담당하고, 여기서는 문서 상태와 탐색만 다룬다.
@@ -413,14 +414,37 @@ final class DataStore: ObservableObject {
         return text
     }
 
+    /// 내용물 UTI가 md 계열인지 (파일 URL 없이 markdown UTI만 오는 드롭 판별). 순수 함수.
+    /// Finder는 .md를 `net.daringfireball.markdown` 내용물로만 줄 때가 있어
+    /// 파일 분기를 못 타고 텍스트가 된다 (2026-10-04 실측). 시스템 md 타입에
+    /// conformance로 물어서 선언형(public.markdown)·동적 UTI 모두 잡는다.
+    nonisolated static func isMarkdownDropTypeIdentifiers(_ ids: [String]) -> Bool {
+        guard let md = UTType(filenameExtension: "md") else { return false }
+        return ids.contains {
+            guard let type = UTType($0) else { return false }
+            return type.conforms(to: md)
+        }
+    }
+
     /// T-14 텍스트 드롭 → 텍스트 블록. 빈 문자열은 무시한다.
     @discardableResult
     func importTextDrop(_ text: String, to projectId: UUID) -> Bool {
+        importDroppedText(text, type: .text, to: projectId)
+    }
+
+    /// 내용물로만 온 md 드롭 → markdown 블록 (파일 URL 없이 UTI만 오는 경우).
+    /// 제목은 파일명이 없어 첫 줄을 쓴다 (텍스트 드롭과 동일 규칙).
+    @discardableResult
+    func importMarkdownDrop(_ text: String, to projectId: UUID) -> Bool {
+        importDroppedText(text, type: .markdown, to: projectId)
+    }
+
+    private func importDroppedText(_ text: String, type: BlockType, to projectId: UUID) -> Bool {
         guard allProjects.contains(where: { $0.project.id == projectId }) else { return false }
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return false }
-        let firstLine = trimmed.split(separator: "\n").first.map(String.init) ?? "텍스트"
-        insertBlock(Block(projectId: projectId, type: .text,
+        let firstLine = trimmed.split(separator: "\n").first.map(String.init) ?? type.displayName
+        insertBlock(Block(projectId: projectId, type: type,
                           title: String(firstLine.prefix(40)), content: trimmed))
         return true
     }

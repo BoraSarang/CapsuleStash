@@ -5040,6 +5040,22 @@
           }
         }
       }
+    },
+    "마크다운 블록 추가됨": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added Markdown block"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "마크다운 블록 추가됨"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
