@@ -59,8 +59,7 @@ struct SidebarView: View {
                     SidebarSectionLabel(text: "SMART")
                     smartRow("즐겨찾기", systemImage: "star", count: store.favoriteProjects.count)
                     smartRow("최근 사용", systemImage: "clock", count: store.recents.count)
-                    smartRow("계정 / Credential", systemImage: "lock", count: store.credentialCount)
-                    // T-55 스마트 그룹 (저장된 검색 조건)
+                    smartRow("계정 / Credential", systemImage: "lock", count: store.credentialCount)                    // T-55 스마트 그룹 (저장된 검색 조건)
                     ForEach(store.smartGroups) { group in
                         smartGroupRow(group)
                     }
@@ -90,6 +89,32 @@ struct SidebarView: View {
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                     }
+                    // T-58 휴지통 (30일 보관, 복원·완전 삭제)
+                    Button {
+                        store.showTrash()
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "trash")
+                                .font(.system(size: 10))
+                                .frame(width: 11)
+                                .foregroundStyle(Theme.sidebarMuted)
+                            LText(key: "휴지통")
+                                .font(.system(size: 13))
+                                .foregroundStyle(store.isTrashSelected ? Theme.ink : Theme.sidebarMuted)
+                            Spacer()
+                            Text("\(store.trashCount)")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundStyle(Theme.sidebarMuted)
+                        }
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 8)
+                        .contentShape(Rectangle())
+                        .background(
+                            store.isTrashSelected ? Theme.tagBackground : Color.clear,
+                            in: RoundedRectangle(cornerRadius: 8)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 14)
                 .padding(.top, 12)
@@ -116,7 +141,7 @@ struct SidebarView: View {
             case .project(let project):
                 return Alert(
                     title: Text(L10n.format("'%@' 삭제", project.name)),
-                    message: Text(L10n.format("포함된 블록 %lld개가 모두 사라집니다.", project.blocks.count)),
+                    message: Text(L10n.string("휴지통으로 이동합니다. 30일 보관됩니다.")),
                     primaryButton: .destructive(Text("삭제")) {
                         store.deleteProject(project)
                         appState.notify("삭제됨")

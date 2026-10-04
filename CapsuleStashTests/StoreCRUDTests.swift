@@ -218,7 +218,7 @@ final class StoreCRUDTests: XCTestCase {
     }
 
     @MainActor
-    func testDeleteBlockClearsAttachments() throws {
+    func testDeleteBlockKeepsAttachmentsUntilForever() throws {
         KeychainStore.inMemory = [:]
         defer { KeychainStore.inMemory = nil }
         let dir = try TestHelpers.makeTempDir()
@@ -236,8 +236,11 @@ final class StoreCRUDTests: XCTestCase {
         let block = Block(projectId: project.id, type: .image, title: "I", imageNames: ["gone.png"])
         store.insertBlock(block)
         store.deleteBlock(block)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: imgDir.appendingPathComponent("gone.png").path),
+                       "휴지통 보관 중에는 복원을 위해 유지")
+        XCTAssertTrue(store.deleteForever(block.id))
         XCTAssertFalse(FileManager.default.fileExists(atPath: imgDir.appendingPathComponent("gone.png").path),
-                       "삭제된 블록의 첨부는 함께 지워야 함")
+                       "완전 삭제 때 첨부 정리")
     }
 
     @MainActor

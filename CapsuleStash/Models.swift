@@ -137,6 +137,25 @@ enum BlockType: String, Codable, CaseIterable, Identifiable {
 
 // MARK: Block
 
+/// 블록 버전 스냅샷 (T-58). 내용 편집 전 상태를 최대 20개 보관한다.
+/// 제목·본문·언어만 남긴다 (첨부·시크릿은 현행 블록이 들고 있어 복원에 영향 없음).
+struct BlockVersion: Identifiable, Hashable, Codable {
+    let id: UUID
+    var title: String
+    var content: String
+    var language: String?
+    var savedAt: Date
+
+    init(id: UUID = UUID(), title: String, content: String,
+         language: String? = nil, savedAt: Date = Date()) {
+        self.id = id
+        self.title = title
+        self.content = content
+        self.language = language
+        self.savedAt = savedAt
+    }
+}
+
 struct Block: Identifiable, Hashable, Codable {
     let id: UUID
     var projectId: UUID
@@ -161,13 +180,45 @@ struct Block: Identifiable, Hashable, Codable {
     var sortOrder: Int
     var createdAt: Date
     var updatedAt: Date
+    /// 버전 기록 (최대 20개, 오래된 것부터 버림). 구 JSON에는 없어 decodeIfPresent.
+    var versions: [BlockVersion] = []
+
+    private enum CodingKeys: String, CodingKey {
+        case id, projectId, type, title, content, language, url, siteName, savedAt
+        case imageNames, archiveFile, pdfFile, thumbnailFile, credential
+        case isCollapsed, sortOrder, createdAt, updatedAt, versions
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        projectId = try container.decode(UUID.self, forKey: .projectId)
+        type = try container.decode(BlockType.self, forKey: .type)
+        title = try container.decodeIfPresent(String.self, forKey: .title) ?? ""
+        content = try container.decodeIfPresent(String.self, forKey: .content) ?? ""
+        language = try container.decodeIfPresent(String.self, forKey: .language)
+        url = try container.decodeIfPresent(String.self, forKey: .url)
+        siteName = try container.decodeIfPresent(String.self, forKey: .siteName)
+        savedAt = try container.decodeIfPresent(Date.self, forKey: .savedAt)
+        imageNames = try container.decodeIfPresent([String].self, forKey: .imageNames) ?? []
+        archiveFile = try container.decodeIfPresent(String.self, forKey: .archiveFile)
+        pdfFile = try container.decodeIfPresent(String.self, forKey: .pdfFile)
+        thumbnailFile = try container.decodeIfPresent(String.self, forKey: .thumbnailFile)
+        credential = try container.decodeIfPresent(Credential.self, forKey: .credential)
+        isCollapsed = try container.decodeIfPresent(Bool.self, forKey: .isCollapsed) ?? false
+        sortOrder = try container.decodeIfPresent(Int.self, forKey: .sortOrder) ?? 0
+        createdAt = try container.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+        updatedAt = try container.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
+        versions = try container.decodeIfPresent([BlockVersion].self, forKey: .versions) ?? []
+    }
 
     init(id: UUID = UUID(), projectId: UUID, type: BlockType, title: String,
          content: String = "", language: String? = nil, url: String? = nil,
          siteName: String? = nil, savedAt: Date? = nil, imageNames: [String] = [],
          archiveFile: String? = nil, pdfFile: String? = nil, thumbnailFile: String? = nil,
          credential: Credential? = nil, isCollapsed: Bool = false, sortOrder: Int = 0,
-         createdAt: Date = Date(), updatedAt: Date = Date()) {
+         createdAt: Date = Date(), updatedAt: Date = Date(),
+         versions: [BlockVersion] = []) {
         self.id = id
         self.projectId = projectId
         self.type = type
@@ -186,6 +237,7 @@ struct Block: Identifiable, Hashable, Codable {
         self.sortOrder = sortOrder
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.versions = versions
     }
 
     /// 검색 인덱스용 문자열. [HARD] Credential 비밀값은 포함하지 않는다.

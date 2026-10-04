@@ -17,11 +17,16 @@ final class DataStore: ObservableObject {
     @Published var expandedWorkspaces: Set<UUID> = []
     /// T-55 스마트 그룹 (검색 조건 저장, UserDefaults 영속화)
     @Published var smartGroups: [SmartGroup] = []
+    /// T-58 휴지통 (삭제된 문서·블록, UserDefaults 영속화·30일 보관)
+    @Published var trash: [TrashedItem] = []
+    /// 휴지통 화면 선택 (문서 선택과 상호 배타)
+    @Published var isTrashSelected = false
 
     private static let smartGroupsKey = "smartGroups"
+    static let trashKey = "trash"  // DataStore+Trash 영속화용
 
     private var saveTask: Task<Void, Never>?
-    private let persistEnabled: Bool
+    let persistEnabled: Bool  // DataStore+Trash 영속화 게이트용
     /// 첨부·아카이브 정리용 기준 폴더. 테스트 격리용 (기본 nil = 실제 Application Support).
     private let attachmentBaseDirectory: URL?
 
@@ -53,6 +58,8 @@ final class DataStore: ObservableObject {
         expandDefaults()
         selectFirstProject()
         loadSmartGroups()
+        loadTrash()
+        purgeExpiredTrash()
         DebugLogger.perf(String(format: "저장소 준비 %.0fms", (CFAbsoluteTimeGetCurrent() - start) * 1000))
     }
 
@@ -105,6 +112,7 @@ final class DataStore: ObservableObject {
 
     func select(_ project: Project) {
         selectedProjectId = project.id
+        isTrashSelected = false
         recents.removeAll { $0.id == project.id }
         recents.insert(RecentEntry(id: project.id, title: project.name), at: 0)
         if recents.count > 8 { recents.removeLast(recents.count - 8) }
@@ -189,17 +197,28 @@ final class DataStore: ObservableObject {
         mutateProject(project.id) { $0.name = name }
     }
 
+    /// T-58 문서 삭제 → 휴지통 (30일 보관). 첨부·시크릿은 복원을 위해 남긴다.
     func deleteProject(_ project: Project) {
-        for block in project.blocks {
-            removeBlockFiles(block)
-        }
+        guard let entry = allProjects.first(where: { $0.project.id == project.id }) else { return }
+        trash.append(.project(TrashedProject(
+            project: entry.project, workspaceId: entry.workspace.id,
+            workspaceName: entry.workspace.name, deletedAt: Date())))
+        persistTrash()
         for wsIndex in workspaces.indices {
             workspaces[wsIndex].projects.removeAll { $0.id == project.id }
         }
         if selectedProjectId == project.id { selectedProjectId = nil }
         recents.removeAll { $0.id == project.id }
         commit()
-        DebugLogger.feature("Project 삭제")
+        DebugLogger.feature("문서 삭제 → 휴지통")
+    }
+
+    /// 휴지통 복원용: 문서를 Workspace 맨 끝에 넣는다.
+    func reinsertProject(_ project: Project, to workspaceId: UUID) {
+        guard let wsIndex = workspaces.firstIndex(where: { $0.id == workspaceId }) else { return }
+        var project = project
+        project.workspaceId = workspaceId
+        workspaces[wsIndex].projects.append(project)
     }
 
     /// Project를 다른 Workspace로 이동 (사이드바 드래그앤드롭).
@@ -449,10 +468,12 @@ final class DataStore: ObservableObject {
         return true
     }
 
+    /// T-58 내용 편집 전 스냅샷을 버전 기록에 남긴다 (제목·본문·언어·URL 변경 때만).
+    /// 접기·순서 변경은 mutate 계열이라 여기 안 탄다. 호출자가 versions 없이 넘겨도 현행 기록 보존.
     func updateBlock(_ block: Block) {
         mutateProject(block.projectId) { project in
             guard let index = project.blocks.firstIndex(where: { $0.id == block.id }) else { return }
-            project.blocks[index] = block
+            project.blocks[index] = Self.snapshotForUpdate(current: project.blocks[index], next: block)
         }
     }
 
@@ -475,17 +496,23 @@ final class DataStore: ObservableObject {
         DebugLogger.feature(collapsed ? "블록 모두 접기" : "블록 모두 펼치기")
     }
 
+    /// T-58 블록 삭제 → 휴지통 (30일 보관). 첨부·시크릿은 복원을 위해 남긴다.
     func deleteBlock(_ block: Block) {
-        removeBlockFiles(block)
-        mutateProject(block.projectId) { project in
-            project.blocks.removeAll { $0.id == block.id }
+        guard let doomed = allProjects
+            .flatMap({ $0.project.blocks })
+            .first(where: { $0.id == block.id }) else { return }
+        trash.append(.block(TrashedBlock(block: doomed, deletedAt: Date())))
+        persistTrash()
+        mutateProject(doomed.projectId) { project in
+            project.blocks.removeAll { $0.id == doomed.id }
         }
-        DebugLogger.feature("블록 삭제")
+        DebugLogger.feature("블록 삭제 → 휴지통")
     }
 
     /// 블록 삭제 시 동반 정리: Keychain 시크릿 + 아카이브 실파일 + 썸네일 + 이미지·파일 첨부.
     /// [HARD] 값 자체를 로그에 남기지 않는다.
-    private func removeBlockFiles(_ block: Block) {
+    /// 휴지통 완전 삭제 때 호출 (DataStore+Trash). [HARD] 값 로깅 금지.
+    func removeBlockFiles(_ block: Block) {
         if block.credential != nil {
             KeychainStore.delete(blockId: block.id)
         }
@@ -629,7 +656,7 @@ final class DataStore: ObservableObject {
 
     // MARK: - 내부 변이 유틸
 
-    private func mutateProject(_ projectId: UUID, _ transform: (inout Project) -> Void) {
+    func mutateProject(_ projectId: UUID, _ transform: (inout Project) -> Void) {
         for wsIndex in workspaces.indices {
             guard let index = workspaces[wsIndex].projects.firstIndex(where: { $0.id == projectId }) else { continue }
             transform(&workspaces[wsIndex].projects[index])
@@ -639,7 +666,7 @@ final class DataStore: ObservableObject {
         }
     }
 
-    private func mutateBlock(_ blockId: UUID, _ transform: (inout Block) -> Void) {
+    func mutateBlock(_ blockId: UUID, _ transform: (inout Block) -> Void) {
         for wsIndex in workspaces.indices {
             for index in workspaces[wsIndex].projects.indices {
                 guard let blockIndex = workspaces[wsIndex].projects[index].blocks.firstIndex(where: { $0.id == blockId }) else { continue }
