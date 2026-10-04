@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// 블록 타입 선택 목록 (생성 우선: 시트 → 저장 시 생성).
-/// 사이드바 하단 `+` 팝오버와 타이틀바 `+` 팝오버가 공유한다.
-/// Toolbar에는 `Menu`를 쓰지 않는다 — 숨긴 인디케이터 자리 때문에 셀이 비대칭으로 보인다.
+/// 베타 popover 크래시 회피로 + 자리는 네이티브 Menu로 대체되어 현재 미사용.
+/// 베타 종료 후 팝오버 복귀 시 재사용한다.
 struct BlockTypePicker: View {
     @EnvironmentObject private var appState: AppState
 

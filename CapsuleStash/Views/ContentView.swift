@@ -105,13 +105,21 @@ struct ContentView: View {
 
     // MARK: - 타이틀바 새 블록 추가
 
-    @State private var isAddingBlock = false
-
-    /// Toolbar에는 Menu를 쓰지 않는다 — 숨긴 인디케이터 자리 때문에 셀이 비대칭으로 보인다.
-    /// 무당벌레와 같은 일반 Button + 팝오버로 맞춘다.
+    /// 팝오버 대신 네이티브 Menu — macOS 27 베타에서 SwiftUI popover present 시
+    /// RenderBox GPU 스레드가 죽으며 앱이 함께 종료된다 (2026-10-04 실측 4건).
+    /// Toolbar Menu의 숨긴 인디케이터 비대칭(T-20)은 베타 기간 감수한다.
     private var addMenu: some View {
-        Button {
-            isAddingBlock = true
+        Menu {
+            if let project = store.selectedProject {
+                ForEach(BlockType.pickable) { type in
+                    Button {
+                        appState.requestBlockCreation(type: type, in: project.id)
+                    } label: {
+                        LText(key: type.displayName)
+                    }
+                    .help(L10n.string(type.purposeHint))
+                }
+            }
         } label: {
             Image(systemName: "plus")
                 .font(.system(size: 13, weight: .semibold))
@@ -122,11 +130,6 @@ struct ContentView: View {
         .buttonStyle(.plain)
         .disabled(store.selectedProject == nil)
         .help("새로 만들기 — 현재 Project에 블록 추가")
-        .popover(isPresented: $isAddingBlock) {
-            if let project = store.selectedProject {
-                BlockTypePicker(projectId: project.id) { isAddingBlock = false }
-            }
-        }
     }
 
     // MARK: - 상세 영역
