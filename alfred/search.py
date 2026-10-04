@@ -23,6 +23,11 @@ def capsule_url(query: str) -> str:
     return "capsule://search?query=" + urllib.parse.quote(query)
 
 
+def open_project_url(project: str) -> str:
+    """⌘Enter용. 앱이 해당 문서를 선택한다 (T-53 `open` 액션)."""
+    return "capsule://open?project=" + urllib.parse.quote(project)
+
+
 def like_pattern(query: str) -> str:
     return "%" + "%".join(query.split()) + "%"
 
@@ -57,14 +62,15 @@ def main() -> None:
             (pattern, pattern, LIMIT),
         ).fetchall()
         for name, ws, note in rows:
-            url = capsule_url(f"project:\"{name}\"")
+            url = open_project_url(name or "")
             items.append({
                 "uid": f"project:{name}",
                 "title": name or "(제목 없음)",
-                "subtitle": f"{ws} · 블록 문서 열기",
+                "subtitle": f"{ws} · Enter 앱에서 문서 열기",
                 "arg": url,
-                "variables": {"do": "open", "content": "", "url": url},
-                "mods": {"cmd": {"subtitle": "내용 대신 앱에서 열기",
+                "variables": {"do": "open", "url": url},
+                "mods": {"cmd": {"subtitle": "앱에서 문서 열기",
+                                 "arg": url,
                                  "variables": {"do": "open"}}},
             })
         # 블록 히트 (제목·본문·언어·URL·태그 매칭)
@@ -95,26 +101,29 @@ def main() -> None:
                 if site:
                     detail += f" · {site}"
             clip = clip[:CONTENT_TRUNCATE]
-            open_url = capsule_url(title or project)
+            # ⌘Enter는 문서로 점프 (팔레트만 여는 search가 아님).
+            # mod가 arg를 URL로 덮어쓰므로 변수 병합 여부와 무관하게 동작한다.
+            open_url = open_project_url(project or "")
             items.append({
                 "uid": f"block:{project}:{title}",
                 "title": title or "(제목 없음)",
-                "subtitle": f"{ws} / {detail} — Enter 복사, ⌘Enter 앱에서 열기",
+                "subtitle": f"{ws} / {detail} — Enter 복사, ⌘Enter 문서로 이동",
                 "arg": clip,
-                "variables": {"do": "copy", "content": clip, "url": open_url},
+                "variables": {"do": "copy", "url": open_url},
                 "text": {"copy": clip},
-                "mods": {"cmd": {"subtitle": "앱에서 열기",
+                "mods": {"cmd": {"arg": open_url,
+                                 "subtitle": "앱에서 문서 열기",
                                  "variables": {"do": "open"}}},
             })
     finally:
         con.close()
 
     if not items:
+        search = capsule_url(query)
         items = [{"title": "결과 없음",
                   "subtitle": "Enter를 눌러 앱에서 전체 검색하기",
-                  "arg": capsule_url(query),
-                  "variables": {"do": "open", "content": "",
-                                "url": capsule_url(query)}}]
+                  "arg": search,
+                  "variables": {"do": "open", "url": search}}]
     print(json.dumps({"items": items[:LIMIT]}, ensure_ascii=False))
     # 시크릿 가드: 출력에 password 컬럼이 섞일 수 없지만, 혹시 모를 본문 노출 확인용
     # (계정 블록 본문은 Keychain 값이라 SQLite에 없음 — 구조상 보장)
