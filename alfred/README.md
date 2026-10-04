@@ -4,9 +4,13 @@
 
 ## 설치
 
-1. 이 폴더(`alfred/`)를 압축하거나 그대로 둔다. 더블클릭 가져기가 안 되면 아래 수동 연결.
-2. Alfred 설정 → Workflows → `+` → Open workflow folder → 이 폴더 내용을 넣는다.
-3. Script Filter와 Run Script가 동작 폴더를 이 폴더로 보게 한다 (기본값이면 그대로).
+```sh
+cd alfred
+zip -j Capsule-Stash.alfredworkflow info.plist search.py copy-or-open.sh
+open Capsule-Stash.alfredworkflow   # Alfred가 가져오기 (재설치는 덮어쓰기 Update)
+```
+
+`*.alfredworkflow`는 빌드 산출물이라 커밋하지 않는다.
 
 ## 수동 연결 (2분, 가져오기 실패 시)
 
