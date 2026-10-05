@@ -7,7 +7,7 @@ extension DataStore {
 
     var parsedQuery: SearchQuery { SearchQuery.parse(searchQuery) }
 
-    var searchHits: [SearchHit] { hits(for: parsedQuery) }
+    var searchHits: [SearchHit] { hits(for: SearchQuery.parse(debouncedSearchQuery)) }
 
     /// T-55 스마트 그룹이 같은 검색 파이프를 쓴다. 저장 조건 = 검색 문법 그대로.
     func hits(for query: SearchQuery) -> [SearchHit] {
