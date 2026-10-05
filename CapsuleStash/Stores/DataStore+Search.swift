@@ -2,6 +2,9 @@ import Foundation
 
 /// 검색 (T-06/T-16). 매칭·스니펫·점수는 static 순수 함수로 두어 단위 테스트에서 직접 검증한다.
 extension DataStore {
+    /// 검색 매칭용 본문 상한 (문자 수). 거대 문서도 키 입력마다 전체 정규화를 안 타게.
+    static let searchTextCap = 32_000
+
     var parsedQuery: SearchQuery { SearchQuery.parse(searchQuery) }
 
     var searchHits: [SearchHit] { hits(for: parsedQuery) }
@@ -76,14 +79,18 @@ extension DataStore {
         guard !normalized.isEmpty else { return 0 }
         if hit.title.normalizedForSearch.hasPrefix(normalized) { return 30 }
         if hit.title.normalizedForSearch.contains(normalized) { return 20 }
-        if hit.block?.searchIndexText.normalizedForSearch.contains(normalized) == true { return 10 }
+        if let text = hit.block.map({ String($0.searchIndexText.prefix(searchTextCap)) }),
+           text.normalizedForSearch.contains(normalized) { return 10 }
         return 1
     }
 
     static func matches(_ term: String, _ candidates: [String]) -> Bool {
         if term.isEmpty { return true }
         let normalized = term.normalizedForSearch
-        return candidates.contains { $0.normalizedForSearch.contains(normalized) }
+        // 거대 본문은 앞에서만 찾는다 (전체 정규화 비용 회피).
+        return candidates.contains {
+            String($0.prefix(searchTextCap)).normalizedForSearch.contains(normalized)
+        }
     }
 
     /// 끼워넣기 해석. 같은 문서에서 제목이(정규화 후) 일치하는 첫 블록. 순수 함수.
@@ -122,7 +129,8 @@ extension DataStore {
         guard !term.isEmpty else {
             return block.displaySubtitle
         }
-        let text = block.content.replacingOccurrences(of: "\n", with: " ")
+        // 거대 본문은 앞에서만 찾는다 (전체 소문자화 비용 회피).
+        let text = String(block.content.prefix(searchTextCap)).replacingOccurrences(of: "\n", with: " ")
         guard let range = text.lowercased().range(of: term) else { return block.displaySubtitle }
         let start = text.index(range.lowerBound, offsetBy: -20, limitedBy: text.startIndex) ?? text.startIndex
         let end = text.index(range.upperBound, offsetBy: 40, limitedBy: text.endIndex) ?? text.endIndex
