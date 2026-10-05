@@ -225,6 +225,15 @@ struct MarkdownBody: View {
     let text: String
     /// 끼워넣기 해석기. nil이면(중첩 렌더) `![[]]`는 리터럴로 보인다. 순환 방지용 1단계.
     var resolve: ((String) -> Block?)? = nil
+    /// 파싱 결과 메모. body가 재평가될 때마다 전체를 다시 파싱하면 거대 문서가 멈춘다.
+    /// 텍스트가 바뀌면 onChange로 갱신한다 (같은 카드 identity 유지 전제).
+    @State private var segments: [MarkdownSegment]
+
+    init(text: String, resolve: ((String) -> Block?)? = nil) {
+        self.text = text
+        self.resolve = resolve
+        _segments = State(initialValue: MarkdownSegment.parse(text))
+    }
 
     /// 인라인 서식 적용. 기본 글꼴은 호출 쪽이 정하고 굵게·기울임·코드는 토큰마다 입힌다.
     static func styled(_ raw: String, base: Font) -> Text {
@@ -249,12 +258,15 @@ struct MarkdownBody: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            ForEach(Array(MarkdownSegment.parse(text).enumerated()), id: \.offset) { _, segment in
+            ForEach(Array(segments.enumerated()), id: \.offset) { _, segment in
                 segmentView(segment)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .textSelection(.enabled)
+        .onChange(of: text) { _, new in
+            segments = MarkdownSegment.parse(new)
+        }
     }
 
     @ViewBuilder

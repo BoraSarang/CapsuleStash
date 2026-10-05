@@ -1,3 +1,4 @@
+import Combine
 import Foundation
 import LocalAuthentication
 import UniformTypeIdentifiers
@@ -10,6 +11,9 @@ final class DataStore: ObservableObject {
     @Published private(set) var workspaces: [Workspace] = []
     @Published var selectedProjectId: UUID?
     @Published var searchQuery: String = ""
+    /// 팔레트 표시용 디바운스 쿼리. 키 입력마다 전체 재검색·전체 리렌더가 일어나서 150ms 둔다.
+    /// 테스트(persist:false)는 동기로 그대로 반영한다.
+    @Published var debouncedSearchQuery: String = ""
     @Published var isVaultUnlocked: Bool = false
     @Published private(set) var recents: [RecentEntry] = []
 
@@ -26,6 +30,7 @@ final class DataStore: ObservableObject {
     static let trashKey = "trash"  // DataStore+Trash 영속화용
 
     private var saveTask: Task<Void, Never>?
+    private var searchCancellable: AnyCancellable?
     let persistEnabled: Bool  // DataStore+Trash 영속화 게이트용
     /// 첨부·아카이브 정리용 기준 폴더. 테스트 격리용 (기본 nil = 실제 Application Support).
     private let attachmentBaseDirectory: URL?
@@ -63,6 +68,16 @@ final class DataStore: ObservableObject {
         purgeExpiredTrash()
         // 실제 저장소를 읽은 기동 때만 (테스트의 persist:true+빈 저장소 조합에서 실파일 보호).
         if samples { sweepOrphanAttachments() }
+        // 검색 디바운스. 테스트는 persist:false 라 동기 반영.
+        if persistEnabled {
+            searchCancellable = $searchQuery
+                .debounce(for: .milliseconds(150), scheduler: RunLoop.main)
+                .removeDuplicates()
+                .sink { [weak self] in self?.debouncedSearchQuery = $0 }
+        } else {
+            searchCancellable = $searchQuery
+                .sink { [weak self] in self?.debouncedSearchQuery = $0 }
+        }
         DebugLogger.perf(String(format: "저장소 준비 %.0fms", (CFAbsoluteTimeGetCurrent() - start) * 1000))
     }
 
@@ -944,6 +959,10 @@ final class DataStore: ObservableObject {
     }
 
     /// 디바운스 저장 (0.6s). 테스트처럼 `persist: false` 로 만든 인스턴스는 아무것도 쓰지 않는다.
+    /// 전체 스냅샷 교체라 메인에서 돌리면 펼치기·편집 때마다 멈춘다 — 직렬 큐에서 저장한다.
+    /// 큐가 직렬이라 구 스냅샷이 새 스냅샷을 덮어쓸 수 없다.
+    private static let saveQueue = DispatchQueue(label: "com.borasarang.CapsuleStash.save")
+
     func commit() {
         guard persistEnabled else { return }
         saveTask?.cancel()
@@ -952,12 +971,14 @@ final class DataStore: ObservableObject {
         saveTask = Task { [weak self] in
             try? await Task.sleep(nanoseconds: 600_000_000)
             guard !Task.isCancelled else { return }
-            do {
-                try SwiftDataBackend.save(snapshot)
-                KeychainStore.sync(secrets)
-                await MainActor.run { self?.saveTask = nil }
-            } catch {
-                DebugLogger.error(code: ErrorCode.storeSave, "저장 실패")
+            Self.saveQueue.async {
+                do {
+                    try SwiftDataBackend.save(snapshot)
+                    KeychainStore.sync(secrets)
+                } catch {
+                    DebugLogger.error(code: ErrorCode.storeSave, "저장 실패")
+                }
+                Task { [weak self] in await MainActor.run { self?.saveTask = nil } }
             }
         }
     }
