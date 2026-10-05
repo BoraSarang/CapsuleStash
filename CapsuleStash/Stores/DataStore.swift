@@ -61,6 +61,8 @@ final class DataStore: ObservableObject {
         loadSmartGroups()
         loadTrash()
         purgeExpiredTrash()
+        // 실제 저장소를 읽은 기동 때만 (테스트의 persist:true+빈 저장소 조합에서 실파일 보호).
+        if samples { sweepOrphanAttachments() }
         DebugLogger.perf(String(format: "저장소 준비 %.0fms", (CFAbsoluteTimeGetCurrent() - start) * 1000))
     }
 
@@ -88,6 +90,46 @@ final class DataStore: ObservableObject {
         if collapsed > 0 {
             DebugLogger.feature("거대 블록 접기: \(collapsed)개")
         }
+    }
+
+    /// 고아 첨부 정리. 블록·휴지통 어디에서도 참조 안 하는 실파일을 지운다.
+    /// import 중 죽으면 복사본만 남고 참조가 없어 다음 기동 때 정리된다.
+    /// 기동 시 호출은 samples:true(실저장소)일 때만 한다 — 테스트 보호.
+    func sweepOrphanAttachments() {
+        var keeping = Set<String>()
+        func collect(_ blocks: [Block]) {
+            for block in blocks {
+                keeping.formUnion(block.imageNames)
+                for name in [block.archiveFile, block.pdfFile, block.thumbnailFile] {
+                    if let name { keeping.insert(name) }
+                }
+            }
+        }
+        for workspace in workspaces {
+            for project in workspace.projects { collect(project.blocks) }
+        }
+        for item in trash {
+            switch item {
+            case .project(let trashed): collect(trashed.project.blocks)
+            case .block(let trashed): collect([trashed.block])
+            case .workspace(let trashed):
+                for project in trashed.workspace.projects { collect(project.blocks) }
+            }
+        }
+        let base = attachmentBaseDirectory ?? PersistenceStore.directoryURL
+        var removed = 0
+        let kinds = [AttachmentStore.imagesKind, AttachmentStore.filesKind,
+                     WebArchiveStore.archiveKind, WebArchiveStore.pdfKind,
+                     WebArchiveStore.thumbnailKind]
+        for kind in kinds {
+            let dir = base.appendingPathComponent(kind, isDirectory: true)
+            guard let files = try? FileManager.default.contentsOfDirectory(
+                at: dir, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles]) else { continue }
+            for url in files where !keeping.contains(url.lastPathComponent) {
+                if (try? FileManager.default.removeItem(at: url)) != nil { removed += 1 }
+            }
+        }
+        if removed > 0 { DebugLogger.cache("고아 첨부 정리: \(removed)개") }
     }
 
     /// 레거시 `webLink` 블록을 `webArchive` 로 통일한다 (T-28, 필드 그대로 승계).
@@ -174,17 +216,20 @@ final class DataStore: ObservableObject {
         commit()
     }
 
+    /// T-58 워크스페이스 삭제 → 통째로 휴지통 (30일 보관). 첨부·시크릿은 복원을 위해 남긴다.
     func deleteWorkspace(_ id: UUID) {
-        if let ws = workspaces.first(where: { $0.id == id }) {
-            for project in ws.projects {
-                for block in project.blocks {
-                    removeBlockFiles(block)
-                }
-            }
+        guard let index = workspaces.firstIndex(where: { $0.id == id }) else { return }
+        let workspace = workspaces[index]
+        trash.append(.workspace(TrashedWorkspace(workspace: workspace, deletedAt: Date())))
+        persistTrash()
+        if let selected = selectedProjectId,
+           workspace.projects.contains(where: { $0.id == selected }) {
+            selectedProjectId = nil
         }
-        workspaces.removeAll { $0.id == id }
+        recents.removeAll { recent in workspace.projects.contains(where: { $0.id == recent.id }) }
+        workspaces.remove(at: index)
         commit()
-        DebugLogger.feature("Workspace 삭제")
+        DebugLogger.feature("Workspace 삭제 → 휴지통")
     }
 
     /// T-50 가져오기: 외부 JSON의 Workspace들을 새 복사본으로 편입한다.
@@ -244,6 +289,11 @@ final class DataStore: ObservableObject {
         var project = project
         project.workspaceId = workspaceId
         workspaces[wsIndex].projects.append(project)
+    }
+
+    /// 휴지통 복원용: 워크스페이스를 통째로 맨 끝에 넣는다.
+    func reinsertWorkspace(_ workspace: Workspace) {
+        workspaces.append(workspace)
     }
 
     /// Project를 다른 Workspace로 이동 (사이드바 드래그앤드롭).

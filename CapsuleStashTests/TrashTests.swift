@@ -217,6 +217,59 @@ final class TrashTests: XCTestCase {
         XCTAssertEqual(capped.lines.count, 5)
     }
 
+    // MARK: - 워크스페이스 휴지통
+
+    @MainActor
+    func testDeleteRestoreWorkspace() throws {
+        let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        _ = try textBlock(store, project)
+        let wsId = store.workspaces.first!.id
+        store.deleteWorkspace(wsId)
+        XCTAssertTrue(store.workspaces.isEmpty)
+        XCTAssertEqual(store.trash.count, 1)
+        guard case .workspace = store.trash.first else { return XCTFail("워크스페이스 항목이어야 함") }
+        XCTAssertTrue(store.restoreFromTrash(wsId))
+        XCTAssertEqual(store.workspaces.first?.id, wsId, "ID 유지 복원")
+        XCTAssertEqual(store.workspaces.first?.projects.first?.blocks.count, 1, "블록까지 함께")
+        XCTAssertTrue(store.trash.isEmpty)
+    }
+
+    @MainActor
+    func testWorkspacePermanentDeleteCleansFiles() throws {
+        let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        let png = try TestHelpers.makeTestPNG(width: 40, height: 40)
+        defer { try? FileManager.default.removeItem(at: png) }
+        XCTAssertEqual(store.importFileDrops([png], to: project.id), 1)
+        let name = store.locate(project)!.project.blocks.first!.imageNames[0]
+        let stored = AttachmentStore.fileURL(kind: AttachmentStore.imagesKind, name: name, baseDirectory: dir)!
+        let wsId = store.workspaces.first!.id
+        store.deleteWorkspace(wsId)
+        XCTAssertTrue(FileManager.default.fileExists(atPath: stored.path), "보관 중 유지")
+        XCTAssertTrue(store.deleteForever(wsId))
+        XCTAssertFalse(FileManager.default.fileExists(atPath: stored.path), "완전 삭제 시 정리")
+    }
+
+    // MARK: - 고아 첨부 정리
+
+    @MainActor
+    func testSweepOrphanAttachments() throws {
+        let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        let imgDir = dir.appendingPathComponent(AttachmentStore.imagesKind, isDirectory: true)
+        try FileManager.default.createDirectory(at: imgDir, withIntermediateDirectories: true)
+        try "keep".write(to: imgDir.appendingPathComponent("keep.png"), atomically: true, encoding: .utf8)
+        try "orphan".write(to: imgDir.appendingPathComponent("orphan.png"), atomically: true, encoding: .utf8)
+        let block = Block(projectId: project.id, type: .image, title: "I", imageNames: ["keep.png"])
+        store.trash = [.block(TrashedBlock(block: block, deletedAt: Date()))]
+        store.sweepOrphanAttachments()
+        XCTAssertTrue(FileManager.default.fileExists(atPath: imgDir.appendingPathComponent("keep.png").path),
+                      "참조 중은 유지 (휴지통 포함)")
+        XCTAssertFalse(FileManager.default.fileExists(atPath: imgDir.appendingPathComponent("orphan.png").path),
+                       "고아는 삭제")
+    }
+
     // MARK: - 영속화
 
     @MainActor

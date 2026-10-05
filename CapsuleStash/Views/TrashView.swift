@@ -24,6 +24,13 @@ struct TrashView: View {
         }
     }
 
+    private var trashedWorkspaces: [TrashedWorkspace] {
+        store.trash.compactMap {
+            if case .workspace(let item) = $0 { return item }
+            return nil
+        }
+    }
+
     private func relative(_ date: Date) -> String {
         let formatter = RelativeDateTimeFormatter()
         formatter.locale = locale
@@ -38,6 +45,12 @@ struct TrashView: View {
                 if store.trash.isEmpty {
                     emptyState
                 } else {
+                    if !trashedWorkspaces.isEmpty {
+                        sectionLabel(text: "워크스페이스")
+                        ForEach(trashedWorkspaces, id: \.workspace.id) { item in
+                            workspaceRow(item)
+                        }
+                    }
                     if !trashedProjects.isEmpty {
                         sectionLabel(text: "문서")
                         ForEach(trashedProjects, id: \.project.id) { item in
@@ -127,6 +140,20 @@ struct TrashView: View {
             .foregroundStyle(Theme.muted)
             .padding(.top, 12)
             .padding(.bottom, 4)
+    }
+
+    private func workspaceRow(_ item: TrashedWorkspace) -> some View {
+        trashRow(
+            icon: "folder",
+            title: item.workspace.name,
+            subtitle: "\(L10n.format("문서 %lld개", item.workspace.projects.count)) • \(relative(item.deletedAt))",
+            onRestore: {
+                if store.restoreFromTrash(item.workspace.id) {
+                    appState.notify(L10n.string("복원됨"))
+                }
+            },
+            onDelete: { confirmDeleteId = item.workspace.id }
+        )
     }
 
     private func projectRow(_ item: TrashedProject) -> some View {

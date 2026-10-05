@@ -2,11 +2,16 @@ import Foundation
 
 // MARK: - T-58 휴지통 (삭제된 문서·블록, 30일 보관 후 자동 완전 삭제)
 
-/// 휴지통 항목. 문서·블록을 원래 자리 정보와 함께 보관한다.
+/// 휴지통 항목. 문서·블록·워크스페이스를 원래 자리 정보와 함께 보관한다.
 struct TrashedProject: Hashable, Codable {
     var project: Project
     var workspaceId: UUID
     var workspaceName: String
+    var deletedAt: Date
+}
+
+struct TrashedWorkspace: Hashable, Codable {
+    var workspace: Workspace
     var deletedAt: Date
 }
 
@@ -18,11 +23,13 @@ struct TrashedBlock: Hashable, Codable {
 enum TrashedItem: Identifiable, Hashable {
     case project(TrashedProject)
     case block(TrashedBlock)
+    case workspace(TrashedWorkspace)
 
     var id: UUID {
         switch self {
         case .project(let item): return item.project.id
         case .block(let item): return item.block.id
+        case .workspace(let item): return item.workspace.id
         }
     }
 
@@ -30,13 +37,14 @@ enum TrashedItem: Identifiable, Hashable {
         switch self {
         case .project(let item): return item.deletedAt
         case .block(let item): return item.deletedAt
+        case .workspace(let item): return item.deletedAt
         }
     }
 }
 
 extension TrashedItem: Codable {
-    private enum Kind: String, Codable { case project, block }
-    private enum Keys: String, CodingKey { case kind, project, block }
+    private enum Kind: String, Codable { case project, block, workspace }
+    private enum Keys: String, CodingKey { case kind, project, block, workspace }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: Keys.self)
@@ -45,6 +53,8 @@ extension TrashedItem: Codable {
             self = .project(try container.decode(TrashedProject.self, forKey: .project))
         case .block:
             self = .block(try container.decode(TrashedBlock.self, forKey: .block))
+        case .workspace:
+            self = .workspace(try container.decode(TrashedWorkspace.self, forKey: .workspace))
         }
     }
 
@@ -57,6 +67,9 @@ extension TrashedItem: Codable {
         case .block(let item):
             try container.encode(Kind.block, forKey: .kind)
             try container.encode(item, forKey: .block)
+        case .workspace(let item):
+            try container.encode(Kind.workspace, forKey: .kind)
+            try container.encode(item, forKey: .workspace)
         }
     }
 }
@@ -104,10 +117,15 @@ extension DataStore {
     // 여기서는 꺼내기·완전 삭제·비우기·만료 정리·버전만 다룬다.
 
     /// 휴지통에서 꺼낸다. 원래 자리가 없으면 Inbox 문서로 (블록) / 첫 Workspace로 (문서).
+    /// 워크스페이스는 통째로 복원된다 (ID 유지라 충돌 없음).
     @discardableResult
     func restoreFromTrash(_ id: UUID) -> Bool {
         guard let index = trash.firstIndex(where: { $0.id == id }) else { return false }
         switch trash[index] {
+        case .workspace(let item):
+            trash.remove(at: index)
+            reinsertWorkspace(item.workspace)
+            if let first = item.workspace.projects.first { select(first) }
         case .project(let item):
             trash.remove(at: index)
             if workspaces.contains(where: { $0.id == item.workspaceId }) {
@@ -144,6 +162,10 @@ extension DataStore {
             for block in item.project.blocks { removeBlockFiles(block) }
         case .block(let item):
             removeBlockFiles(item.block)
+        case .workspace(let item):
+            for project in item.workspace.projects {
+                for block in project.blocks { removeBlockFiles(block) }
+            }
         }
         persistTrash()
         DebugLogger.feature("휴지통 완전 삭제")

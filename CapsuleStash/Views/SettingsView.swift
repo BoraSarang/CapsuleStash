@@ -24,7 +24,6 @@ struct SettingsView: View {
     @AppStorage("hotkeyKeyCode") private var hotkeyCode = 47
     @AppStorage("hotkeyModifiers") private var hotkeyMods = Int(NSEvent.ModifierFlags.command.rawValue)
     @StateObject private var hotkeyRecorder = HotkeyRecorder()
-    @State private var folderConfirm: FolderImportChoice?
 
     var body: some View {
         Form {
@@ -130,7 +129,6 @@ struct SettingsView: View {
                 HStack {
                     Button("전체 내보내기 (JSON)") { exportAll() }
                     Button("가져오기 (JSON)") { importJSON() }
-                    Button("폴더 가져오기") { importFolderPanel() }
                     Spacer()
                 }
                 .padding(.top, 2)
@@ -208,26 +206,9 @@ struct SettingsView: View {
         } message: {
             Text((launchError ?? "") + "\n(\(ErrorCode.launchAtLogin))")
         }
-        .alert(item: $folderConfirm) { choice in
-            Alert(
-                title: Text(choice.url.lastPathComponent),
-                message: Text(L10n.format("문서 %lld개 · 파일 %lld개 가져옵니다", choice.projects, choice.files)),
-                primaryButton: .default(Text("가져오기")) { runFolderImport(choice.url) },
-                secondaryButton: .cancel(Text("취소"))
-            )
-        }
     }
 
     // MARK: - 동작
-
-    /// 폴더 가져오기 확인 모델 (얼럿 item용).
-    struct FolderImportChoice: Identifiable {
-        let id = UUID()
-        let url: URL
-        let projects: Int
-        let files: Int
-    }
-
     /// @AppStorage 값에서 조합을 읽는다 (저장 즉시 표시 갱신).
     private var currentHotkey: HotkeyCombo {
         HotkeyCombo(modifiers: NSEvent.ModifierFlags(rawValue: UInt(hotkeyMods)),
@@ -319,49 +300,6 @@ struct SettingsView: View {
         } catch {
             DebugLogger.error(code: ErrorCode.storeSave, "가져오기 실패")
             appState.notify("가져오기 실패")
-        }
-    }
-
-    /// 폴더 통째로 가져오기 (하위 폴더→문서, md/txt→내용 블록).
-    /// 파일 IO가 무거울 수 있어 백그라운드에서 돌리고 토스트로 알린다.
-    private func importFolderPanel() {
-        let panel = NSOpenPanel()
-        panel.allowsMultipleSelection = false
-        panel.canChooseDirectories = true
-        panel.canChooseFiles = false
-        panel.canCreateDirectories = false
-        panel.prompt = L10n.string("가져오기")
-        panel.message = L10n.string("가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다.")
-        panel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard panel.runModal() == .OK else { return }
-        guard let url = panel.url else {
-            DebugLogger.feature("폴더 패널: 선택 없음")
-            appState.notify(L10n.string("가져올 파일이 없습니다"))
-            return
-        }
-        DebugLogger.feature("폴더 패널 선택: \(url.lastPathComponent)")
-        // 폴더를 잘못 고르는 실수 방지: 개수 세서 확인받고 시작한다.
-        let scanned = DataStore.scanFolder(url)
-        DebugLogger.feature("폴더 스캔: 문서 \(scanned.projects)개·파일 \(scanned.files)개")
-        guard scanned.files > 0 else {
-            appState.notify(L10n.string("가져올 파일이 없습니다"))
-            return
-        }
-        folderConfirm = FolderImportChoice(url: url, projects: scanned.projects, files: scanned.files)
-    }
-
-    private func runFolderImport(_ url: URL) {
-        // 1단계(파일 IO)는 백그라운드, 2단계(저장소 반영)만 메인. 거대 폴더도 UI가 안 멈춘다.
-        Task.detached(priority: .userInitiated) {
-            let prepared = DataStore.prepareFolderImport(root: url)
-            let report = await MainActor.run { store.applyPreparedImport(prepared) }
-            await MainActor.run {
-                var message = L10n.format("블록 %lld개 추가됨", report.blocks)
-                if !report.skipped.isEmpty {
-                    message += " · " + L10n.format("파일 %lld개 건너뜀", report.skipped.count)
-                }
-                appState.notify(message)
-            }
         }
     }
 
