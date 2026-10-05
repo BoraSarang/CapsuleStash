@@ -1,6 +1,14 @@
 import SwiftUI
 import UniformTypeIdentifiers
 
+/// 폴더 가져오기 확인 모델 (드롭 후 얼럿 item용).
+struct FolderImportChoice: Identifiable {
+    let id = UUID()
+    let url: URL
+    let projects: Int
+    let files: Int
+}
+
 /// T-04 Project 문서 상세 (제목 + 메타 + 블록 목록 + 블록 추가).
 struct ProjectDetailView: View {
     @EnvironmentObject private var store: DataStore
@@ -20,7 +28,7 @@ struct ProjectDetailView: View {
     /// 이어보기(연속 마크다운) 모드. 카드 목록 대신 합친 글을 보여준다.
     @State private var isContinuous = false
     /// 드롭된 폴더의 가져오기 확인 대상 (얼럿 item용).
-    @State private var folderImportTarget: SettingsView.FolderImportChoice?
+    @State private var folderImportTarget: FolderImportChoice?
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -479,7 +487,7 @@ struct ProjectDetailView: View {
                         self.appState.notify(L10n.string("가져올 파일이 없습니다"))
                         return
                     }
-                    self.folderImportTarget = SettingsView.FolderImportChoice(
+                    self.folderImportTarget = FolderImportChoice(
                         url: dir, projects: scanned.projects, files: scanned.files)
                 }
                 guard !files.isEmpty else { return }

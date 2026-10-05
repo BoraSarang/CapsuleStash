@@ -5472,6 +5472,38 @@
           }
         }
       }
+    },
+    "워크스페이스": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Workspace"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "워크스페이스"
+          }
+        }
+      }
+    },
+    "문서 %lld개": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%lld projects"
+          }
+        },
+        "ko": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "문서 %lld개"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

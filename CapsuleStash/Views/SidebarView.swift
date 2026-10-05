@@ -131,7 +131,7 @@ struct SidebarView: View {
             case .workspace(let ws):
                 return Alert(
                     title: Text(L10n.format("'%@' 삭제", ws.name)),
-                    message: Text(L10n.format("포함된 Project %lld개가 모두 사라집니다.", ws.projects.count)),
+                    message: Text(L10n.string("휴지통으로 이동합니다. 30일 보관됩니다.")),
                     primaryButton: .destructive(Text("삭제")) {
                         store.deleteWorkspace(ws.id)
                         appState.notify("삭제됨")
