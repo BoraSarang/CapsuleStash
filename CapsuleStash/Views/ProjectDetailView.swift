@@ -19,6 +19,8 @@ struct ProjectDetailView: View {
     @State private var typeFilter: BlockType? = nil
     /// 이어보기(연속 마크다운) 모드. 카드 목록 대신 합친 글을 보여준다.
     @State private var isContinuous = false
+    /// 드롭된 폴더의 가져오기 확인 대상 (얼럿 item용).
+    @State private var folderImportTarget: SettingsView.FolderImportChoice?
     @Environment(\.locale) private var locale
 
     var body: some View {
@@ -85,6 +87,14 @@ struct ProjectDetailView: View {
                 BlockEditorSheet(create: request)
                     .environmentObject(store)
                     .environmentObject(appState)
+            }
+            .alert(item: $folderImportTarget) { choice in
+                Alert(
+                    title: Text(choice.url.lastPathComponent),
+                    message: Text(L10n.format("문서 %lld개 · 파일 %lld개 가져옵니다", choice.projects, choice.files)),
+                    primaryButton: .default(Text("가져오기")) { runFolderImport(choice.url) },
+                    secondaryButton: .cancel(Text("취소"))
+                )
             }
         }
     }
@@ -410,8 +420,21 @@ struct ProjectDetailView: View {
         isEditingTitle = false
     }
 
-    private func copyAll() {
-        let includeSecrets = store.isVaultUnlocked
+    /// 드롭된 폴더 가져오기 실행 (확인 얼럿에서 호출).
+    private func runFolderImport(_ url: URL) {
+        Task.detached(priority: .userInitiated) {
+            let report = await MainActor.run { store.importFolder(url) }
+            await MainActor.run {
+                var message = L10n.format("블록 %lld개 추가됨", report.blocks)
+                if !report.skipped.isEmpty {
+                    message += " · " + L10n.format("파일 %lld개 건너뜀", report.skipped.count)
+                }
+                appState.notify(message)
+            }
+        }
+    }
+
+    private func copyAll() {        let includeSecrets = store.isVaultUnlocked
         let text = project.plainText(includeSecrets: includeSecrets)
         guard !text.isEmpty else {
             appState.notify("복사할 블록이 없습니다")
@@ -424,6 +447,17 @@ struct ProjectDetailView: View {
 
     // MARK: - T-14 외부 드롭
 
+    /// 드롭 URL을 폴더·파일로 나눈다. 폴더는 폴더 가져오기 확인으로 보낸다.
+    private static func partitionDrop(_ urls: [URL]) -> (dirs: [URL], files: [URL]) {
+        var dirs: [URL] = []
+        var files: [URL] = []
+        for url in urls {
+            let isDir = (try? url.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true
+            if isDir { dirs.append(url) } else { files.append(url) }
+        }
+        return (dirs, files)
+    }
+
     /// Finder·브라우저·텍스트 드롭으로 블록을 만든다.
     /// 카드가 파일을 선점했으면(`skipFiles`) 파일은 건너뛰고 텍스트·URL만 처리한다.
     private func handleExternalDrop(_ providers: [NSItemProvider], skipFiles: Bool) {
@@ -435,7 +469,19 @@ struct ProjectDetailView: View {
         if !skipFiles {
             AttachmentStore.urls(from: providers) { urls in
                 guard !urls.isEmpty else { return }
-                let created = self.store.importFileDrops(urls, to: self.project.id)
+                // 폴더 드롭은 파일 가져오기가 아니라 폴더 가져오기 확인으로 보낸다.
+                let (dirs, files) = Self.partitionDrop(urls)
+                if let dir = dirs.first {
+                    let scanned = DataStore.scanFolder(dir)
+                    guard scanned.files > 0 else {
+                        self.appState.notify(L10n.string("가져올 파일이 없습니다"))
+                        return
+                    }
+                    self.folderImportTarget = SettingsView.FolderImportChoice(
+                        url: dir, projects: scanned.projects, files: scanned.files)
+                }
+                guard !files.isEmpty else { return }
+                let created = self.store.importFileDrops(files, to: self.project.id)
                 if created > 0 {
                     self.appState.notify(L10n.format("블록 %lld개 추가됨", created))
                 }

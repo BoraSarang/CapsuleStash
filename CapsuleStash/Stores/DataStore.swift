@@ -361,7 +361,11 @@ final class DataStore: ObservableObject {
     func importFileDrops(_ urls: [URL], to projectId: UUID) -> Int {
         guard allProjects.contains(where: { $0.project.id == projectId }) else { return 0 }
         var created = 0
-        let files = urls.filter(\.isFileURL)
+        // 폴더는 파일 가져오기에서 제외 (폴더 가져오기 전용 경로로 처리).
+        let files = urls.filter {
+            $0.isFileURL
+                && (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) != true
+        }
         let images = files.filter { AttachmentStore.isImageFile($0) }
         if !images.isEmpty {
             let names = AttachmentStore.importFiles(from: images, kind: AttachmentStore.imagesKind,
