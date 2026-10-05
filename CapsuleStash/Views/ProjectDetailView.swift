@@ -51,7 +51,8 @@ struct ProjectDetailView: View {
                             .padding(.vertical, 48)
                             .frame(maxWidth: .infinity)
                     } else {
-                        VStack(spacing: Theme.blockSpacing) {
+                        // Lazy: 보이는 카드만 렌더. 40개+ 문서 전체 렌더가 GPU를 죽인다 (베타).
+                        LazyVStack(spacing: Theme.blockSpacing) {
                             ForEach(Array(visibleBlocks.enumerated()), id: \.element.id) { index, block in
                                 BlockCardView(
                                     block: block,
@@ -122,12 +123,11 @@ struct ProjectDetailView: View {
     }
 
     /// 블록으로 스크롤 (접혔으면 펼치고 이동). 레일·팔레트 이동 공유.
+    /// 애니메이션 없이 점프한다 — 거대 문서 애니메이션 스크롤이 GPU를 죽인다 (베타).
     private func scrollToBlock(_ id: UUID, proxy: ScrollViewProxy) {
         store.expandBlock(id)
         DispatchQueue.main.async {
-            withAnimation(.easeOut(duration: 0.25)) {
-                proxy.scrollTo(id, anchor: .top)
-            }
+            proxy.scrollTo(id, anchor: .top)
         }
     }
 
