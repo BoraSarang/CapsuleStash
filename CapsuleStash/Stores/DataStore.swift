@@ -23,6 +23,8 @@ final class DataStore: ObservableObject {
     @Published var smartGroups: [SmartGroup] = []
     /// T-58 휴지통 (삭제된 문서·블록, UserDefaults 영속화·30일 보관)
     @Published var trash: [TrashedItem] = []
+    /// 검색색인 정규화 캐시 (키 입력마다 전체 재계산 방지).
+    var normalizedCache: [UUID: (hash: Int, text: String)] = [:]
     /// 휴지통 화면 선택 (문서 선택과 상호 배타)
     @Published var isTrashSelected = false
 
@@ -237,6 +239,7 @@ final class DataStore: ObservableObject {
         let workspace = workspaces[index]
         trash.append(.workspace(TrashedWorkspace(workspace: workspace, deletedAt: Date())))
         persistTrash()
+        evictNormalizedCache(for: workspace.projects.flatMap { $0.blocks.map(\.id) })
         if let selected = selectedProjectId,
            workspace.projects.contains(where: { $0.id == selected }) {
             selectedProjectId = nil
@@ -289,6 +292,7 @@ final class DataStore: ObservableObject {
             project: entry.project, workspaceId: entry.workspace.id,
             workspaceName: entry.workspace.name, deletedAt: Date())))
         persistTrash()
+        evictNormalizedCache(for: entry.project.blocks.map(\.id))
         for wsIndex in workspaces.indices {
             workspaces[wsIndex].projects.removeAll { $0.id == project.id }
         }
@@ -751,6 +755,7 @@ final class DataStore: ObservableObject {
             .first(where: { $0.id == block.id }) else { return }
         trash.append(.block(TrashedBlock(block: doomed, deletedAt: Date())))
         persistTrash()
+        evictNormalizedCache(for: [doomed.id])
         mutateProject(doomed.projectId) { project in
             project.blocks.removeAll { $0.id == doomed.id }
         }

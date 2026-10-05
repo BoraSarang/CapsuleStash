@@ -12,6 +12,7 @@ extension DataStore {
     /// T-55 스마트 그룹이 같은 검색 파이프를 쓴다. 저장 조건 = 검색 문법 그대로.
     func hits(for query: SearchQuery) -> [SearchHit] {
         guard !query.isEmpty else { return [] }
+        let normalizedTerm = query.freeText.normalizedForSearch
 
         var hits: [SearchHit] = []
 
@@ -43,7 +44,8 @@ extension DataStore {
 
             for block in entry.project.sortedBlocks {
                 if !query.types.isEmpty, !query.types.contains(block.type) { continue }
-                guard Self.matches(query.freeText, [block.searchIndexText]) else { continue }
+                guard query.freeText.isEmpty
+                    || cachedNormalizedText(block).contains(normalizedTerm) else { continue }
 
                 let kind: SearchHit.Kind = block.type == .credential ? .credential : .block
                 hits.append(SearchHit(
@@ -66,6 +68,22 @@ extension DataStore {
         }
     }
 
+    /// 블록 검색색인 정규화 (캐시 적중 시 해시 비교만).
+    /// 키 입력마다 바뀌는 블록만 정규화한다. 상한 32k자는 여기서 적용.
+    func cachedNormalizedText(_ block: Block) -> String {
+        let source = String(block.searchIndexText.prefix(Self.searchTextCap))
+        let hash = source.hashValue
+        if let cached = normalizedCache[block.id], cached.hash == hash { return cached.text }
+        let normalized = source.normalizedForSearch
+        normalizedCache[block.id] = (hash, normalized)
+        return normalized
+    }
+
+    /// 캐시 비우기 (삭제 시 호출. 방치해도 정확성엔 영향 없고 메모리만 쓴다).
+    func evictNormalizedCache(for blockIds: [UUID]) {
+        for id in blockIds { normalizedCache.removeValue(forKey: id) }
+    }
+
     static func kindRank(_ kind: SearchHit.Kind) -> Int {
         switch kind {
         case .project: return 0
@@ -79,9 +97,8 @@ extension DataStore {
         guard !normalized.isEmpty else { return 0 }
         if hit.title.normalizedForSearch.hasPrefix(normalized) { return 30 }
         if hit.title.normalizedForSearch.contains(normalized) { return 20 }
-        if let text = hit.block.map({ String($0.searchIndexText.prefix(searchTextCap)) }),
-           text.normalizedForSearch.contains(normalized) { return 10 }
-        return 1
+        // 블록 히트는 matches()를 통과한 것만 오므로 본문 포함은 확정. 재계산 안 한다.
+        return 10
     }
 
     static func matches(_ term: String, _ candidates: [String]) -> Bool {

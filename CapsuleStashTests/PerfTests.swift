@@ -48,8 +48,22 @@ final class PerfTests: XCTestCase {
     }
 
     @MainActor
-    func testVersionSkipsHugeContent() throws {
+    func testNormalizedCacheFollowsEdits() throws {
         let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        var block = Block(projectId: project.id, type: .text, title: "과일", content: "사과 바나나")
+        store.insertBlock(block)
+        store.searchQuery = "사과"
+        XCTAssertTrue(store.searchHits.contains { $0.block?.id == block.id })
+        block.content = "포도"
+        store.updateBlock(block)
+        XCTAssertFalse(store.searchHits.contains { $0.block?.id == block.id }, "캐시가 갱신을 따라가야 함")
+        store.searchQuery = "포도"
+        XCTAssertTrue(store.searchHits.contains { $0.block?.id == block.id })
+    }
+
+    @MainActor
+    func testVersionSkipsHugeContent() throws {        let dir = try TestHelpers.makeTempDir()
         let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
         var block = Block(projectId: project.id, type: .text, title: "t",
                           content: String(repeating: "y", count: 150_000))
