@@ -63,12 +63,21 @@ final class FolderImportTests: XCTestCase {
     }
 
     @MainActor
-    func testImportFolderRejects() throws {        let dir = try TestHelpers.makeTempDir()
+    func testImportFolderRejects() throws {
+        let dir = try TestHelpers.makeTempDir()
         let store = DataStore(samples: false, loadSeeds: false, persist: false, attachmentBase: dir)
         let empty = store.importFolder(dir.appendingPathComponent("없음"))
         XCTAssertEqual(empty.blocks, 0)
         let file = dir.appendingPathComponent("f.txt")
         try "x".write(to: file, atomically: true, encoding: .utf8)
         XCTAssertEqual(store.importFolder(file).blocks, 0, "파일 경로는 거부")
+    }
+
+    @MainActor
+    func testFileDropsSkipDirectories() throws {
+        let dir = try TestHelpers.makeTempDir()
+        let (store, project) = try TestHelpers.makeStoreWithProject(dir: dir)
+        XCTAssertEqual(store.importFileDrops([dir], to: project.id), 0, "폴더는 파일 가져오기에서 제외")
+        XCTAssertTrue(store.locate(project)?.project.blocks.isEmpty == true)
     }
 }

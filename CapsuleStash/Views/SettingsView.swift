@@ -333,13 +333,10 @@ struct SettingsView: View {
         panel.prompt = L10n.string("가져오기")
         panel.message = L10n.string("가져올 폴더를 고르세요. 하위 폴더가 문서가 됩니다.")
         panel.directoryURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
-        guard panel.runModal() == .OK else {
-            DebugLogger.feature("폴더 패널 취소됨")
-            return
-        }
-        // 선택 없이 가져오기를 누르면 현재 보고 있는 폴더로 간주 (들어간 함정 구제).
-        guard let url = panel.url ?? panel.directoryURL else {
-            DebugLogger.feature("폴더 패널: URL 없음")
+        guard panel.runModal() == .OK else { return }
+        guard let url = panel.url else {
+            DebugLogger.feature("폴더 패널: 선택 없음")
+            appState.notify(L10n.string("가져올 파일이 없습니다"))
             return
         }
         DebugLogger.feature("폴더 패널 선택: \(url.lastPathComponent)")
