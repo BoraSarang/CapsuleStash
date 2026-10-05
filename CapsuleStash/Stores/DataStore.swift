@@ -54,6 +54,7 @@ final class DataStore: ObservableObject {
             DebugLogger.info("빈 저장소로 시작")
         }
         normalizeWebBlocks()
+        collapseHugeBlocks()
         restoreSecretsFromKeychain()
         expandDefaults()
         selectFirstProject()
@@ -64,6 +65,30 @@ final class DataStore: ObservableObject {
     }
 
     // MARK: - 탐색 헬퍼
+
+    /// 거대 블록 접기 임계값 (문자 수). 초과분은 기동 시 접어둔다.
+    /// 129KB급 마크다운 전체 렌더가 메인 스레드를 멈추게 해서 도입 (2026-10-05 실측).
+    static let hugeBlockChars = 8000
+
+    /// 본문이 임계값을 넘는 블록을 접는다. 가져온 거대 문서가 화면을 멈추지 않게.
+    /// 다음 commit 때 영속화된다 (기존 normalize 패턴과 동일).
+    func collapseHugeBlocks(limit: Int = hugeBlockChars) {
+        var collapsed = 0
+        for wsIndex in workspaces.indices {
+            for index in workspaces[wsIndex].projects.indices {
+                for blockIndex in workspaces[wsIndex].projects[index].blocks.indices {
+                    if !workspaces[wsIndex].projects[index].blocks[blockIndex].isCollapsed,
+                       workspaces[wsIndex].projects[index].blocks[blockIndex].content.count > limit {
+                        workspaces[wsIndex].projects[index].blocks[blockIndex].isCollapsed = true
+                        collapsed += 1
+                    }
+                }
+            }
+        }
+        if collapsed > 0 {
+            DebugLogger.feature("거대 블록 접기: \(collapsed)개")
+        }
+    }
 
     /// 레거시 `webLink` 블록을 `webArchive` 로 통일한다 (T-28, 필드 그대로 승계).
     /// 다음 commit 때 DB에도 반영된다.
@@ -372,7 +397,8 @@ final class DataStore: ObservableObject {
                                                     baseDirectory: attachmentBaseDirectory)
             if !names.isEmpty {
                 insertBlock(Block(projectId: projectId, type: .image,
-                                  title: L10n.format("이미지 %lld개", names.count), imageNames: names))
+                                  title: L10n.format("이미지 %lld개", names.count), imageNames: names,
+                                  isCollapsed: true))
                 created += 1
             }
         }
@@ -391,7 +417,8 @@ final class DataStore: ObservableObject {
             }
         }
         for item in textItems {
-            insertBlock(Block(projectId: projectId, type: item.type, title: item.title, content: item.content))
+            insertBlock(Block(projectId: projectId, type: item.type, title: item.title, content: item.content,
+                              isCollapsed: true))
             created += 1
         }
         if !binaries.isEmpty {
@@ -401,7 +428,7 @@ final class DataStore: ObservableObject {
                 let base = binaries[0].deletingPathExtension().lastPathComponent
                 insertBlock(Block(projectId: projectId, type: .file,
                                   title: base.isEmpty ? "파일" : String(base.prefix(40)),
-                                  imageNames: names))
+                                  imageNames: names, isCollapsed: true))
                 created += 1
             }
         }
@@ -456,6 +483,99 @@ final class DataStore: ObservableObject {
         var skipped: [String] = []
     }
 
+    /// 폴더 가져오기 준비물 (백그라운드에서 파일 IO까지 끝낸 상태).
+    struct PreparedFolderFile {
+        var group: String
+        var title: String
+        var kind: PreparedFolderKind
+    }
+
+    enum PreparedFolderKind {
+        case markdown(content: String)
+        case text(content: String)
+        case image(names: [String])
+        case file(names: [String])
+    }
+
+    struct PreparedFolderImport {
+        var workspaceName: String
+        var files: [PreparedFolderFile]
+        var skipped: [String]
+    }
+
+    /// 폴더 가져오기 1단계 (백그라운드 안전: store를 건드리지 않는다).
+    /// 열거·본문 읽기·첨부 복사를 여기서 끝낸다.
+    nonisolated static func prepareFolderImport(root: URL, maxFileBytes: Int = 100 * 1024 * 1024,
+                                                attachmentBase: URL? = nil) -> PreparedFolderImport {
+        var prepared = PreparedFolderImport(workspaceName: root.lastPathComponent, files: [], skipped: [])
+        var isDir = ObjCBool(false)
+        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir),
+              isDir.boolValue else { return prepared }
+        let (groups, preSkipped) = collectFolderGroups(root: root, maxFileBytes: maxFileBytes)
+        prepared.skipped = preSkipped
+        for group in groups.keys.sorted() {
+            for file in groups[group]!.sorted(by: { $0.path < $1.path }) {
+                let stem = file.deletingPathExtension().lastPathComponent
+                let title = stem.isEmpty ? "파일" : String(stem.prefix(40))
+                if AttachmentStore.isImageFile(file) {
+                    let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.imagesKind,
+                                                            baseDirectory: attachmentBase)
+                    if names.isEmpty { prepared.skipped.append(file.lastPathComponent); continue }
+                    prepared.files.append(PreparedFolderFile(group: group, title: title, kind: .image(names: names)))
+                } else if let type = textBlockType(for: file),
+                          let content = readableText(from: file),
+                          !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                    prepared.files.append(PreparedFolderFile(
+                        group: group, title: title,
+                        kind: type == .markdown ? .markdown(content: content) : .text(content: content)))
+                } else {
+                    let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.filesKind,
+                                                            baseDirectory: attachmentBase)
+                    if names.isEmpty { prepared.skipped.append(file.lastPathComponent); continue }
+                    prepared.files.append(PreparedFolderFile(group: group, title: title, kind: .file(names: names)))
+                }
+            }
+        }
+        return prepared
+    }
+
+    /// 폴더 가져오기 2단계 (MainActor: Workspace·문서·블록 생성만).
+    @discardableResult
+    func applyPreparedImport(_ prepared: PreparedFolderImport) -> FolderImportReport {
+        var report = FolderImportReport()
+        report.skipped = prepared.skipped
+        guard !prepared.files.isEmpty else { return report }
+        createWorkspace(name: prepared.workspaceName)
+        guard let ws = workspaces.last else { return report }
+        var projectIds: [String: UUID] = [:]
+        for item in prepared.files {
+            if projectIds[item.group] == nil {
+                guard let created = createProject(title: item.group, in: ws.id) else { continue }
+                projectIds[item.group] = created.id
+                report.projects += 1
+            }
+            let projectId = projectIds[item.group]!
+            switch item.kind {
+            case .markdown(let content):
+                insertBlock(Block(projectId: projectId, type: .markdown, title: item.title, content: content,
+                                  isCollapsed: true))
+            case .text(let content):
+                insertBlock(Block(projectId: projectId, type: .text, title: item.title, content: content,
+                                  isCollapsed: true))
+            case .image(let names):
+                insertBlock(Block(projectId: projectId, type: .image, title: item.title, imageNames: names,
+                                  isCollapsed: true))
+            case .file(let names):
+                insertBlock(Block(projectId: projectId, type: .file, title: item.title, imageNames: names,
+                                  isCollapsed: true))
+            }
+            report.blocks += 1
+        }
+        if let first = workspaces.last?.projects.first { select(first) }
+        DebugLogger.feature("폴더 가져오기: 문서 \(report.projects)개·블록 \(report.blocks)개·건너뜀 \(report.skipped.count)개")
+        return report
+    }
+
     /// 폴더 스캔 (가져오기 전 확인용). 프로젝트(문서) 수·파일 수만 센다.
     nonisolated static func scanFolder(_ root: URL,
                                       maxFileBytes: Int = 100 * 1024 * 1024) -> (projects: Int, files: Int) {
@@ -501,59 +621,11 @@ final class DataStore: ObservableObject {
 
     /// 폴더 구조를 Workspace(Project 묶음)로 편입한다.
     /// 최상위 폴더→Workspace, 하위 폴더→Project, 루트 파일→"기타" 문서.
-    /// md/txt는 내용 블록, 이미지는 이미지 블록, 나머지는 파일 블록 (1파일 1블록).
-    /// 100MB 초과·번들·심볼릭링크·숨김은 건너뛴다. 동기 실행 (호출자가 백그라운드로).
+    /// 동기 일괄판 (테스트용). UI는 prepare(백그라운드 IO)+apply(메인 반영) 분리 호출.
     @discardableResult
     func importFolder(_ root: URL, maxFileBytes: Int = 100 * 1024 * 1024) -> FolderImportReport {
-        var report = FolderImportReport()
-        var isDir = ObjCBool(false)
-        guard FileManager.default.fileExists(atPath: root.path, isDirectory: &isDir),
-              isDir.boolValue else { return report }
-        let (groups, preSkipped) = Self.collectFolderGroups(root: root, maxFileBytes: maxFileBytes)
-        report.skipped = preSkipped
-        guard !groups.isEmpty else { return report }
-        createWorkspace(name: root.lastPathComponent)
-        guard let ws = workspaces.last else { return report }
-        for group in groups.keys.sorted() {
-            var projectId: UUID?
-            for file in groups[group]!.sorted(by: { $0.path < $1.path }) {
-                if projectId == nil {
-                    guard let created = createProject(title: group, in: ws.id) else { continue }
-                    projectId = created.id
-                    report.projects += 1
-                }
-                if importFolderFile(file, to: projectId!) { report.blocks += 1 }
-                else { report.skipped.append(file.lastPathComponent) }
-            }
-        }
-        if let first = workspaces.last?.projects.first { select(first) }
-        DebugLogger.feature("폴더 가져오기: 문서 \(report.projects)개·블록 \(report.blocks)개·건너뜀 \(report.skipped.count)개")
-        return report
-    }
-
-    /// 폴더 가져오기용 1파일 처리. 성공하면 true.
-    private func importFolderFile(_ file: URL, to projectId: UUID) -> Bool {
-        let stem = file.deletingPathExtension().lastPathComponent
-        let title = stem.isEmpty ? "파일" : String(stem.prefix(40))
-        if AttachmentStore.isImageFile(file) {
-            let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.imagesKind,
-                                                    baseDirectory: attachmentBaseDirectory)
-            guard !names.isEmpty else { return false }
-            insertBlock(Block(projectId: projectId, type: .image, title: title, imageNames: names))
-            return true
-        }
-        if let type = Self.textBlockType(for: file),
-           let content = Self.readableText(from: file),
-           !content.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            insertBlock(Block(projectId: projectId, type: type, title: title, content: content))
-            return true
-        }
-        // 읽히지 않는 텍스트 파일 포함 나머지는 파일 블록으로 폴백
-        let names = AttachmentStore.importFiles(from: [file], kind: AttachmentStore.filesKind,
-                                                baseDirectory: attachmentBaseDirectory)
-        guard !names.isEmpty else { return false }
-        insertBlock(Block(projectId: projectId, type: .file, title: title, imageNames: names))
-        return true
+        applyPreparedImport(Self.prepareFolderImport(
+            root: root, maxFileBytes: maxFileBytes, attachmentBase: attachmentBaseDirectory))
     }
 
     /// T-14 텍스트 드롭 → 텍스트 블록. 빈 문자열은 무시한다.
@@ -573,8 +645,9 @@ final class DataStore: ObservableObject {
         let trimmed = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return false }
         let firstLine = trimmed.split(separator: "\n").first.map(String.init) ?? type.displayName
+        // 가져온 블록은 접힘으로 (거대 문서 렌더 멈춤 방지).
         insertBlock(Block(projectId: projectId, type: type,
-                          title: String(firstLine.prefix(40)), content: trimmed))
+                          title: String(firstLine.prefix(40)), content: trimmed, isCollapsed: true))
         return true
     }
 

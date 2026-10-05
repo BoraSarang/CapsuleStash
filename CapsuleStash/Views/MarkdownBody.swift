@@ -389,9 +389,12 @@ struct MarkdownBody: View {
     }
 
     /// 표 렌더링. 헤더 굵게 + 행 줄무늬 없이 선으로만 구분.
+    /// 60행 초과분은 생략한다 (거대 표 Grid 레이아웃 멈춤 방지).
     private func tableView(header: [String], rows: [[String]]) -> some View {
         let columnCount = max(header.count, rows.map(\.count).max() ?? 0)
-        return Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
+        let shown = Array(rows.prefix(60))
+        return VStack(spacing: 0) {
+            Grid(alignment: .leading, horizontalSpacing: 0, verticalSpacing: 0) {
             GridRow {
                 ForEach(0..<columnCount, id: \.self) { index in
                     Self.styled(index < header.count ? header[index] : "",
@@ -404,10 +407,10 @@ struct MarkdownBody: View {
             }
             .background(Theme.tagBackground)
             Divider().overlay(Theme.line)
-            ForEach(rows.indices, id: \.self) { rowIndex in
+            ForEach(shown.indices, id: \.self) { rowIndex in
                 GridRow {
                     ForEach(0..<columnCount, id: \.self) { colIndex in
-                        Self.styled(colIndex < rows[rowIndex].count ? rows[rowIndex][colIndex] : "",
+                        Self.styled(colIndex < shown[rowIndex].count ? shown[rowIndex][colIndex] : "",
                                     base: .system(size: 13))
                             .foregroundStyle(Theme.ink)
                             .padding(.horizontal, 10)
@@ -415,9 +418,16 @@ struct MarkdownBody: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                if rowIndex < rows.count - 1 {
+                if rowIndex < shown.count - 1 {
                     Divider().overlay(Theme.line)
                 }
+            }
+            }
+            if rows.count > shown.count {
+                Text(L10n.format("외 %lld줄", rows.count - shown.count))
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.muted)
+                    .padding(.vertical, 6)
             }
         }
         .overlay(RoundedRectangle(cornerRadius: 8).strokeBorder(Theme.line, lineWidth: 1))

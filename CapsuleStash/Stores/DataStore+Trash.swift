@@ -169,6 +169,8 @@ extension DataStore {
             || current.language != next.language || current.url != next.url else {
             return merged
         }
+        // 거대 본문은 스냅샷 제외 (버전 20개 × 수백KB 폭증 방지). 기록 자체는 유지.
+        guard current.content.count <= 100_000 else { return merged }
         let snapshot = BlockVersion(title: current.title, content: current.content,
                                     language: current.language, savedAt: current.updatedAt)
         merged.versions = ([snapshot] + current.versions).prefix(versionLimit).map { $0 }

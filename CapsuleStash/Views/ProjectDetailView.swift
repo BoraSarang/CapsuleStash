@@ -422,8 +422,10 @@ struct ProjectDetailView: View {
 
     /// 드롭된 폴더 가져오기 실행 (확인 얼럿에서 호출).
     private func runFolderImport(_ url: URL) {
+        // 1단계(파일 IO)는 백그라운드, 2단계(저장소 반영)만 메인. 거대 폴더도 UI가 안 멈춘다.
         Task.detached(priority: .userInitiated) {
-            let report = await MainActor.run { store.importFolder(url) }
+            let prepared = DataStore.prepareFolderImport(root: url)
+            let report = await MainActor.run { store.applyPreparedImport(prepared) }
             await MainActor.run {
                 var message = L10n.format("블록 %lld개 추가됨", report.blocks)
                 if !report.skipped.isEmpty {
